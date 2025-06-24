@@ -179,8 +179,10 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
           <Text style={styles.selectedDateText}>
             <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Selected</Text>
+            {selectedDate.toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
+            })}
             <View style={[styles.legendDot, { backgroundColor: colors.warning + '20', borderWidth: 1, borderColor: colors.warning }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Today</Text>
           </Text>
@@ -306,6 +308,7 @@ const styles = StyleSheet.create({
   selectedCell: {
     backgroundColor: '#4F46E5',
   },
+  todayText: {
     color: '#F59E0B',
     fontFamily: 'Inter-SemiBold',
   },
