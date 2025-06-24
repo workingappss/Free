@@ -13,33 +13,7 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import { 
-  User, 
-  Settings, 
-  Bell, 
-  Shield, 
-  CircleHelp as HelpCircle, 
-  Star, 
-  Award, 
-  TrendingUp, 
-  ChevronRight, 
-  Edit3, 
-  LogOut,
-  Moon,
-  Sun,
-  Smartphone,
-  Globe,
-  Lock,
-  Eye,
-  EyeOff,
-  Camera,
-  X,
-  Check,
-  Trash2,
-  Download,
-  Upload,
-  RefreshCw
-} from 'lucide-react-native';
+import { User, Settings, Bell, Shield, CircleHelp as HelpCircle, Star, Award, TrendingUp, ChevronRight, CreditCard as Edit3, LogOut, Moon, Sun, Smartphone, Globe, Lock, Eye, EyeOff, Camera, X, Check, Trash2, Download, Upload, RefreshCw } from 'lucide-react-native';
 
 interface UserProfile {
   name: string;
