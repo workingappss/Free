@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react-native';
 import { Habit, HabitEntry } from '@/types/habit';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface HabitCardProps {
   habit: Habit;
@@ -35,6 +36,7 @@ export default function HabitCard({
 }: HabitCardProps) {
   const [showValueInput, setShowValueInput] = useState(false);
   const [inputValue, setInputValue] = useState(entry?.value?.toString() || '');
+  const { colors } = useTheme();
 
   const isCompleted = entry?.completed || false;
   const currentValue = entry?.value || 0;
@@ -84,8 +86,9 @@ export default function HabitCard({
       <TouchableOpacity 
         style={[
           styles.container,
+          { backgroundColor: colors.surface, borderColor: colors.borderLight },
           { borderLeftColor: habit.color },
-          isCompleted && styles.completedContainer
+          isCompleted && { backgroundColor: colors.card }
         ]}
         onPress={onPress}
         activeOpacity={0.8}
@@ -98,14 +101,14 @@ export default function HabitCard({
               </Text>
             </View>
             <View style={styles.titleInfo}>
-              <Text style={[styles.title, isCompleted && styles.completedTitle]}>
+              <Text style={[styles.title, { color: colors.text }, isCompleted && { color: colors.textSecondary }]}>
                 {habit.name}
               </Text>
               <View style={styles.metaInfo}>
                 {streak > 0 && (
                   <View style={styles.metaItem}>
-                    <Flame size={12} color="#F59E0B" strokeWidth={2} />
-                    <Text style={[styles.metaText, { color: '#F59E0B' }]}>
+                    <Flame size={12} color={colors.warning} strokeWidth={2} />
+                    <Text style={[styles.metaText, { color: colors.warning }]}>
                       {streak} day{streak !== 1 ? 's' : ''}
                     </Text>
                   </View>

@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react-native';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface CalendarViewProps {
   selectedDate: Date;
@@ -18,6 +19,7 @@ interface CalendarViewProps {
 
 export default function CalendarView({ selectedDate, onDateSelect, onClose }: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
+  const { colors } = useTheme();
 
   const formatMonth = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -89,12 +91,12 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Select Date</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose} activeOpacity={0.7}>
-          <X size={20} color="#6B7280" strokeWidth={2} />
+      <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Select Date</Text>
+        <TouchableOpacity style={[styles.closeButton, { backgroundColor: colors.card }]} onPress={onClose} activeOpacity={0.7}>
+          <X size={20} color={colors.textSecondary} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 

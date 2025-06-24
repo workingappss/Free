@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit3, Clock, TrendingUp, Users, Percent } from 'lucide-react-native';
 import GoalForm from '@/components/GoalForm';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Goal {
   id: string;
@@ -61,6 +62,7 @@ export default function GoalsScreen() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [progressUpdateGoal, setProgressUpdateGoal] = useState<Goal | null>(null);
   const [newProgressValue, setNewProgressValue] = useState('');
+  const { colors } = useTheme();
 
   const openCreateModal = () => {
     setEditingGoal(null);
@@ -187,17 +189,17 @@ export default function GoalsScreen() {
   const sortedTimeframes = timeframeOrder.filter(timeframe => groupedGoals[timeframe]?.length > 0);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View style={styles.headerContent}>
           <View style={styles.headerTop}>
             <View>
-              <Text style={styles.headerTitle}>Goals</Text>
-              <Text style={styles.headerSubtitle}>Track your progress</Text>
+              <Text style={[styles.headerTitle, { color: colors.text }]}>Goals</Text>
+              <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>Track your progress</Text>
             </View>
             <TouchableOpacity 
-              style={styles.addButton} 
+              style={[styles.addButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]} 
               onPress={openCreateModal}
               activeOpacity={0.8}
             >

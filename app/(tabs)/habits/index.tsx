@@ -14,6 +14,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { Habit, HabitEntry, HabitStats } from '@/types/habit';
 import { habitStorage } from '@/utils/habitStorage';
 import HabitCard from '@/components/HabitCard';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function HabitsScreen() {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -21,6 +22,7 @@ export default function HabitsScreen() {
   const [habitStats, setHabitStats] = useState<Record<string, HabitStats>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { colors } = useTheme();
 
   const today = new Date();
   const todayStr = habitStorage.formatDate(today);
@@ -131,17 +133,17 @@ export default function HabitsScreen() {
   const totalStreaks = getTotalActiveStreaks();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View style={styles.headerContent}>
           <View style={styles.headerTop}>
             <View>
-              <Text style={styles.headerTitle}>Habits</Text>
-              <Text style={styles.headerSubtitle}>{formatDate(today)}</Text>
+              <Text style={[styles.headerTitle, { color: colors.text }]}>Habits</Text>
+              <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{formatDate(today)}</Text>
             </View>
             <TouchableOpacity 
-              style={styles.addButton} 
+              style={[styles.addButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]} 
               onPress={() => router.push('/habits/create')}
               activeOpacity={0.8}
             >

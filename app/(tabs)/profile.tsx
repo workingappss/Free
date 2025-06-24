@@ -14,6 +14,7 @@ import {
   TextInput,
 } from 'react-native';
 import { User, Settings, Bell, Shield, CircleHelp as HelpCircle, Star, Award, TrendingUp, ChevronRight, CreditCard as Edit3, LogOut, Moon, Sun, Smartphone, Globe, Lock, Eye, EyeOff, Camera, X, Check, Trash2, Download, Upload, RefreshCw } from 'lucide-react-native';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface UserProfile {
   name: string;
@@ -34,7 +35,7 @@ interface AppSettings {
     achievements: boolean;
   };
   appearance: {
-    theme: 'light' | 'dark' | 'system';
+    theme: ThemeMode;
     language: string;
   };
   privacy: {
@@ -56,6 +57,8 @@ interface ProfileStats {
 }
 
 export default function ProfileScreen() {
+  const { theme, colors, setTheme } = useTheme();
+  
   const [profile, setProfile] = useState<UserProfile>({
     name: 'Alex Johnson',
     email: 'alex.johnson@email.com',
@@ -75,7 +78,7 @@ export default function ProfileScreen() {
       achievements: true,
     },
     appearance: {
-      theme: 'system',
+      theme,
       language: 'English',
     },
     privacy: {
@@ -112,6 +115,10 @@ export default function ProfileScreen() {
   };
 
   const handleSettingChange = (category: keyof AppSettings, setting: string, value: any) => {
+    if (category === 'appearance' && setting === 'theme') {
+      setTheme(value);
+    }
+    
     setSettings(prev => ({
       ...prev,
       [category]: {
@@ -185,9 +192,9 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View style={styles.headerContent}>
           <View style={styles.profileSection}>
             <View style={styles.profileImageContainer}>
@@ -216,35 +223,35 @@ export default function ProfileScreen() {
           {/* Stats */}
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#6366F120' }]}>
-                <Award size={16} color="#6366F1" strokeWidth={2} />
+              <View style={[styles.statIcon, { backgroundColor: colors.primary + '20' }]}>
+                <Award size={16} color={colors.primary} strokeWidth={2} />
               </View>
-              <Text style={styles.statValue}>{stats.tasksCompleted}</Text>
-              <Text style={styles.statLabel}>Tasks</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{stats.tasksCompleted}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Tasks</Text>
             </View>
             
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
-                <Star size={16} color="#10B981" strokeWidth={2} />
+              <View style={[styles.statIcon, { backgroundColor: colors.success + '20' }]}>
+                <Star size={16} color={colors.success} strokeWidth={2} />
               </View>
-              <Text style={styles.statValue}>{stats.goalsAchieved}</Text>
-              <Text style={styles.statLabel}>Goals</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{stats.goalsAchieved}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Goals</Text>
             </View>
             
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#F59E0B20' }]}>
-                <TrendingUp size={16} color="#F59E0B" strokeWidth={2} />
+              <View style={[styles.statIcon, { backgroundColor: colors.warning + '20' }]}>
+                <TrendingUp size={16} color={colors.warning} strokeWidth={2} />
               </View>
-              <Text style={styles.statValue}>{stats.streakDays}</Text>
-              <Text style={styles.statLabel}>Streak</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{stats.streakDays}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Streak</Text>
             </View>
 
             <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#8B5CF620' }]}>
+              <View style={[styles.statIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
                 <TrendingUp size={16} color="#8B5CF6" strokeWidth={2} />
               </View>
-              <Text style={styles.statValue}>{stats.totalHabits}</Text>
-              <Text style={styles.statLabel}>Habits</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{stats.totalHabits}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Habits</Text>
             </View>
           </View>
         </View>
@@ -259,7 +266,7 @@ export default function ProfileScreen() {
           />
           <View style={styles.bannerOverlay}>
             <Star size={20} color="#FFFFFF" strokeWidth={2} />
-            <Text style={styles.bannerTitle}>Productivity Master!</Text>
+            <Text style={[styles.bannerTitle, { color: '#FFFFFF' }]}>Productivity Master!</Text>
             <Text style={styles.bannerText}>
               You've completed {stats.tasksCompleted} tasks this month
             </Text>
@@ -269,22 +276,22 @@ export default function ProfileScreen() {
         {/* Settings Sections */}
         <View style={styles.menuSection}>
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}
             onPress={() => setActiveModal('notifications')}
             activeOpacity={0.8}
           >
-            <View style={[styles.menuIcon, { backgroundColor: '#6366F120' }]}>
-              <Bell size={18} color="#6366F1" strokeWidth={2} />
+            <View style={[styles.menuIcon, { backgroundColor: colors.primary + '20' }]}>
+              <Bell size={18} color={colors.primary} strokeWidth={2} />
             </View>
             <View style={styles.menuContent}>
-              <Text style={styles.menuTitle}>Notifications</Text>
-              <Text style={styles.menuSubtitle}>Manage your alerts and reminders</Text>
+              <Text style={[styles.menuTitle, { color: colors.text }]}>Notifications</Text>
+              <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>Manage your alerts and reminders</Text>
             </View>
-            <ChevronRight size={18} color="#9CA3AF" strokeWidth={2} />
+            <ChevronRight size={18} color={colors.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}
             onPress={() => setActiveModal('appearance')}
             activeOpacity={0.8}
           >
@@ -292,44 +299,44 @@ export default function ProfileScreen() {
               <Settings size={18} color="#8B5CF6" strokeWidth={2} />
             </View>
             <View style={styles.menuContent}>
-              <Text style={styles.menuTitle}>Appearance</Text>
-              <Text style={styles.menuSubtitle}>Theme, language, and display settings</Text>
+              <Text style={[styles.menuTitle, { color: colors.text }]}>Appearance</Text>
+              <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>Theme, language, and display settings</Text>
             </View>
-            <ChevronRight size={18} color="#9CA3AF" strokeWidth={2} />
+            <ChevronRight size={18} color={colors.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}
             onPress={() => setActiveModal('privacy')}
             activeOpacity={0.8}
           >
-            <View style={[styles.menuIcon, { backgroundColor: '#10B98120' }]}>
-              <Shield size={18} color="#10B981" strokeWidth={2} />
+            <View style={[styles.menuIcon, { backgroundColor: colors.success + '20' }]}>
+              <Shield size={18} color={colors.success} strokeWidth={2} />
             </View>
             <View style={styles.menuContent}>
-              <Text style={styles.menuTitle}>Privacy & Security</Text>
-              <Text style={styles.menuSubtitle}>Control your data and privacy settings</Text>
+              <Text style={[styles.menuTitle, { color: colors.text }]}>Privacy & Security</Text>
+              <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>Control your data and privacy settings</Text>
             </View>
-            <ChevronRight size={18} color="#9CA3AF" strokeWidth={2} />
+            <ChevronRight size={18} color={colors.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}
             onPress={() => setActiveModal('backup')}
             activeOpacity={0.8}
           >
-            <View style={[styles.menuIcon, { backgroundColor: '#F59E0B20' }]}>
-              <Download size={18} color="#F59E0B" strokeWidth={2} />
+            <View style={[styles.menuIcon, { backgroundColor: colors.warning + '20' }]}>
+              <Download size={18} color={colors.warning} strokeWidth={2} />
             </View>
             <View style={styles.menuContent}>
-              <Text style={styles.menuTitle}>Backup & Restore</Text>
-              <Text style={styles.menuSubtitle}>Manage your data backups</Text>
+              <Text style={[styles.menuTitle, { color: colors.text }]}>Backup & Restore</Text>
+              <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>Manage your data backups</Text>
             </View>
-            <ChevronRight size={18} color="#9CA3AF" strokeWidth={2} />
+            <ChevronRight size={18} color={colors.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}
             onPress={() => setActiveModal('help')}
             activeOpacity={0.8}
           >
@@ -337,21 +344,21 @@ export default function ProfileScreen() {
               <HelpCircle size={18} color="#06B6D4" strokeWidth={2} />
             </View>
             <View style={styles.menuContent}>
-              <Text style={styles.menuTitle}>Help & Support</Text>
-              <Text style={styles.menuSubtitle}>Get help and contact support</Text>
+              <Text style={[styles.menuTitle, { color: colors.text }]}>Help & Support</Text>
+              <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>Get help and contact support</Text>
             </View>
-            <ChevronRight size={18} color="#9CA3AF" strokeWidth={2} />
+            <ChevronRight size={18} color={colors.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
         </View>
 
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8}>
-          <LogOut size={18} color="#EF4444" strokeWidth={2} />
-          <Text style={styles.logoutText}>Sign Out</Text>
+        <TouchableOpacity style={[styles.logoutButton, { backgroundColor: colors.surface, borderColor: colors.error + '30' }]} activeOpacity={0.8}>
+          <LogOut size={18} color={colors.error} strokeWidth={2} />
+          <Text style={[styles.logoutText, { color: colors.error }]}>Sign Out</Text>
         </TouchableOpacity>
 
         {/* App Version */}
-        <Text style={styles.versionText}>DoFive v1.0.0</Text>
+        <Text style={[styles.versionText, { color: colors.textTertiary }]}>DoFive v1.0.0</Text>
       </ScrollView>
 
       {/* Profile Edit Modal */}
@@ -511,36 +518,36 @@ export default function ProfileScreen() {
         presentationStyle="pageSheet"
         onRequestClose={closeModal}
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Appearance Settings</Text>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: colors.surface }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: colors.borderLight }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Appearance Settings</Text>
             <TouchableOpacity onPress={closeModal} activeOpacity={0.7}>
-              <X size={20} color="#6B7280" strokeWidth={2} />
+              <X size={20} color={colors.textSecondary} strokeWidth={2} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.modalContent}>
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>Theme</Text>
+              <Text style={[styles.settingsSectionTitle, { color: colors.text }]}>Theme</Text>
               
               {['light', 'dark', 'system'].map((theme) => (
                 <TouchableOpacity
-                  key={theme}
-                  style={styles.themeOption}
-                  onPress={() => handleSettingChange('appearance', 'theme', theme)}
+                  key={themeOption}
+                  style={[styles.themeOption, { backgroundColor: colors.background, borderColor: colors.borderLight }]}
+                  onPress={() => handleSettingChange('appearance', 'theme', themeOption)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.themeInfo}>
                     <View style={styles.themeIcon}>
-                      {theme === 'light' && <Sun size={16} color="#F59E0B" strokeWidth={2} />}
-                      {theme === 'dark' && <Moon size={16} color="#6366F1" strokeWidth={2} />}
-                      {theme === 'system' && <Smartphone size={16} color="#10B981" strokeWidth={2} />}
+                      {themeOption === 'light' && <Sun size={16} color={colors.warning} strokeWidth={2} />}
+                      {themeOption === 'dark' && <Moon size={16} color={colors.primary} strokeWidth={2} />}
+                      {themeOption === 'system' && <Smartphone size={16} color={colors.success} strokeWidth={2} />}
                     </View>
-                    <Text style={styles.themeTitle}>
-                      {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                    <Text style={[styles.themeTitle, { color: colors.text }]}>
+                      {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
                     </Text>
                   </View>
-                  {settings.appearance.theme === theme && (
+                  {settings.appearance.theme === themeOption && (
                     <Check size={16} color="#6366F1" strokeWidth={2} />
                   )}
                 </TouchableOpacity>
@@ -548,18 +555,18 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>Language</Text>
+              <Text style={[styles.settingsSectionTitle, { color: colors.text }]}>Language</Text>
               
               {['English', 'Spanish', 'French', 'German'].map((language) => (
                 <TouchableOpacity
                   key={language}
-                  style={styles.languageOption}
+                  style={[styles.languageOption, { backgroundColor: colors.background, borderColor: colors.borderLight }]}
                   onPress={() => handleSettingChange('appearance', 'language', language)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.languageInfo}>
-                    <Globe size={16} color="#6B7280" strokeWidth={2} />
-                    <Text style={styles.languageTitle}>{language}</Text>
+                    <Globe size={16} color={colors.textSecondary} strokeWidth={2} />
+                    <Text style={[styles.languageTitle, { color: colors.text }]}>{language}</Text>
                   </View>
                   {settings.appearance.language === language && (
                     <Check size={16} color="#6366F1" strokeWidth={2} />
@@ -781,10 +788,8 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
   },
   header: {
-    backgroundColor: '#FFFFFF',
     paddingTop: Platform.OS === 'ios' ? 0 : 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -831,19 +836,16 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 22,
     fontFamily: 'Inter-Bold',
-    color: '#1F2937',
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
     marginBottom: 2,
   },
   memberSince: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -869,13 +871,11 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
-    color: '#1F2937',
     marginBottom: 2,
   },
   statLabel: {
     fontSize: 10,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
     textAlign: 'center',
   },
   content: {
@@ -907,7 +907,6 @@ const styles = StyleSheet.create({
   bannerTitle: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
     marginTop: 4,
     marginBottom: 2,
   },
@@ -924,7 +923,6 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
@@ -950,13 +948,11 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 15,
     fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
     marginBottom: 2,
   },
   menuSubtitle: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
   },
   logoutButton: {
     flexDirection: 'row',
@@ -972,20 +968,17 @@ const styles = StyleSheet.create({
   logoutText: {
     fontSize: 15,
     fontFamily: 'Inter-SemiBold',
-    color: '#EF4444',
     marginLeft: 8,
   },
   versionText: {
     fontSize: 11,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
     textAlign: 'center',
     marginBottom: 20,
   },
   // Modal Styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -999,7 +992,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
   },
   modalContent: {
     flex: 1,
@@ -1097,7 +1089,6 @@ const styles = StyleSheet.create({
   settingsSectionTitle: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
-    color: '#1F2937',
     marginBottom: 16,
   },
   settingItem: {
@@ -1114,13 +1105,11 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 15,
     fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
     marginBottom: 2,
   },
   settingDescription: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
   },
   // Theme Options
   themeOption: {
@@ -1131,7 +1120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
   },
   themeInfo: {
     flexDirection: 'row',
@@ -1143,7 +1132,6 @@ const styles = StyleSheet.create({
   themeTitle: {
     fontSize: 15,
     fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
   },
   // Language Options
   languageOption: {
@@ -1154,7 +1142,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
   },
   languageInfo: {
     flexDirection: 'row',
@@ -1163,7 +1151,6 @@ const styles = StyleSheet.create({
   languageTitle: {
     fontSize: 15,
     fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
     marginLeft: 12,
   },
   // Security Options

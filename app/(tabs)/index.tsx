@@ -14,6 +14,7 @@ import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck a
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import ComplexTaskForm from '@/components/ComplexTaskForm';
 import CalendarView from '@/components/CalendarView';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Subtask {
   id: string;
@@ -41,6 +42,7 @@ export default function TodayScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { colors } = useTheme();
   
   // Use a single state to manage which modal is open
   const [modalState, setModalState] = useState<ModalState>('none');
@@ -294,17 +296,17 @@ export default function TodayScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View style={styles.headerContent}>
           <View style={styles.dateNavigation}>
             <TouchableOpacity 
-              style={styles.navButton}
+              style={[styles.navButton, { backgroundColor: colors.card }]}
               onPress={() => navigateDate('prev')}
               activeOpacity={0.7}
             >
-              <ChevronLeft size={18} color="#6B7280" strokeWidth={2} />
+              <ChevronLeft size={18} color={colors.textSecondary} strokeWidth={2} />
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -312,8 +314,8 @@ export default function TodayScreen() {
               onPress={openCalendarView}
               activeOpacity={0.7}
             >
-              <Text style={styles.dateText}>{formatDate(currentDate)}</Text>
-              <Text style={styles.dateSubtext}>
+              <Text style={[styles.dateText, { color: colors.text }]}>{formatDate(currentDate)}</Text>
+              <Text style={[styles.dateSubtext, { color: colors.textSecondary }]}>
                 {currentDate.toLocaleDateString('en-US', { 
                   weekday: 'long',
                   month: 'long',
@@ -323,49 +325,49 @@ export default function TodayScreen() {
             </TouchableOpacity>
             
             <TouchableOpacity 
-              style={styles.navButton}
+              style={[styles.navButton, { backgroundColor: colors.card }]}
               onPress={() => navigateDate('next')}
               activeOpacity={0.7}
             >
-              <ChevronRight size={18} color="#6B7280" strokeWidth={2} />
+              <ChevronRight size={18} color={colors.textSecondary} strokeWidth={2} />
             </TouchableOpacity>
           </View>
 
           {/* Go to Today Button - Only show when not on today */}
           {!isToday() && (
             <TouchableOpacity 
-              style={styles.todayButton}
+              style={[styles.todayButton, { backgroundColor: colors.primaryLight, borderColor: colors.primary + '40' }]}
               onPress={goToToday}
               activeOpacity={0.8}
             >
-              <ArrowLeft size={14} color="#4F46E5" strokeWidth={2} />
-              <Text style={styles.todayButtonText}>Back to Today</Text>
+              <ArrowLeft size={14} color={colors.primary} strokeWidth={2} />
+              <Text style={[styles.todayButtonText, { color: colors.primary }]}>Back to Today</Text>
             </TouchableOpacity>
           )}
 
           {/* Enhanced Progress Card */}
           {progress.total > 0 && (
-            <View style={styles.progressCard}>
+            <View style={[styles.progressCard, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
               <View style={styles.progressHeader}>
-                <View style={styles.progressIconContainer}>
-                  <CheckCircle2 size={20} color="#10B981" strokeWidth={2} />
+                <View style={[styles.progressIconContainer, { backgroundColor: colors.success + '20' }]}>
+                  <CheckCircle2 size={20} color={colors.success} strokeWidth={2} />
                 </View>
                 <View style={styles.progressTextContainer}>
-                  <Text style={styles.progressTitle}>Progress</Text>
-                  <Text style={styles.progressSubtitle}>
+                  <Text style={[styles.progressTitle, { color: colors.text }]}>Progress</Text>
+                  <Text style={[styles.progressSubtitle, { color: colors.textSecondary }]}>
                     {progress.completed} of {progress.total} completed
                   </Text>
                 </View>
-                <Text style={styles.progressPercentage}>
+                <Text style={[styles.progressPercentage, { color: colors.success }]}>
                   {progress.percentage}%
                 </Text>
               </View>
               <View style={styles.progressBarContainer}>
-                <View style={styles.progressBar}>
+                <View style={[styles.progressBar, { backgroundColor: colors.borderLight }]}>
                   <View 
                     style={[
                       styles.progressFill, 
-                      { width: `${progress.percentage}%` }
+                      { width: `${progress.percentage}%`, backgroundColor: colors.success }
                     ]} 
                   />
                 </View>
@@ -382,7 +384,7 @@ export default function TodayScreen() {
           {modalState === 'none' ? (
             <View style={styles.addButtonsContainer}>
               <TouchableOpacity
-                style={styles.complexTaskButton}
+                style={[styles.complexTaskButton, { backgroundColor: '#8B5CF6' }]}
                 onPress={openComplexTaskForm}
                 activeOpacity={0.8}
               >
@@ -391,7 +393,7 @@ export default function TodayScreen() {
               </TouchableOpacity>
               
               <TouchableOpacity
-                style={styles.simpleTaskButton}
+                style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
                 onPress={openSimpleTaskInput}
                 activeOpacity={0.8}
               >
@@ -400,11 +402,11 @@ export default function TodayScreen() {
               </TouchableOpacity>
             </View>
           ) : modalState === 'simple' ? (
-            <View style={styles.addInputCard}>
+            <View style={[styles.addInputCard, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}>
               <TextInput
-                style={styles.addInput}
+                style={[styles.addInput, { color: colors.text }]}
                 placeholder="What needs to be done?"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.textTertiary}
                 value={newTaskTitle}
                 onChangeText={setNewTaskTitle}
                 autoFocus
@@ -414,14 +416,14 @@ export default function TodayScreen() {
               />
               <View style={styles.addInputActions}>
                 <TouchableOpacity
-                  style={styles.cancelButton}
+                  style={[styles.cancelButton, { backgroundColor: colors.card }]}
                   onPress={closeAllModals}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.saveButton}
+                  style={[styles.saveButton, { backgroundColor: colors.primary }]}
                   onPress={addSimpleTask}
                   activeOpacity={0.8}
                 >
@@ -435,11 +437,11 @@ export default function TodayScreen() {
         {/* Tasks List */}
         {currentDateTasks.length === 0 ? (
           <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <Calendar size={32} color="#9CA3AF" strokeWidth={1.5} />
+            <View style={[styles.emptyIconContainer, { backgroundColor: colors.card }]}>
+              <Calendar size={32} color={colors.textTertiary} strokeWidth={1.5} />
             </View>
-            <Text style={styles.emptyTitle}>No tasks yet</Text>
-            <Text style={styles.emptySubtitle}>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>No tasks yet</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
               Add your first task to get started with your day
             </Text>
           </View>

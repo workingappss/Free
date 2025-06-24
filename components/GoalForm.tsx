@@ -12,6 +12,7 @@ import {
   Modal,
 } from 'react-native';
 import { X, Target, SquareCheck as CheckSquare, Calendar, Plus, Trash2, ChevronLeft, ChevronRight, Clock } from 'lucide-react-native';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Goal {
   id: string;
@@ -118,6 +119,7 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
   const [customCategory, setCustomCategory] = useState(goal?.customCategory || '');
   const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const { colors } = useTheme();
 
   // Get available categories (default + custom)
   const [customCategories, setCustomCategories] = useState<Array<{name: string, color: string}>>([]);
@@ -327,13 +329,13 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
+      <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
           {isEditing ? 'Edit Goal' : 'Create New Goal'}
         </Text>
-        <TouchableOpacity style={styles.closeButton} onPress={onCancel} activeOpacity={0.7}>
-          <X size={20} color="#6B7280" strokeWidth={2} />
+        <TouchableOpacity style={[styles.closeButton, { backgroundColor: colors.card }]} onPress={onCancel} activeOpacity={0.7}>
+          <X size={20} color={colors.textSecondary} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 

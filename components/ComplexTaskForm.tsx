@@ -12,6 +12,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Plus, X, Clock, Trash2, ChevronDown } from 'lucide-react-native';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Subtask {
   id: string;
@@ -38,6 +39,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [duration, setDuration] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const { colors } = useTheme();
 
   const addSubtask = () => {
     if (!newSubtaskTitle.trim()) {
@@ -97,11 +99,11 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Create Complex Task</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={onCancel} activeOpacity={0.7}>
-          <X size={20} color="#6B7280" strokeWidth={2} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
+      <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Create Complex Task</Text>
+        <TouchableOpacity style={[styles.closeButton, { backgroundColor: colors.card }]} onPress={onCancel} activeOpacity={0.7}>
+          <X size={20} color={colors.textSecondary} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
