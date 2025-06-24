@@ -548,7 +548,7 @@ export default function ProfileScreen() {
                     </Text>
                   </View>
                   {settings.appearance.theme === themeOption && (
-                    <Check size={16} color="#6366F1" strokeWidth={2} />
+                    <Check size={16} color={colors.primary} strokeWidth={2} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -569,7 +569,7 @@ export default function ProfileScreen() {
                     <Text style={[styles.languageTitle, { color: colors.text }]}>{language}</Text>
                   </View>
                   {settings.appearance.language === language && (
-                    <Check size={16} color="#6366F1" strokeWidth={2} />
+                    <Check size={16} color={colors.primary} strokeWidth={2} />
                   )}
                 </TouchableOpacity>
               ))}

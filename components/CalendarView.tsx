@@ -151,8 +151,8 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
                 styles.dayCell,
                 !date && styles.emptyCell,
                 date && !isSameMonth(date) && styles.otherMonthCell,
-                isToday(date) && styles.todayCell,
-                isSelected(date) && styles.selectedCell,
+                isToday(date) && [styles.todayCell, { backgroundColor: colors.warning + '20', borderColor: colors.warning }],
+                isSelected(date) && [styles.selectedCell, { backgroundColor: colors.primary }],
               ]}
               onPress={() => date && handleDateSelect(date)}
               disabled={!date}
@@ -162,8 +162,9 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
                 <Text style={[
                   styles.dayText,
                   !isSameMonth(date) && styles.otherMonthText,
-                  isToday(date) && styles.todayText,
-                  isSelected(date) && styles.selectedText,
+                  { color: colors.text },
+                  isToday(date) && { color: colors.warning, fontFamily: 'Inter-SemiBold' },
+                  isSelected(date) && { color: '#FFFFFF', fontFamily: 'Inter-SemiBold' },
                 ]}>
                   {date.getDate()}
                 </Text>
@@ -176,12 +177,12 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
         <View style={styles.selectedDateContainer}>
           <Text style={styles.selectedDateLabel}>Selected Date</Text>
           <Text style={styles.selectedDateText}>
-            {selectedDate.toLocaleDateString('en-US', {
-              weekday: 'long',
+            <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
+            <Text style={[styles.legendText, { color: colors.textSecondary }]}>Selected</Text>
               year: 'numeric',
               month: 'long',
-              day: 'numeric',
-            })}
+            <View style={[styles.legendDot, { backgroundColor: colors.warning + '20', borderWidth: 1, borderColor: colors.warning }]} />
+            <Text style={[styles.legendText, { color: colors.textSecondary }]}>Today</Text>
           </Text>
         </View>
       </ScrollView>
@@ -189,14 +190,14 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <TouchableOpacity
-          style={styles.cancelButton}
+          style={[styles.cancelButton, { backgroundColor: colors.card }]}
           onPress={onClose}
           activeOpacity={0.7}
         >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.confirmButton}
+          style={[styles.confirmButton, { backgroundColor: colors.primary }]}
           onPress={() => onDateSelect(selectedDate)}
           activeOpacity={0.8}
         >
@@ -277,14 +278,12 @@ const styles = StyleSheet.create({
   weekDaysContainer: {
     flexDirection: 'row',
     marginBottom: 12,
-    paddingHorizontal: 4,
   },
   weekDay: {
     flex: 1,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
     paddingVertical: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -292,7 +291,6 @@ const styles = StyleSheet.create({
   calendarGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 4,
   },
   dayCell: {
     width: '14.28%',
@@ -305,46 +303,24 @@ const styles = StyleSheet.create({
   emptyCell: {
     opacity: 0,
   },
-  otherMonthCell: {
-    opacity: 0.3,
-  },
-  todayCell: {
-    backgroundColor: '#FEF3C7',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-  },
   selectedCell: {
     backgroundColor: '#4F46E5',
   },
-  dayText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#1F2937',
-  },
-  otherMonthText: {
-    color: '#9CA3AF',
-  },
-  todayText: {
     color: '#F59E0B',
     fontFamily: 'Inter-SemiBold',
   },
   selectedText: {
     color: '#FFFFFF',
-    fontFamily: 'Inter-SemiBold',
   },
   selectedDateContainer: {
-    backgroundColor: '#F8FAFC',
     borderRadius: 12,
     padding: 16,
     marginTop: 24,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   selectedDateLabel: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
     marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -352,7 +328,6 @@ const styles = StyleSheet.create({
   selectedDateText: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -360,12 +335,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -373,11 +345,9 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
   },
   confirmButton: {
     flex: 1,
-    backgroundColor: '#4F46E5',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',

@@ -64,26 +64,26 @@ const lightColors: ThemeColors = {
 };
 
 const darkColors: ThemeColors = {
-  background: '#0F172A',
-  surface: '#1E293B',
-  card: '#334155',
+  background: '#000000',
+  surface: '#111111',
+  card: '#1A1A1A',
   
   text: '#F1F5F9',
   textSecondary: '#CBD5E1',
   textTertiary: '#94A3B8',
   
-  border: '#475569',
-  borderLight: '#334155',
+  border: '#333333',
+  borderLight: '#222222',
   
   primary: '#6366F1',
-  primaryLight: '#1E1B4B',
+  primaryLight: '#1A1A2E',
   
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.7)',
+  overlay: 'rgba(0, 0, 0, 0.8)',
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
