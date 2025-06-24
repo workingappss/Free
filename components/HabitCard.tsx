@@ -13,9 +13,7 @@ import {
   Plus, 
   Minus, 
   Clock, 
-  Target,
   Flame,
-  TrendingUp,
   X
 } from 'lucide-react-native';
 import { Habit, HabitEntry } from '@/types/habit';
@@ -72,14 +70,6 @@ export default function HabitCard({
     onToggle(targetReached, newValue);
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
   const getProgressPercentage = () => {
     if (habit.type === 'measurable' && habit.targetValue && currentValue > 0) {
       return Math.min((currentValue / habit.targetValue) * 100, 100);
@@ -112,14 +102,6 @@ export default function HabitCard({
                 {habit.name}
               </Text>
               <View style={styles.metaInfo}>
-                {habit.reminderTime && (
-                  <View style={styles.metaItem}>
-                    <Clock size={12} color="#9CA3AF" strokeWidth={2} />
-                    <Text style={styles.metaText}>
-                      {formatTime(habit.reminderTime)}
-                    </Text>
-                  </View>
-                )}
                 {streak > 0 && (
                   <View style={styles.metaItem}>
                     <Flame size={12} color="#F59E0B" strokeWidth={2} />

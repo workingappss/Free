@@ -2,7 +2,6 @@ import React from 'react';
 import { router } from 'expo-router';
 import { Habit } from '@/types/habit';
 import { habitStorage } from '@/utils/habitStorage';
-import { notificationService } from '@/utils/notificationService';
 import HabitForm from '@/components/HabitForm';
 
 export default function CreateHabitScreen() {
@@ -15,12 +14,6 @@ export default function CreateHabitScreen() {
       };
 
       await habitStorage.saveHabit(newHabit);
-
-      // Schedule notification if reminder time is set
-      if (newHabit.reminderTime) {
-        await notificationService.scheduleHabitReminder(newHabit);
-      }
-
       router.back();
     } catch (error) {
       console.error('Error creating habit:', error);

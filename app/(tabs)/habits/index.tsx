@@ -9,11 +9,10 @@ import {
   Platform,
   RefreshControl,
 } from 'react-native';
-import { Plus, Calendar, TrendingUp, SquareCheck as CheckSquare, Flame, Target } from 'lucide-react-native';
+import { Plus, Target, TrendingUp, SquareCheck as CheckSquare, Flame } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Habit, HabitEntry, HabitStats } from '@/types/habit';
 import { habitStorage } from '@/utils/habitStorage';
-import { notificationService } from '@/utils/notificationService';
 import HabitCard from '@/components/HabitCard';
 
 export default function HabitsScreen() {
@@ -185,7 +184,7 @@ export default function HabitsScreen() {
             <View style={styles.quickStats}>
               <View style={styles.quickStatItem}>
                 <View style={styles.quickStatIcon}>
-                  <Target size={16} color="#4F46E5" strokeWidth={2} />
+                  <Target size={16} color="#6366F1" strokeWidth={2} />
                 </View>
                 <Text style={styles.quickStatValue}>{habits.length}</Text>
                 <Text style={styles.quickStatLabel}>Active Habits</Text>
@@ -369,10 +368,10 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#6366F1',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#4F46E5',
+    shadowColor: '#6366F1',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -512,11 +511,11 @@ const styles = StyleSheet.create({
   emptyActionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#6366F1',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 12,
-    shadowColor: '#4F46E5',
+    shadowColor: '#6366F1',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,

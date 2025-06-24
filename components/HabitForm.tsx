@@ -14,15 +14,14 @@ import {
 import {
   X,
   Clock,
-  ChevronDown,
   Target,
   SquareCheck as CheckSquare,
   Bell,
   MessageCircle,
-  Palette
+  Palette,
+  ChevronDown
 } from 'lucide-react-native';
 import { Habit } from '@/types/habit';
-import DayPicker from './DayPicker';
 
 interface HabitFormProps {
   habit?: Habit;
@@ -32,16 +31,16 @@ interface HabitFormProps {
 }
 
 const HABIT_COLORS = [
-  '#4F46E5',
-  '#10B981',
-  '#F59E0B',
-  '#EF4444',
-  '#8B5CF6',
-  '#06B6D4',
-  '#84CC16',
-  '#F97316',
-  '#EC4899',
-  '#6B7280',
+  '#6366F1', // Indigo
+  '#10B981', // Emerald
+  '#F59E0B', // Amber
+  '#EF4444', // Red
+  '#8B5CF6', // Violet
+  '#06B6D4', // Cyan
+  '#84CC16', // Lime
+  '#F97316', // Orange
+  '#EC4899', // Pink
+  '#6B7280', // Gray
 ];
 
 const HABIT_ICONS = [
@@ -57,6 +56,7 @@ const FREQUENCY_OPTIONS = [
 
 export default function HabitForm({ habit, onSave, onCancel, isEditing = false }: HabitFormProps) {
   const [name, setName] = useState(habit?.name || '');
+  const [description, setDescription] = useState(habit?.description || '');
   const [type, setType] = useState<'boolean' | 'measurable'>(habit?.type || 'boolean');
   const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'custom'>(habit?.frequency || 'daily');
   const [customDays, setCustomDays] = useState<number[]>(habit?.customDays || []);
@@ -93,6 +93,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
 
     const habitData: Omit<Habit, 'id' | 'createdAt'> = {
       name: name.trim(),
+      description: description.trim() || undefined,
       type,
       frequency,
       customDays: frequency === 'custom' ? customDays : undefined,
@@ -108,6 +109,14 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
     onSave(habitData);
   };
 
+  const toggleDay = (dayValue: number) => {
+    if (customDays.includes(dayValue)) {
+      setCustomDays(customDays.filter(day => day !== dayValue));
+    } else {
+      setCustomDays([...customDays, dayValue].sort());
+    }
+  };
+
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -115,6 +124,16 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
       hour12: true,
     });
   };
+
+  const DAYS = [
+    { label: 'Sun', value: 0 },
+    { label: 'Mon', value: 1 },
+    { label: 'Tue', value: 2 },
+    { label: 'Wed', value: 3 },
+    { label: 'Thu', value: 4 },
+    { label: 'Fri', value: 5 },
+    { label: 'Sat', value: 6 },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -143,6 +162,21 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
           />
         </View>
 
+        {/* Description */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Description</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Why is this habit important to you? (optional)"
+            placeholderTextColor="#9CA3AF"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
+        </View>
+
         {/* Tracking Type */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Tracking Type *</Text>
@@ -159,7 +193,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
             >
               <CheckSquare
                 size={20}
-                color={type === 'boolean' ? '#4F46E5' : '#6B7280'}
+                color={type === 'boolean' ? '#6366F1' : '#6B7280'}
                 strokeWidth={2}
               />
               <View style={styles.typeContent}>
@@ -185,7 +219,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
             >
               <Target
                 size={20}
-                color={type === 'measurable' ? '#4F46E5' : '#6B7280'}
+                color={type === 'measurable' ? '#6366F1' : '#6B7280'}
                 strokeWidth={2}
               />
               <View style={styles.typeContent}>
@@ -261,10 +295,35 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
           </View>
 
           {frequency === 'custom' && (
-            <DayPicker
-              selectedDays={customDays}
-              onDaysChange={setCustomDays}
-            />
+            <View style={styles.dayPickerContainer}>
+              <Text style={styles.dayPickerLabel}>Select Days</Text>
+              <View style={styles.daysContainer}>
+                {DAYS.map((day) => {
+                  const isSelected = customDays.includes(day.value);
+                  return (
+                    <TouchableOpacity
+                      key={day.value}
+                      style={[
+                        styles.dayButton,
+                        isSelected && styles.selectedDayButton
+                      ]}
+                      onPress={() => toggleDay(day.value)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[
+                        styles.dayText,
+                        isSelected && styles.selectedDayText
+                      ]}>
+                        {day.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              {customDays.length === 0 && (
+                <Text style={styles.errorText}>Please select at least one day</Text>
+              )}
+            </View>
           )}
         </View>
 
@@ -276,7 +335,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
           {reminderTime ? (
             <View style={styles.reminderContainer}>
               <View style={styles.reminderDisplay}>
-                <Bell size={16} color="#4F46E5" strokeWidth={2} />
+                <Bell size={16} color="#6366F1" strokeWidth={2} />
                 <Text style={styles.reminderText}>{formatTime(reminderTime)}</Text>
               </View>
               <TouchableOpacity
@@ -361,7 +420,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
         </View>
       </ScrollView>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Fixed at bottom */}
       <View style={styles.actionButtons}>
         <TouchableOpacity
           style={styles.cancelButton}
@@ -395,7 +454,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
   );
 }
 
-// Reuse the SimpleTimePickerModal from ComplexTaskForm
+// Simple Time Picker Modal Component
 function SimpleTimePickerModal({ 
   visible, 
   onClose, 
@@ -408,60 +467,11 @@ function SimpleTimePickerModal({
   currentTime: Date | null;
 }) {
   const now = new Date();
-  const [selectedHour, setSelectedHour] = useState(currentTime ? currentTime.getHours() : now.getHours());
-  const [selectedMinute, setSelectedMinute] = useState(currentTime ? Math.round(currentTime.getMinutes() / 15) * 15 : Math.round(now.getMinutes() / 15) * 15);
-  const [is24Hour, setIs24Hour] = useState(false);
+  const [selectedHour, setSelectedHour] = useState(currentTime ? currentTime.getHours() : 9);
+  const [selectedMinute, setSelectedMinute] = useState(currentTime ? Math.round(currentTime.getMinutes() / 15) * 15 : 0);
 
-  const hours = is24Hour 
-    ? Array.from({ length: 24 }, (_, i) => i)
-    : Array.from({ length: 12 }, (_, i) => i + 1);
-
+  const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = [0, 15, 30, 45];
-
-  const formatHour = (hour: number) => {
-    if (is24Hour) {
-      return hour.toString().padStart(2, '0');
-    } else {
-      return hour.toString();
-    }
-  };
-
-  const getCurrentPeriod = () => {
-    return selectedHour >= 12 ? 'PM' : 'AM';
-  };
-
-  const getDisplayHour = () => {
-    if (is24Hour) {
-      return selectedHour;
-    } else {
-      if (selectedHour === 0) return 12;
-      if (selectedHour > 12) return selectedHour - 12;
-      return selectedHour;
-    }
-  };
-
-  const togglePeriod = () => {
-    if (!is24Hour) {
-      setSelectedHour(prev => prev >= 12 ? prev - 12 : prev + 12);
-    }
-  };
-
-  const handleHourSelect = (hour: number) => {
-    if (is24Hour) {
-      setSelectedHour(hour);
-    } else {
-      const currentPeriod = getCurrentPeriod();
-      let newHour = hour;
-      
-      if (currentPeriod === 'PM' && hour !== 12) {
-        newHour = hour + 12;
-      } else if (currentPeriod === 'AM' && hour === 12) {
-        newHour = 0;
-      }
-      
-      setSelectedHour(newHour);
-    }
-  };
 
   const handleConfirm = () => {
     const selectedTime = new Date();
@@ -472,20 +482,11 @@ function SimpleTimePickerModal({
   const getDisplayTime = () => {
     const time = new Date();
     time.setHours(selectedHour, selectedMinute, 0, 0);
-    
-    if (is24Hour) {
-      return time.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-    } else {
-      return time.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-    }
+    return time.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
   };
 
   return (
@@ -504,48 +505,24 @@ function SimpleTimePickerModal({
             </TouchableOpacity>
           </View>
 
-          <View style={styles.formatToggleContainer}>
-            <TouchableOpacity
-              style={[styles.formatButton, !is24Hour && styles.formatButtonActive]}
-              onPress={() => setIs24Hour(false)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.formatButtonText, !is24Hour && styles.formatButtonTextActive]}>
-                12 Hour
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.formatButton, is24Hour && styles.formatButtonActive]}
-              onPress={() => setIs24Hour(true)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.formatButtonText, is24Hour && styles.formatButtonTextActive]}>
-                24 Hour
-              </Text>
-            </TouchableOpacity>
-          </View>
-
           <View style={styles.timeSelectorsContainer}>
             <View style={styles.timeColumn}>
               <Text style={styles.timeColumnLabel}>Hour</Text>
               <ScrollView style={styles.timeScrollView} showsVerticalScrollIndicator={false}>
                 {hours.map((hour) => {
-                  const isSelected = is24Hour 
-                    ? selectedHour === hour
-                    : getDisplayHour() === hour;
-                  
+                  const isSelected = selectedHour === hour;
                   return (
                     <TouchableOpacity
                       key={hour}
                       style={[styles.timeOption, isSelected && styles.selectedTimeOption]}
-                      onPress={() => handleHourSelect(hour)}
+                      onPress={() => setSelectedHour(hour)}
                       activeOpacity={0.7}
                     >
                       <Text style={[
                         styles.timeOptionText,
                         isSelected && styles.selectedTimeOptionText
                       ]}>
-                        {formatHour(hour)}
+                        {hour.toString().padStart(2, '0')}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -558,7 +535,6 @@ function SimpleTimePickerModal({
               <ScrollView style={styles.timeScrollView} showsVerticalScrollIndicator={false}>
                 {minutes.map((minute) => {
                   const isSelected = selectedMinute === minute;
-                  
                   return (
                     <TouchableOpacity
                       key={minute}
@@ -577,39 +553,10 @@ function SimpleTimePickerModal({
                 })}
               </ScrollView>
             </View>
-
-            {!is24Hour && (
-              <View style={styles.timeColumn}>
-                <Text style={styles.timeColumnLabel}>Period</Text>
-                <View style={styles.periodContainer}>
-                  {['AM', 'PM'].map((period) => {
-                    const isSelected = getCurrentPeriod() === period;
-                    return (
-                      <TouchableOpacity
-                        key={period}
-                        style={[
-                          styles.timeOption,
-                          isSelected && styles.selectedTimeOption
-                        ]}
-                        onPress={togglePeriod}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={[
-                          styles.timeOptionText,
-                          isSelected && styles.selectedTimeOptionText
-                        ]}>
-                          {period}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-            )}
           </View>
 
           <View style={styles.selectedTimeDisplay}>
-            <Clock size={16} color="#4F46E5" strokeWidth={2} />
+            <Clock size={16} color="#6366F1" strokeWidth={2} />
             <Text style={styles.selectedTimeText}>
               {getDisplayTime()}
             </Text>
@@ -694,6 +641,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  textArea: {
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
   typeContainer: {
     gap: 12,
   },
@@ -707,7 +658,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   selectedTypeOption: {
-    borderColor: '#4F46E5',
+    borderColor: '#6366F1',
     backgroundColor: '#EEF2FF',
   },
   typeContent: {
@@ -721,7 +672,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   selectedTypeTitle: {
-    color: '#4F46E5',
+    color: '#6366F1',
   },
   typeDescription: {
     fontSize: 13,
@@ -740,7 +691,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   selectedFrequencyOption: {
-    borderColor: '#4F46E5',
+    borderColor: '#6366F1',
     backgroundColor: '#EEF2FF',
   },
   frequencyLabel: {
@@ -750,12 +701,53 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   selectedFrequencyLabel: {
-    color: '#4F46E5',
+    color: '#6366F1',
   },
   frequencyDescription: {
     fontSize: 13,
     fontFamily: 'Inter-Medium',
     color: '#6B7280',
+  },
+  dayPickerContainer: {
+    marginTop: 16,
+  },
+  dayPickerLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  daysContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 4,
+  },
+  dayButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  selectedDayButton: {
+    backgroundColor: '#6366F1',
+    borderColor: '#6366F1',
+  },
+  dayText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#6B7280',
+  },
+  selectedDayText: {
+    color: '#FFFFFF',
+  },
+  errorText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#EF4444',
+    marginTop: 4,
   },
   reminderContainer: {
     flexDirection: 'row',
@@ -857,12 +849,13 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   selectedIconOption: {
-    borderColor: '#4F46E5',
+    borderColor: '#6366F1',
     backgroundColor: '#EEF2FF',
   },
   iconText: {
     fontSize: 20,
   },
+  // Action Buttons - Fixed at bottom
   actionButtons: {
     flexDirection: 'row',
     gap: 12,
@@ -926,38 +919,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#1F2937',
   },
-  formatToggleContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#F8FAFC',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  formatButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginHorizontal: 4,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  formatButtonActive: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
-  },
-  formatButtonText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#6B7280',
-  },
-  formatButtonTextActive: {
-    color: '#FFFFFF',
-    fontFamily: 'Inter-SemiBold',
-  },
   timeSelectorsContainer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -993,7 +954,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   selectedTimeOption: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#6366F1',
   },
   timeOptionText: {
     fontSize: 16,
@@ -1003,11 +964,6 @@ const styles = StyleSheet.create({
   selectedTimeOptionText: {
     color: '#FFFFFF',
     fontFamily: 'Inter-SemiBold',
-  },
-  periodContainer: {
-    width: '100%',
-    paddingVertical: 8,
-    alignItems: 'center',
   },
   selectedTimeDisplay: {
     flexDirection: 'row',
@@ -1047,7 +1003,7 @@ const styles = StyleSheet.create({
   },
   timePickerConfirmButton: {
     flex: 1,
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#6366F1',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',

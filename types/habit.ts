@@ -1,6 +1,7 @@
 export interface Habit {
   id: string;
   name: string;
+  description?: string;
   type: 'boolean' | 'measurable';
   frequency: 'daily' | 'weekly' | 'custom';
   customDays?: number[]; // 0-6 for Sunday-Saturday
