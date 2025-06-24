@@ -532,22 +532,22 @@ export default function ProfileScreen() {
               
               {['light', 'dark', 'system'].map((theme) => (
                 <TouchableOpacity
-                  key={themeOption}
+                  key={theme}
                   style={[styles.themeOption, { backgroundColor: colors.background, borderColor: colors.borderLight }]}
-                  onPress={() => handleSettingChange('appearance', 'theme', themeOption)}
+                  onPress={() => handleSettingChange('appearance', 'theme', theme)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.themeInfo}>
                     <View style={styles.themeIcon}>
-                      {themeOption === 'light' && <Sun size={16} color={colors.warning} strokeWidth={2} />}
-                      {themeOption === 'dark' && <Moon size={16} color={colors.primary} strokeWidth={2} />}
-                      {themeOption === 'system' && <Smartphone size={16} color={colors.success} strokeWidth={2} />}
+                      {theme === 'light' && <Sun size={16} color={colors.warning} strokeWidth={2} />}
+                      {theme === 'dark' && <Moon size={16} color={colors.primary} strokeWidth={2} />}
+                      {theme === 'system' && <Smartphone size={16} color={colors.success} strokeWidth={2} />}
                     </View>
                     <Text style={[styles.themeTitle, { color: colors.text }]}>
-                      {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+                      {theme.charAt(0).toUpperCase() + theme.slice(1)}
                     </Text>
                   </View>
-                  {settings.appearance.theme === themeOption && (
+                  {settings.appearance.theme === theme && (
                     <Check size={16} color={colors.primary} strokeWidth={2} />
                   )}
                 </TouchableOpacity>
