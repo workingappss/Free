@@ -118,6 +118,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>
           {isEditing ? 'Edit Habit' : 'Create New Habit'}
@@ -127,7 +128,9 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
         </TouchableOpacity>
       </View>
 
+      {/* Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Habit Name */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Habit Name *</Text>
           <TextInput
@@ -140,6 +143,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
           />
         </View>
 
+        {/* Tracking Type */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Tracking Type *</Text>
           <Text style={styles.helpText}>How do you want to track this habit?</Text>
@@ -199,6 +203,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
           </View>
         </View>
 
+        {/* Measurable Habit Fields */}
         {type === 'measurable' && (
           <>
             <View style={styles.section}>
@@ -226,6 +231,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
           </>
         )}
 
+        {/* Frequency */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Frequency *</Text>
           <Text style={styles.helpText}>How often do you want to do this habit?</Text>
@@ -355,6 +361,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
         </View>
       </ScrollView>
 
+      {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <TouchableOpacity
           style={styles.cancelButton}
@@ -374,6 +381,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
         </TouchableOpacity>
       </View>
 
+      {/* Time Picker Modal */}
       <SimpleTimePickerModal
         visible={showTimePicker}
         onClose={() => setShowTimePicker(false)}
