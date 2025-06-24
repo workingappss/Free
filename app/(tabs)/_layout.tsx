@@ -599,7 +599,6 @@ function TaskCard({
                       ]} 
                     />
                   </View>
-                </View>
               </View>
               {task.subtasks.map((subtask) => (
                 <TouchableOpacity
