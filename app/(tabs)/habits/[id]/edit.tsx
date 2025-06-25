@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Modal } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Habit } from '@/types/habit';
 import { habitStorage } from '@/utils/habitStorage';
@@ -73,11 +74,18 @@ export default function EditHabitScreen() {
   }
 
   return (
-    <HabitForm
-      habit={habit}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      isEditing={true}
-    />
+    <Modal
+      visible={true}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      onRequestClose={handleCancel}
+    >
+      <HabitForm
+        habit={habit}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        isEditing={true}
+      />
+    </Modal>
   );
 }

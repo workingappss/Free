@@ -1,4 +1,5 @@
 import React from 'react';
+import { Modal } from 'react-native';
 import { router } from 'expo-router';
 import { Habit } from '@/types/habit';
 import { habitStorage } from '@/utils/habitStorage';
@@ -25,10 +26,17 @@ export default function CreateHabitScreen() {
   };
 
   return (
-    <HabitForm
-      onSave={handleSave}
-      onCancel={handleCancel}
-      isEditing={false}
-    />
+    <Modal
+      visible={true}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      onRequestClose={handleCancel}
+    >
+      <HabitForm
+        onSave={handleSave}
+        onCancel={handleCancel}
+        isEditing={false}
+      />
+    </Modal>
   );
 }

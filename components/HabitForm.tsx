@@ -145,7 +145,11 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Habit Name */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Habit Name *</Text>
@@ -608,8 +612,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    flex: 1,
     paddingHorizontal: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   section: {
     paddingVertical: 16,
