@@ -14,7 +14,6 @@ import {
 import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit3, Clock, TrendingUp, Users, Percent } from 'lucide-react-native';
 import GoalForm from '@/components/GoalForm';
 import { useTheme } from '@/contexts/ThemeContext';
-import { goalStorage } from '@/utils/goalStorage';
 
 interface Goal {
   id: string;
@@ -65,20 +64,6 @@ export default function GoalsScreen() {
   const [newProgressValue, setNewProgressValue] = useState('');
   const { colors } = useTheme();
 
-  // Load goals from storage on component mount
-  useEffect(() => {
-    loadGoals();
-  }, []);
-
-  const loadGoals = async () => {
-    try {
-      const storedGoals = await goalStorage.getGoals();
-      setGoals(storedGoals);
-    } catch (error) {
-      console.error('Error loading goals:', error);
-    }
-  };
-
   const openCreateModal = () => {
     setEditingGoal(null);
     setModalState('create');
@@ -110,14 +95,11 @@ export default function GoalsScreen() {
   const handleSaveGoal = (goalData: Omit<Goal, 'id' | 'createdAt'>) => {
     if (editingGoal) {
       // Update existing goal
-      const updatedGoal = { ...goalData, id: editingGoal.id, createdAt: editingGoal.createdAt };
       setGoals(prev => prev.map(goal => 
-        goal.id === editingGoal.id ? updatedGoal : goal
+        goal.id === editingGoal.id 
+          ? { ...goalData, id: editingGoal.id, createdAt: editingGoal.createdAt }
+          : goal
       ));
-      // Save to storage
-      goalStorage.saveGoal(updatedGoal).catch(error => {
-        console.error('Error updating goal in storage:', error);
-      });
     } else {
       // Create new goal
       const newGoal: Goal = {
@@ -126,10 +108,6 @@ export default function GoalsScreen() {
         createdAt: new Date(),
       };
       setGoals(prev => [...prev, newGoal]);
-      // Save to storage
-      goalStorage.saveGoal(newGoal).catch(error => {
-        console.error('Error saving goal to storage:', error);
-      });
     }
     closeModal();
   };
@@ -143,13 +121,7 @@ export default function GoalsScreen() {
         { 
           text: 'Delete', 
           style: 'destructive',
-          onPress: () => {
-            setGoals(prev => prev.filter(goal => goal.id !== goalId));
-            // Delete from storage
-            goalStorage.deleteGoal(goalId).catch(error => {
-              console.error('Error deleting goal from storage:', error);
-            });
-          }
+          onPress: () => setGoals(prev => prev.filter(goal => goal.id !== goalId))
         },
       ]
     );

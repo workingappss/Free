@@ -15,9 +15,6 @@ import {
 } from 'react-native';
 import { User, Settings, Bell, Shield, CircleHelp as HelpCircle, Star, Award, TrendingUp, ChevronRight, CreditCard as Edit3, LogOut, Moon, Sun, Smartphone, Globe, Lock, Eye, EyeOff, Camera, X, Check, Trash2, Download, Upload, RefreshCw } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
-import { habitStorage } from '@/utils/habitStorage';
-import { Habit, HabitStats } from '@/types/habit';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface UserProfile {
   name: string;
@@ -55,7 +52,7 @@ interface AppSettings {
 interface ProfileStats {
   tasksCompleted: number;
   goalsAchieved: number;
-  totalStreakDays: number;
+  streakDays: number;
   totalHabits: number;
 }
 
@@ -96,52 +93,14 @@ export default function ProfileScreen() {
   });
 
   const [stats, setStats] = useState<ProfileStats>({
-    tasksCompleted: 0,
-    goalsAchieved: 0,
-    totalStreakDays: 0,
-    totalHabits: 0,
+    tasksCompleted: 127,
+    goalsAchieved: 8,
+    streakDays: 23,
+    totalHabits: 12,
   });
 
   const [activeModal, setActiveModal] = useState<'none' | 'profile' | 'notifications' | 'appearance' | 'privacy' | 'backup' | 'help'>('none');
   const [editingProfile, setEditingProfile] = useState<UserProfile>(profile);
-
-  useEffect(() => {
-    loadUserStats();
-  }, []);
-
-  const loadUserStats = async () => {
-    try {
-      // Load habits and calculate stats
-      const habits = await habitStorage.getHabits();
-      const activeHabits = habits.filter(h => h.isActive);
-      
-      // Calculate total streak days from all habits
-      let totalStreakDays = 0;
-      for (const habit of activeHabits) {
-        const habitStats = await habitStorage.calculateHabitStats(habit.id);
-        totalStreakDays += habitStats.currentStreak;
-      }
-
-      // Load tasks from AsyncStorage
-      const tasksJson = await AsyncStorage.getItem('tasks');
-      const tasks = tasksJson ? JSON.parse(tasksJson) : [];
-      const completedTasks = tasks.filter((task: any) => task.completed).length;
-
-      // Load goals from AsyncStorage
-      const goalsJson = await AsyncStorage.getItem('goals');
-      const goals = goalsJson ? JSON.parse(goalsJson) : [];
-      const completedGoals = goals.filter((goal: any) => goal.isCompleted).length;
-
-      setStats({
-        tasksCompleted: completedTasks,
-        goalsAchieved: completedGoals,
-        totalStreakDays,
-        totalHabits: activeHabits.length,
-      });
-    } catch (error) {
-      console.error('Error loading user stats:', error);
-    }
-  };
 
   const formatMemberSince = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -283,7 +242,7 @@ export default function ProfileScreen() {
               <View style={[styles.statIcon, { backgroundColor: colors.warning + '20' }]}>
                 <TrendingUp size={16} color={colors.warning} strokeWidth={2} />
               </View>
-              <Text style={[styles.statValue, { color: colors.text }]}>{stats.totalStreakDays}</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{stats.streakDays}</Text>
               <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Streak</Text>
             </View>
 
@@ -309,7 +268,7 @@ export default function ProfileScreen() {
             <Star size={20} color="#FFFFFF" strokeWidth={2} />
             <Text style={[styles.bannerTitle, { color: '#FFFFFF' }]}>Productivity Master!</Text>
             <Text style={styles.bannerText}>
-              You've completed {stats.tasksCompleted} tasks total
+              You've completed {stats.tasksCompleted} tasks this month
             </Text>
           </View>
         </View>
