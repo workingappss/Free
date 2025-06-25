@@ -154,7 +154,7 @@ export default function HabitStatsView({ habit }: HabitStatsViewProps) {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Overview Stats */}
       <View style={styles.statsGrid}>
-        <View style={[styles.statCard, { backgroundColor: habit.color + '10' }]}>
+        <View style={[styles.statCard, styles.statCardCompact, { backgroundColor: habit.color + '10' }]}>
           <View style={[styles.statIcon, { backgroundColor: habit.color + '20' }]}>
             <Flame size={20} color={habit.color} strokeWidth={2} />
           </View>
@@ -162,7 +162,7 @@ export default function HabitStatsView({ habit }: HabitStatsViewProps) {
           <Text style={styles.statLabel}>Current Streak</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#F59E0B10' }]}>
+        <View style={[styles.statCard, styles.statCardCompact, { backgroundColor: '#F59E0B10' }]}>
           <View style={[styles.statIcon, { backgroundColor: '#F59E0B20' }]}>
             <Award size={20} color="#F59E0B" strokeWidth={2} />
           </View>
@@ -170,7 +170,7 @@ export default function HabitStatsView({ habit }: HabitStatsViewProps) {
           <Text style={styles.statLabel}>Best Streak</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#10B98110' }]}>
+        <View style={[styles.statCard, styles.statCardCompact, { backgroundColor: '#10B98110' }]}>
           <View style={[styles.statIcon, { backgroundColor: '#10B98120' }]}>
             <Target size={20} color="#10B981" strokeWidth={2} />
           </View>
@@ -178,7 +178,7 @@ export default function HabitStatsView({ habit }: HabitStatsViewProps) {
           <Text style={styles.statLabel}>Total Completions</Text>
         </View>
 
-        <View style={[styles.statCard, { backgroundColor: '#8B5CF610' }]}>
+        <View style={[styles.statCard, styles.statCardCompact, { backgroundColor: '#8B5CF610' }]}>
           <View style={[styles.statIcon, { backgroundColor: '#8B5CF620' }]}>
             <TrendingUp size={20} color="#8B5CF6" strokeWidth={2} />
           </View>
@@ -405,15 +405,22 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
+    flexWrap: 'wrap', 
+    justifyContent: 'space-between',
     padding: 20,
     paddingBottom: 0,
+    gap: 12,
   },
   statCard: {
-    flex: 1,
-    minWidth: '45%',
     backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  statCardCompact: {
+    width: '47%', // Slightly less than 50% to account for gap
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
