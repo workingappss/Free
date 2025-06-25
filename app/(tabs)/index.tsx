@@ -15,6 +15,7 @@ import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flat
 import ComplexTaskForm from '@/components/ComplexTaskForm';
 import CalendarView from '@/components/CalendarView';
 import SimpleTaskInput from '@/components/SimpleTaskInput';
+import { taskStorage } from '@/utils/taskStorage';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface Subtask {
@@ -46,6 +47,38 @@ export default function TodayScreen() {
   
   // Use a single state to manage which modal is open
   const [modalState, setModalState] = useState<ModalState>('none');
+
+  // Load tasks from storage on component mount
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const loadTasks = async () => {
+    try {
+      const storedTasks = await taskStorage.getTasks();
+      setTasks(storedTasks);
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+    }
+  };
+
+  // Save tasks to storage whenever tasks change
+  useEffect(() => {
+    if (tasks.length > 0) {
+      saveTasks();
+    }
+  }, [tasks]);
+
+  const saveTasks = async () => {
+    try {
+      // Save all tasks to storage
+      for (const task of tasks) {
+        await taskStorage.saveTask(task);
+      }
+    } catch (error) {
+      console.error('Error saving tasks:', error);
+    }
+  };
 
   const formatDate = (date: Date) => {
     const today = new Date();
@@ -247,7 +280,14 @@ export default function TodayScreen() {
   };
 
   const deleteTask = (taskId: string) => {
-    setTasks(prev => prev.filter(task => task.id !== taskId));
+    setTasks(prev => {
+      const updatedTasks = prev.filter(task => task.id !== taskId);
+      // Also delete from storage
+      taskStorage.deleteTask(taskId).catch(error => {
+        console.error('Error deleting task from storage:', error);
+      });
+      return updatedTasks;
+    });
   };
 
   const handleDragEnd = ({ data }: { data: Task[] }) => {
