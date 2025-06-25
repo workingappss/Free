@@ -14,6 +14,7 @@ import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck a
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import ComplexTaskForm from '@/components/ComplexTaskForm';
 import CalendarView from '@/components/CalendarView';
+import SimpleTaskInput from '@/components/SimpleTaskInput';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface Subtask {
@@ -40,7 +41,6 @@ type ModalState = 'none' | 'simple' | 'complex' | 'calendar';
 
 export default function TodayScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTaskTitle, setNewTaskTitle] = useState('');
   const [currentDate, setCurrentDate] = useState(new Date());
   const { colors } = useTheme();
   
@@ -140,7 +140,6 @@ export default function TodayScreen() {
   // Simplified modal handlers
   const openSimpleTaskInput = () => {
     setModalState('simple');
-    setNewTaskTitle('');
   };
 
   const openComplexTaskForm = () => {
@@ -153,18 +152,12 @@ export default function TodayScreen() {
 
   const closeAllModals = () => {
     setModalState('none');
-    setNewTaskTitle('');
   };
 
-  const addSimpleTask = () => {
-    if (!newTaskTitle.trim()) {
-      Alert.alert('Error', 'Please enter a task title');
-      return;
-    }
-
+  const addSimpleTask = (title: string) => {
     const newTask: Task = {
       id: Date.now().toString(),
-      title: newTaskTitle.trim(),
+      title,
       completed: false,
       dateKey: getDateKey(currentDate),
       isComplex: false,
@@ -172,8 +165,7 @@ export default function TodayScreen() {
     };
 
     setTasks(prev => [...prev, newTask]);
-    setNewTaskTitle('');
-    setModalState('none');
+    closeAllModals();
   };
 
   const addComplexTask = (taskData: {
@@ -202,7 +194,7 @@ export default function TodayScreen() {
 
   const handleDateSelect = (selectedDate: Date) => {
     setCurrentDate(selectedDate);
-    setModalState('none');
+    closeAllModals();
   };
 
   const toggleTask = (taskId: string) => {
@@ -402,35 +394,10 @@ export default function TodayScreen() {
               </TouchableOpacity>
             </View>
           ) : modalState === 'simple' ? (
-            <View style={[styles.addInputCard, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}>
-              <TextInput
-                style={[styles.addInput, { color: colors.text }]}
-                placeholder="What needs to be done?"
-                placeholderTextColor={colors.textTertiary}
-                value={newTaskTitle}
-                onChangeText={setNewTaskTitle}
-                autoFocus
-                onSubmitEditing={addSimpleTask}
-                returnKeyType="done"
-                multiline
-              />
-              <View style={styles.addInputActions}>
-                <TouchableOpacity
-                  style={[styles.cancelButton, { backgroundColor: colors.card }]}
-                  onPress={closeAllModals}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.saveButton, { backgroundColor: colors.primary }]}
-                  onPress={addSimpleTask}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.saveButtonText}>Add task</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <SimpleTaskInput
+              onSave={addSimpleTask}
+              onCancel={closeAllModals}
+            />
           ) : null}
         </View>
 
@@ -817,54 +784,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
     marginLeft: 6,
-  },
-  addInputCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  addInput: {
-    fontSize: 15,
-    fontFamily: 'Inter-Medium',
-    color: '#1F2937',
-    marginBottom: 16,
-    paddingVertical: 4,
-    minHeight: 20,
-  },
-  addInputActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#6B7280',
-  },
-  saveButton: {
-    flex: 1,
-    backgroundColor: '#4F46E5',
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#FFFFFF',
   },
   emptyState: {
     alignItems: 'center',
