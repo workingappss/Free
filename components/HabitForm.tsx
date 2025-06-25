@@ -42,12 +42,10 @@ const HABIT_COLORS = [
   '#EC4899', // Pink
   '#6B7280', // Gray
 ];
-
 const HABIT_ICONS = [
   '💪', '🏃', '📚', '🧘', '💧', '🥗', '😴', '🎯',
   '✍️', '🎵', '🎨', '🌱', '🏠', '💼', '❤️', '🧠'
 ];
-
 const FREQUENCY_OPTIONS = [
   { id: 'daily', label: 'Daily', description: 'Every day' },
   { id: 'weekly', label: 'Weekly', description: 'Once per week' },
@@ -147,7 +145,6 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
         </TouchableOpacity>
       </View>
 
-      {/* Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Habit Name */}
         <View style={styles.section}>
@@ -455,11 +452,11 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
 }
 
 // Simple Time Picker Modal Component
-function SimpleTimePickerModal({ 
-  visible, 
-  onClose, 
-  onTimeSelect, 
-  currentTime 
+function SimpleTimePickerModal({
+  visible,
+  onClose,
+  onTimeSelect,
+  currentTime
 }: {
   visible: boolean;
   onClose: () => void;
@@ -469,7 +466,6 @@ function SimpleTimePickerModal({
   const now = new Date();
   const [selectedHour, setSelectedHour] = useState(currentTime ? currentTime.getHours() : 9);
   const [selectedMinute, setSelectedMinute] = useState(currentTime ? Math.round(currentTime.getMinutes() / 15) * 15 : 0);
-
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = [0, 15, 30, 45];
 
@@ -855,7 +851,6 @@ const styles = StyleSheet.create({
   iconText: {
     fontSize: 20,
   },
-  // Action Buttons - Fixed at bottom
   actionButtons: {
     flexDirection: 'row',
     gap: 12,
@@ -889,7 +884,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
   },
-  // Time Picker Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
