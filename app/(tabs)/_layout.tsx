@@ -47,20 +47,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="goals"
-        options={{
-          title: 'Goals',
-          tabBarIcon: ({ size, color }) => (
-            <Target size={24} color={color} strokeWidth={2.5} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="habits"
         options={{
           title: 'Habits',
           tabBarIcon: ({ size, color }) => (
             <CheckSquare size={24} color={color} strokeWidth={2.5} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="goals"
+        options={{
+          title: 'Goals',
+          tabBarIcon: ({ size, color }) => (
+            <Target size={24} color={color} strokeWidth={2.5} />
           ),
         }}
       />
