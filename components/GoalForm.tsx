@@ -70,7 +70,7 @@ const TIMEFRAME_OPTIONS = [
   { 
     id: 'quarterly', 
     label: 'Quarterly', 
-    description: 'Complete within 3 months',
+    description: 'Complete within a quarter',
     color: '#8B5CF6',
     icon: Calendar
   },
@@ -103,6 +103,12 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
     goal?.timeframe || 'monthly'
   );
 
+  // Quarterly selection state
+  const [showQuarterSelection, setShowQuarterSelection] = useState(goal?.timeframe === 'quarterly');
+  const [selectedQuarterIndex, setSelectedQuarterIndex] = useState<number | null>(
+    goal?.timeframe === 'quarterly' ? getCurrentQuarter() : null
+  );
+
   // Quantifiable goal fields
   const [targetNumber, setTargetNumber] = useState(goal?.targetNumber?.toString() || '');
   const [unit, setUnit] = useState(goal?.unit || '');
@@ -133,8 +139,39 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
   const selectedCategoryData = allCategories.find(cat => cat.name === selectedCategory) || DEFAULT_CATEGORIES[0];
   const selectedTimeframeData = TIMEFRAME_OPTIONS.find(tf => tf.id === timeframe) || TIMEFRAME_OPTIONS[1];
 
-  // Calculate automatic deadline based on timeframe
-  const getAutomaticDeadline = (selectedTimeframe: string): Date => {
+  // Helper function to get current quarter
+  function getCurrentQuarter(): number {
+    const now = new Date();
+    return Math.floor(now.getMonth() / 3);
+  }
+
+  // Helper function to get quarter info
+  function getQuarterInfo(quarterIndex: number, year: number = new Date().getFullYear()) {
+    const quarterNames = ['Q1', 'Q2', 'Q3', 'Q4'];
+    const quarterMonths = [
+      ['Jan', 'Feb', 'Mar'],
+      ['Apr', 'May', 'Jun'],
+      ['Jul', 'Aug', 'Sep'],
+      ['Oct', 'Nov', 'Dec']
+    ];
+    
+    const startMonth = quarterIndex * 3;
+    const endMonth = startMonth + 2;
+    const startDate = new Date(year, startMonth, 1);
+    const endDate = new Date(year, endMonth + 1, 0, 23, 59, 59, 999);
+    
+    return {
+      name: quarterNames[quarterIndex],
+      months: quarterMonths[quarterIndex],
+      startDate,
+      endDate,
+      isPast: endDate < new Date(),
+      isCurrent: getCurrentQuarter() === quarterIndex,
+    };
+  }
+
+  // Calculate automatic deadline based on timeframe and quarter
+  const getAutomaticDeadline = (selectedTimeframe: string, quarterIndex?: number): Date => {
     const now = new Date();
     
     switch (selectedTimeframe) {
@@ -149,20 +186,22 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
       case 'monthly':
         // End of current month at 11:59 PM
         const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-        endOfMonth.setHours(23, 59, 59, 999);
         return endOfMonth;
         
       case 'quarterly':
-        // End of current quarter at 11:59 PM
-        const currentQuarter = Math.floor(now.getMonth() / 3);
-        const endOfQuarter = new Date(now.getFullYear(), (currentQuarter + 1) * 3, 0, 23, 59, 59, 999);
-        endOfQuarter.setHours(23, 59, 59, 999);
-        return endOfQuarter;
+        // End of specific quarter at 11:59 PM
+        if (quarterIndex !== undefined) {
+          const quarterInfo = getQuarterInfo(quarterIndex);
+          return quarterInfo.endDate;
+        }
+        // Fallback to current quarter
+        const currentQuarter = getCurrentQuarter();
+        const currentQuarterInfo = getQuarterInfo(currentQuarter);
+        return currentQuarterInfo.endDate;
         
       case 'yearly':
         // End of current year at 11:59 PM
         const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
-        endOfYear.setHours(23, 59, 59, 999);
         return endOfYear;
         
       default:
@@ -176,13 +215,35 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
   const handleTimeframeChange = (newTimeframe: string) => {
     setTimeframe(newTimeframe as any);
     
-    if (newTimeframe !== 'custom') {
-      // Automatically set deadline based on timeframe
-      setDeadline(getAutomaticDeadline(newTimeframe));
+    if (newTimeframe === 'quarterly') {
+      setShowQuarterSelection(true);
+      const currentQuarter = getCurrentQuarter();
+      setSelectedQuarterIndex(currentQuarter);
+      setDeadline(getAutomaticDeadline(newTimeframe, currentQuarter));
     } else {
-      // For custom, clear deadline so user can set their own
-      setDeadline(null);
+      setShowQuarterSelection(false);
+      setSelectedQuarterIndex(null);
+      
+      if (newTimeframe !== 'custom') {
+        // Automatically set deadline based on timeframe
+        setDeadline(getAutomaticDeadline(newTimeframe));
+      } else {
+        // For custom, clear deadline so user can set their own
+        setDeadline(null);
+      }
     }
+  };
+
+  const handleQuarterSelect = (quarterIndex: number) => {
+    const quarterInfo = getQuarterInfo(quarterIndex);
+    
+    // Don't allow selection of past quarters
+    if (quarterInfo.isPast) {
+      return;
+    }
+    
+    setSelectedQuarterIndex(quarterIndex);
+    setDeadline(quarterInfo.endDate);
   };
 
   const handleCategorySelect = (categoryName: string) => {
@@ -280,6 +341,11 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
 
     if (timeframe === 'custom' && !deadline) {
       Alert.alert('Error', 'Please set a deadline for custom timeframe');
+      return false;
+    }
+
+    if (timeframe === 'quarterly' && selectedQuarterIndex === null) {
+      Alert.alert('Error', 'Please select a quarter');
       return false;
     }
 
@@ -424,6 +490,67 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
             })}
           </View>
         </View>
+
+        {/* Quarter Selection - Only show for quarterly timeframe */}
+        {showQuarterSelection && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Select Quarter *</Text>
+            <Text style={styles.helpText}>Choose which quarter you want to complete this goal</Text>
+            
+            <View style={styles.quarterContainer}>
+              {[0, 1, 2, 3].map((quarterIndex) => {
+                const quarterInfo = getQuarterInfo(quarterIndex);
+                const isSelected = selectedQuarterIndex === quarterIndex;
+                
+                return (
+                  <TouchableOpacity
+                    key={quarterIndex}
+                    style={[
+                      styles.quarterOption,
+                      isSelected && styles.selectedQuarterOption,
+                      quarterInfo.isPast && styles.disabledQuarterOption,
+                    ]}
+                    onPress={() => handleQuarterSelect(quarterIndex)}
+                    disabled={quarterInfo.isPast}
+                    activeOpacity={quarterInfo.isPast ? 1 : 0.7}
+                  >
+                    <View style={styles.quarterHeader}>
+                      <Text style={[
+                        styles.quarterName,
+                        isSelected && styles.selectedQuarterName,
+                        quarterInfo.isPast && styles.disabledQuarterText,
+                      ]}>
+                        {quarterInfo.name}
+                      </Text>
+                      {quarterInfo.isCurrent && !quarterInfo.isPast && (
+                        <View style={styles.currentQuarterBadge}>
+                          <Text style={styles.currentQuarterBadgeText}>Current</Text>
+                        </View>
+                      )}
+                      {quarterInfo.isPast && (
+                        <View style={styles.pastQuarterBadge}>
+                          <Text style={styles.pastQuarterBadgeText}>Ended</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[
+                      styles.quarterMonths,
+                      quarterInfo.isPast && styles.disabledQuarterText,
+                    ]}>
+                      {quarterInfo.months.join(' • ')}
+                    </Text>
+                    <Text style={[
+                      styles.quarterDates,
+                      quarterInfo.isPast && styles.disabledQuarterText,
+                    ]}>
+                      {formatDate(quarterInfo.startDate)} - {formatDate(quarterInfo.endDate)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        )}
 
         {/* Custom Date Selection - Only show for custom timeframe */}
         {timeframe === 'custom' && (
@@ -1068,9 +1195,83 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     marginLeft: 4,
   },
-  goalTypeContainer: {
+  // Quarter Selection Styles
+  quarterContainer: {
     gap: 12,
     marginTop: 8,
+  },
+  quarterOption: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
+  },
+  selectedQuarterOption: {
+    borderColor: '#8B5CF6',
+    backgroundColor: '#8B5CF610',
+  },
+  disabledQuarterOption: {
+    backgroundColor: '#F3F4F6',
+    borderColor: '#D1D5DB',
+    opacity: 0.6,
+  },
+  quarterHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  quarterName: {
+    fontSize: 16,
+    fontFamily: 'Inter-Bold',
+    color: '#374151',
+  },
+  selectedQuarterName: {
+    color: '#8B5CF6',
+  },
+  disabledQuarterText: {
+    color: '#9CA3AF',
+  },
+  currentQuarterBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  currentQuarterBadgeText: {
+    fontSize: 10,
+    fontFamily: 'Inter-Bold',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  pastQuarterBadge: {
+    backgroundColor: '#6B7280',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  pastQuarterBadgeText: {
+    fontSize: 10,
+    fontFamily: 'Inter-Bold',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  quarterMonths: {
+    fontSize: 13,
+    fontFamily: 'Inter-SemiBold',
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  quarterDates: {
+    fontSize: 11,
+    fontFamily: 'Inter-Medium',
+    color: '#9CA3AF',
+  },
+  goalTypeContainer: {
+    gap: 12,
   },
   goalTypeOption: {
     flexDirection: 'row',
@@ -1082,7 +1283,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   goalTypeOptionSelected: {
-    borderColor: '#4F46E5',
+    borderColor: '#6366F1',
     backgroundColor: '#EEF2FF',
   },
   goalTypeIconContainer: {
@@ -1264,13 +1465,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%',
+    maxHeight: '80%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 8,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
   },
   datePickerHeader: {
     flexDirection: 'row',
@@ -1454,7 +1654,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 16,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
     backgroundColor: '#FFFFFF',
