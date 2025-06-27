@@ -139,33 +139,37 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
     
     switch (selectedTimeframe) {
       case 'weekly':
-        // End of current week (Sunday)
+        // End of current week (Sunday at 11:59 PM)
         const endOfWeek = new Date(now);
-        endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
+        const daysUntilSunday = (7 - now.getDay()) % 7;
+        endOfWeek.setDate(now.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
         endOfWeek.setHours(23, 59, 59, 999);
         return endOfWeek;
         
       case 'monthly':
-        // End of current month
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        // End of current month at 11:59 PM
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
         endOfMonth.setHours(23, 59, 59, 999);
         return endOfMonth;
         
       case 'quarterly':
-        // End of current quarter
+        // End of current quarter at 11:59 PM
         const currentQuarter = Math.floor(now.getMonth() / 3);
-        const endOfQuarter = new Date(now.getFullYear(), (currentQuarter + 1) * 3, 0);
+        const endOfQuarter = new Date(now.getFullYear(), (currentQuarter + 1) * 3, 0, 23, 59, 59, 999);
         endOfQuarter.setHours(23, 59, 59, 999);
         return endOfQuarter;
         
       case 'yearly':
-        // End of current year
-        const endOfYear = new Date(now.getFullYear(), 11, 31);
+        // End of current year at 11:59 PM
+        const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
         endOfYear.setHours(23, 59, 59, 999);
         return endOfYear;
         
       default:
-        return now;
+        // Default to end of current day
+        const endOfDay = new Date(now);
+        endOfDay.setHours(23, 59, 59, 999);
+        return endOfDay;
     }
   };
 
@@ -1260,12 +1264,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '85%',
+    maxHeight: '90%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 8,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
   },
   datePickerHeader: {
     flexDirection: 'row',
@@ -1382,7 +1387,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingBottom: 8,
   },
   dayCell: {
     width: '14.28%',
@@ -1427,7 +1432,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 20,
-    marginBottom: 16,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
@@ -1448,10 +1453,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
+    paddingTop: 16,
+    paddingBottom: 16,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
   },
   datePickerCancelButton: {
     flex: 1,
