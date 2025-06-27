@@ -11,7 +11,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit3, Clock, TrendingUp, Users, Percent, BarChart3 } from 'lucide-react-native';
+import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit3, Clock, TrendingUp, Users, Percent, ChartBar as BarChart3 } from 'lucide-react-native';
 import GoalForm from '@/components/GoalForm';
 import { taskStorage } from '@/utils/taskStorage';
 import { Goal, GoalContribution } from '@/types/goal';
