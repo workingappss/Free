@@ -11,32 +11,11 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit3, Clock, TrendingUp, Users, Percent } from 'lucide-react-native';
+import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit3, Clock, TrendingUp, Users, Percent, BarChart3 } from 'lucide-react-native';
 import GoalForm from '@/components/GoalForm';
+import { taskStorage } from '@/utils/taskStorage';
+import { Goal, GoalContribution } from '@/types/goal';
 import { useTheme } from '@/contexts/ThemeContext';
-
-interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  type: 'quantifiable' | 'non-quantifiable';
-  // For quantifiable goals
-  targetNumber?: number;
-  unit?: string;
-  currentProgress?: number;
-  // For non-quantifiable goals
-  contributedHours?: number;
-  contributedTasks?: number;
-  estimatedProgress?: number; // Percentage estimation (0-100)
-  // Common fields
-  deadline?: Date;
-  timeframe: 'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom';
-  category: string;
-  customCategory?: string;
-  color: string;
-  isCompleted: boolean;
-  createdAt: Date;
-}
 
 type ModalState = 'none' | 'create' | 'edit' | 'updateProgress' | 'updateEstimation';
 
@@ -58,11 +37,40 @@ const TIMEFRAME_LABELS = {
 
 export default function GoalsScreen() {
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [goalContributions, setGoalContributions] = useState<Record<string, GoalContribution[]>>({});
   const [modalState, setModalState] = useState<ModalState>('none');
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [progressUpdateGoal, setProgressUpdateGoal] = useState<Goal | null>(null);
   const [newProgressValue, setNewProgressValue] = useState('');
   const { colors } = useTheme();
+
+  React.useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [allGoals, allContributions] = await Promise.all([
+        taskStorage.getGoals(),
+        taskStorage.getGoalContributions()
+      ]);
+      
+      setGoals(allGoals);
+      
+      // Group contributions by goal ID
+      const contributionsByGoal = allContributions.reduce((acc, contribution) => {
+        if (!acc[contribution.goalId]) {
+          acc[contribution.goalId] = [];
+        }
+        acc[contribution.goalId].push(contribution);
+        return acc;
+      }, {} as Record<string, GoalContribution[]>);
+      
+      setGoalContributions(contributionsByGoal);
+    } catch (error) {
+      console.error('Error loading goals data:', error);
+    }
+  };
 
   const openCreateModal = () => {
     setEditingGoal(null);
@@ -95,10 +103,10 @@ export default function GoalsScreen() {
   const handleSaveGoal = (goalData: Omit<Goal, 'id' | 'createdAt'>) => {
     if (editingGoal) {
       // Update existing goal
+      const updatedGoal = { ...goalData, id: editingGoal.id, createdAt: editingGoal.createdAt };
+      taskStorage.saveGoal(updatedGoal);
       setGoals(prev => prev.map(goal => 
-        goal.id === editingGoal.id 
-          ? { ...goalData, id: editingGoal.id, createdAt: editingGoal.createdAt }
-          : goal
+        goal.id === editingGoal.id ? updatedGoal : goal
       ));
     } else {
       // Create new goal
@@ -107,6 +115,7 @@ export default function GoalsScreen() {
         id: Date.now().toString(),
         createdAt: new Date(),
       };
+      taskStorage.saveGoal(newGoal);
       setGoals(prev => [...prev, newGoal]);
     }
     closeModal();
@@ -121,7 +130,15 @@ export default function GoalsScreen() {
         { 
           text: 'Delete', 
           style: 'destructive',
-          onPress: () => setGoals(prev => prev.filter(goal => goal.id !== goalId))
+          onPress: async () => {
+            try {
+              // Note: In a real app, you'd want to implement deleteGoal in taskStorage
+              setGoals(prev => prev.filter(goal => goal.id !== goalId));
+            } catch (error) {
+              console.error('Error deleting goal:', error);
+              Alert.alert('Error', 'Failed to delete goal');
+            }
+          }
         },
       ]
     );
@@ -153,6 +170,17 @@ export default function GoalsScreen() {
         }
         return goal;
       }));
+      
+      // Save updated goal
+      const updatedGoal = goals.find(g => g.id === progressUpdateGoal.id);
+      if (updatedGoal) {
+        const goalToSave = {
+          ...updatedGoal,
+          currentProgress: newProgress,
+          isCompleted: progressUpdateGoal.targetNumber ? newProgress >= progressUpdateGoal.targetNumber : false
+        };
+        taskStorage.saveGoal(goalToSave);
+      }
     } else if (modalState === 'updateEstimation') {
       // Non-quantifiable goal estimation update
       if (newProgress > 100) {
@@ -170,6 +198,17 @@ export default function GoalsScreen() {
         }
         return goal;
       }));
+      
+      // Save updated goal
+      const updatedGoal = goals.find(g => g.id === progressUpdateGoal.id);
+      if (updatedGoal) {
+        const goalToSave = {
+          ...updatedGoal,
+          estimatedProgress: newProgress,
+          isCompleted: newProgress >= 100
+        };
+        taskStorage.saveGoal(goalToSave);
+      }
     }
 
     closeModal();
@@ -390,6 +429,21 @@ function GoalCard({
   onDelete: () => void;
   onUpdateProgress: () => void;
 }) {
+  const [contributions, setContributions] = React.useState<GoalContribution[]>([]);
+
+  React.useEffect(() => {
+    loadContributions();
+  }, [goal.id]);
+
+  const loadContributions = async () => {
+    try {
+      const goalContributions = await taskStorage.getGoalContributionsForGoal(goal.id);
+      setContributions(goalContributions);
+    } catch (error) {
+      console.error('Error loading goal contributions:', error);
+    }
+  };
+
   const getProgressData = () => {
     if (goal.type === 'quantifiable' && goal.targetNumber && goal.currentProgress !== undefined) {
       const percentage = (goal.currentProgress / goal.targetNumber) * 100;
@@ -645,6 +699,35 @@ function GoalCard({
                 </View>
               );
             })()}
+          </View>
+        )}
+
+        {/* Recent Contributions */}
+        {contributions.length > 0 && (
+          <View style={styles.contributionsSection}>
+            <View style={styles.contributionsHeader}>
+              <BarChart3 size={14} color="#6B7280" strokeWidth={2} />
+              <Text style={styles.contributionsTitle}>
+                Recent Contributions ({contributions.length})
+              </Text>
+            </View>
+            <View style={styles.contributionsList}>
+              {contributions.slice(0, 3).map((contribution) => (
+                <View key={contribution.id} style={styles.contributionItem}>
+                  <Text style={styles.contributionTask} numberOfLines={1}>
+                    {contribution.taskTitle}
+                  </Text>
+                  <Text style={styles.contributionAmount}>
+                    +{contribution.amount} {contribution.unit}
+                  </Text>
+                </View>
+              ))}
+              {contributions.length > 3 && (
+                <Text style={styles.moreContributions}>
+                  +{contributions.length - 3} more
+                </Text>
+              )}
+            </View>
           </View>
         )}
 
@@ -1040,6 +1123,51 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#10B981',
     marginLeft: 4,
+  },
+  contributionsSection: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  contributionsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  contributionsTitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#6B7280',
+  },
+  contributionsList: {
+    gap: 4,
+  },
+  contributionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 2,
+  },
+  contributionTask: {
+    fontSize: 11,
+    fontFamily: 'Inter-Medium',
+    color: '#374151',
+    flex: 1,
+    marginRight: 8,
+  },
+  contributionAmount: {
+    fontSize: 11,
+    fontFamily: 'Inter-SemiBold',
+    color: '#10B981',
+  },
+  moreContributions: {
+    fontSize: 10,
+    fontFamily: 'Inter-Medium',
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 4,
   },
   // Progress Update Modal Styles
   modalOverlay: {

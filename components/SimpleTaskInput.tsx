@@ -6,11 +6,14 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Modal,
 } from 'react-native';
+import { Target } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import GoalSelector from './GoalSelector';
 
 interface SimpleTaskInputProps {
-  onSave: (title: string) => void;
+  onSave: (title: string, goalData?: { goalId: string; contribution: number; unit: string }) => void;
   onCancel: () => void;
   placeholder?: string;
 }
@@ -21,6 +24,10 @@ export default function SimpleTaskInput({
   placeholder = "What needs to be done?" 
 }: SimpleTaskInputProps) {
   const [taskTitle, setTaskTitle] = useState('');
+  const [showGoalSelector, setShowGoalSelector] = useState(false);
+  const [linkedGoalId, setLinkedGoalId] = useState<string | undefined>();
+  const [goalContribution, setGoalContribution] = useState<number | undefined>();
+  const [goalUnit, setGoalUnit] = useState<string | undefined>();
   const { colors } = useTheme();
 
   const handleSave = () => {
@@ -29,45 +36,95 @@ export default function SimpleTaskInput({
       return;
     }
 
-    onSave(taskTitle.trim());
+    const goalData = linkedGoalId && goalContribution && goalUnit 
+      ? { goalId: linkedGoalId, contribution: goalContribution, unit: goalUnit }
+      : undefined;
+    
+    onSave(taskTitle.trim(), goalData);
     setTaskTitle(''); // Clear input after saving
+    setLinkedGoalId(undefined);
+    setGoalContribution(undefined);
+    setGoalUnit(undefined);
   };
 
   const handleCancel = () => {
     setTaskTitle(''); // Clear input when canceling
+    setLinkedGoalId(undefined);
+    setGoalContribution(undefined);
+    setGoalUnit(undefined);
     onCancel();
   };
 
+  const handleGoalSelect = (goalId: string | undefined, contribution: number | undefined, unit: string | undefined) => {
+    setLinkedGoalId(goalId);
+    setGoalContribution(contribution);
+    setGoalUnit(unit);
+    setShowGoalSelector(false);
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}>
-      <TextInput
-        style={[styles.input, { color: colors.text }]}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textTertiary}
-        value={taskTitle}
-        onChangeText={setTaskTitle}
-        autoFocus
-        onSubmitEditing={handleSave}
-        returnKeyType="done"
-        multiline
-      />
-      <View style={styles.actions}>
+    <>
+      <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}>
+        <TextInput
+          style={[styles.input, { color: colors.text }]}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textTertiary}
+          value={taskTitle}
+          onChangeText={setTaskTitle}
+          autoFocus
+          onSubmitEditing={handleSave}
+          returnKeyType="done"
+          multiline
+        />
+        
+        {/* Goal Link Button */}
         <TouchableOpacity
-          style={[styles.cancelButton, { backgroundColor: colors.card }]}
-          onPress={handleCancel}
+          style={[styles.goalButton, { borderColor: colors.borderLight }]}
+          onPress={() => setShowGoalSelector(true)}
           activeOpacity={0.7}
         >
-          <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
+          <Target size={14} color={linkedGoalId ? colors.primary : colors.textTertiary} strokeWidth={2} />
+          <Text style={[
+            styles.goalButtonText, 
+            { color: linkedGoalId ? colors.primary : colors.textTertiary }
+          ]}>
+            {linkedGoalId ? `+${goalContribution} ${goalUnit}` : 'Link goal'}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.saveButton, { backgroundColor: colors.primary }]}
-          onPress={handleSave}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.saveButtonText}>Add task</Text>
-        </TouchableOpacity>
+        
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={[styles.cancelButton, { backgroundColor: colors.card }]}
+            onPress={handleCancel}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.saveButton, { backgroundColor: colors.primary }]}
+            onPress={handleSave}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.saveButtonText}>Add task</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+
+      {/* Goal Selector Modal */}
+      <Modal
+        visible={showGoalSelector}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowGoalSelector(false)}
+      >
+        <GoalSelector
+          selectedGoalId={linkedGoalId}
+          goalContribution={goalContribution}
+          goalUnit={goalUnit}
+          onGoalSelect={handleGoalSelect}
+        />
+      </Modal>
+    </>
   );
 }
 
@@ -91,6 +148,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingVertical: 4,
     minHeight: 20,
+  },
+  goalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginBottom: 12,
+    gap: 4,
+  },
+  goalButtonText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#9CA3AF',
   },
   actions: {
     flexDirection: 'row',

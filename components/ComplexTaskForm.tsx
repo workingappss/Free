@@ -11,8 +11,9 @@ import {
   Modal,
   SafeAreaView,
 } from 'react-native';
-import { Plus, X, Clock, Trash2, ChevronDown } from 'lucide-react-native';
+import { Plus, X, Clock, Trash2, ChevronDown, Target } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import GoalSelector from './GoalSelector';
 
 interface Subtask {
   id: string;
@@ -27,6 +28,9 @@ interface ComplexTaskFormProps {
     subtasks: Subtask[];
     startTime: Date | null;
     duration: number;
+    linkedGoalId?: string;
+    goalContribution?: number;
+    goalUnit?: string;
   }) => void;
   onCancel: () => void;
 }
@@ -39,6 +43,9 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [duration, setDuration] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [linkedGoalId, setLinkedGoalId] = useState<string | undefined>();
+  const [goalContribution, setGoalContribution] = useState<number | undefined>();
+  const [goalUnit, setGoalUnit] = useState<string | undefined>();
   const { colors } = useTheme();
 
   const addSubtask = () => {
@@ -95,7 +102,16 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
       subtasks,
       startTime,
       duration: durationMinutes,
+      linkedGoalId,
+      goalContribution,
+      goalUnit,
     });
+  };
+
+  const handleGoalSelect = (goalId: string | undefined, contribution: number | undefined, unit: string | undefined) => {
+    setLinkedGoalId(goalId);
+    setGoalContribution(contribution);
+    setGoalUnit(unit);
   };
 
   return (
@@ -167,6 +183,18 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
             />
             <Text style={styles.durationUnit}>min</Text>
           </View>
+        </View>
+
+        {/* Goal Linking */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Link to Goal</Text>
+          <Text style={styles.helpText}>Connect this task to a goal to automatically update progress when completed</Text>
+          <GoalSelector
+            selectedGoalId={linkedGoalId}
+            goalContribution={goalContribution}
+            goalUnit={goalUnit}
+            onGoalSelect={handleGoalSelect}
+          />
         </View>
 
         {/* Subtasks */}

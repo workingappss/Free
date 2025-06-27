@@ -10,31 +10,17 @@ import {
   Alert,
   Modal,
 } from 'react-native';
-import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck as CheckCircle2, Clock, Target, ArrowLeft } from 'lucide-react-native';
+import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck as CheckCircle2, Clock, Target, ArrowLeft, Play, Pause } from 'lucide-react-native';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import ComplexTaskForm from '@/components/ComplexTaskForm';
 import CalendarView from '@/components/CalendarView';
 import SimpleTaskInput from '@/components/SimpleTaskInput';
+import TaskTimer from '@/components/TaskTimer';
+import { taskStorage } from '@/utils/taskStorage';
+import { Task } from '@/types/task';
 import { useTheme } from '@/contexts/ThemeContext';
 
-interface Subtask {
-  id: string;
-  title: string;
-  completed: boolean;
-}
-
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  completed: boolean;
-  dateKey: string;
-  subtasks?: Subtask[];
-  startTime?: Date;
-  duration?: number;
-  isComplex?: boolean;
-  order: number; // Add order field for consistent sorting
-}
+import { Subtask } from '@/types/task';
 
 // Define modal states as an enum for better type safety
 type ModalState = 'none' | 'simple' | 'complex' | 'calendar';
@@ -46,6 +32,20 @@ export default function TodayScreen() {
   
   // Use a single state to manage which modal is open
   const [modalState, setModalState] = useState<ModalState>('none');
+
+  // Load tasks on component mount
+  React.useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const loadTasks = async () => {
+    try {
+      const allTasks = await taskStorage.getTasks();
+      setTasks(allTasks);
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+    }
+  };
 
   const formatDate = (date: Date) => {
     const today = new Date();
@@ -152,7 +152,7 @@ export default function TodayScreen() {
     setModalState('none');
   };
 
-  const addSimpleTask = (title: string) => {
+  const addSimpleTask = async (title: string, goalData?: { goalId: string; contribution: number; unit: string }) => {
     const newTask: Task = {
       id: Date.now().toString(),
       title,
@@ -160,18 +160,33 @@ export default function TodayScreen() {
       dateKey: getDateKey(currentDate),
       isComplex: false,
       order: getNextOrder(),
+      timerSessions: [],
+      totalTimeSpent: 0,
+      isTimerRunning: false,
+      linkedGoalId: goalData?.goalId,
+      goalContribution: goalData?.contribution,
+      goalUnit: goalData?.unit,
     };
 
-    setTasks(prev => [...prev, newTask]);
+    try {
+      await taskStorage.saveTask(newTask);
+      setTasks(prev => [...prev, newTask]);
+    } catch (error) {
+      console.error('Error saving task:', error);
+      Alert.alert('Error', 'Failed to save task');
+    }
     closeAllModals();
   };
 
-  const addComplexTask = (taskData: {
+  const addComplexTask = async (taskData: {
     title: string;
     description: string;
     subtasks: Subtask[];
     startTime: Date | null;
     duration: number;
+    linkedGoalId?: string;
+    goalContribution?: number;
+    goalUnit?: string;
   }) => {
     const newTask: Task = {
       id: Date.now().toString(),
@@ -184,10 +199,22 @@ export default function TodayScreen() {
       duration: taskData.duration || undefined,
       isComplex: true,
       order: getNextOrder(),
+      timerSessions: [],
+      totalTimeSpent: 0,
+      isTimerRunning: false,
+      linkedGoalId: taskData.linkedGoalId,
+      goalContribution: taskData.goalContribution,
+      goalUnit: taskData.goalUnit,
     };
 
-    setTasks(prev => [...prev, newTask]);
-    setModalState('none');
+    try {
+      await taskStorage.saveTask(newTask);
+      setTasks(prev => [...prev, newTask]);
+      setModalState('none');
+    } catch (error) {
+      console.error('Error saving task:', error);
+      Alert.alert('Error', 'Failed to save task');
+    }
   };
 
   const handleDateSelect = (selectedDate: Date) => {
@@ -195,71 +222,92 @@ export default function TodayScreen() {
     closeAllModals();
   };
 
-  const toggleTask = (taskId: string) => {
-    setTasks(prev =>
-      prev.map(task => {
-        if (task.id === taskId) {
-          const newCompleted = !task.completed;
-          
-          // If the task has subtasks, mark all subtasks as completed/uncompleted
-          if (task.subtasks && task.subtasks.length > 0) {
-            return {
-              ...task,
-              completed: newCompleted,
-              subtasks: task.subtasks.map(subtask => ({
-                ...subtask,
-                completed: newCompleted
-              }))
-            };
-          }
-          
-          return { ...task, completed: newCompleted };
-        }
-        return task;
-      })
-    );
+  const toggleTask = async (taskId: string) => {
+    try {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      if (!task.completed) {
+        // Completing the task
+        await taskStorage.completeTaskWithGoalUpdate(taskId);
+      } else {
+        // Uncompleting the task - just toggle completed status
+        const updatedTask = { ...task, completed: false };
+        await taskStorage.saveTask(updatedTask);
+      }
+
+      // Reload tasks to get updated data
+      await loadTasks();
+    } catch (error) {
+      console.error('Error toggling task:', error);
+      Alert.alert('Error', 'Failed to update task');
+    }
   };
 
-  const toggleSubtask = (taskId: string, subtaskId: string) => {
-    setTasks(prev =>
-      prev.map(task => {
-        if (task.id === taskId && task.subtasks) {
-          const updatedSubtasks = task.subtasks.map(subtask =>
-            subtask.id === subtaskId
-              ? { ...subtask, completed: !subtask.completed }
-              : subtask
-          );
-          
-          // Check if all subtasks are completed to mark the main task as completed
-          const allSubtasksCompleted = updatedSubtasks.every(subtask => subtask.completed);
-          
-          return {
-            ...task,
-            subtasks: updatedSubtasks,
-            completed: allSubtasksCompleted
-          };
-        }
-        return task;
-      })
-    );
+  const toggleSubtask = async (taskId: string, subtaskId: string) => {
+    try {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task || !task.subtasks) return;
+
+      const updatedSubtasks = task.subtasks.map(subtask =>
+        subtask.id === subtaskId
+          ? { ...subtask, completed: !subtask.completed }
+          : subtask
+      );
+      
+      // Check if all subtasks are completed to mark the main task as completed
+      const allSubtasksCompleted = updatedSubtasks.every(subtask => subtask.completed);
+      
+      const updatedTask = {
+        ...task,
+        subtasks: updatedSubtasks,
+        completed: allSubtasksCompleted
+      };
+
+      await taskStorage.saveTask(updatedTask);
+      setTasks(prev => prev.map(t => t.id === taskId ? updatedTask : t));
+    } catch (error) {
+      console.error('Error toggling subtask:', error);
+      Alert.alert('Error', 'Failed to update subtask');
+    }
   };
 
-  const deleteTask = (taskId: string) => {
-    setTasks(prev => prev.filter(task => task.id !== taskId));
+  const deleteTask = async (taskId: string) => {
+    try {
+      await taskStorage.deleteTask(taskId);
+      setTasks(prev => prev.filter(task => task.id !== taskId));
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      Alert.alert('Error', 'Failed to delete task');
+    }
   };
 
-  const handleDragEnd = ({ data }: { data: Task[] }) => {
+  const handleDragEnd = async ({ data }: { data: Task[] }) => {
     // Update the order of tasks based on their new positions
     const updatedTasks = data.map((task, index) => ({
       ...task,
       order: index
     }));
 
-    // Update the tasks state with reordered tasks
-    setTasks(prev => {
-      const otherDateTasks = prev.filter(task => task.dateKey !== getDateKey(currentDate));
-      return [...otherDateTasks, ...updatedTasks];
-    });
+    try {
+      // Save all updated tasks
+      for (const task of updatedTasks) {
+        await taskStorage.saveTask(task);
+      }
+
+      // Update the tasks state with reordered tasks
+      setTasks(prev => {
+        const otherDateTasks = prev.filter(task => task.dateKey !== getDateKey(currentDate));
+        return [...otherDateTasks, ...updatedTasks];
+      });
+    } catch (error) {
+      console.error('Error reordering tasks:', error);
+      Alert.alert('Error', 'Failed to reorder tasks');
+    }
+  };
+
+  const handleTaskUpdate = (updatedTask: Task) => {
+    setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
   };
 
   const formatTime = (date: Date) => {
@@ -280,6 +328,7 @@ export default function TodayScreen() {
       onToggleSubtask={(subtaskId) => toggleSubtask(item.id, subtaskId)}
       onDelete={() => deleteTask(item.id)}
       formatTime={formatTime}
+      onTaskUpdate={handleTaskUpdate}
       drag={drag}
       isActive={isActive}
     />
@@ -459,6 +508,7 @@ function TaskCard({
   onToggleSubtask, 
   onDelete, 
   formatTime,
+  onTaskUpdate,
   drag,
   isActive
 }: { 
@@ -467,6 +517,7 @@ function TaskCard({
   onToggleSubtask: (subtaskId: string) => void;
   onDelete: () => void;
   formatTime: (date: Date) => string;
+  onTaskUpdate: (task: Task) => void;
   drag: () => void;
   isActive: boolean;
 }) {
@@ -594,6 +645,15 @@ function TaskCard({
           )}
         </View>
       </TouchableOpacity>
+
+      {/* Timer Component */}
+      {!task.completed && (
+        <TaskTimer 
+          task={task} 
+          onTaskUpdate={onTaskUpdate}
+          compact={true}
+        />
+      )}
 
       <TouchableOpacity
         style={styles.deleteButton}
