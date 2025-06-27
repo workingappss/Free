@@ -530,7 +530,7 @@ export default function ProfileScreen() {
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.text }]}>Theme</Text>
               
-              {['light', 'dark', 'system'].map((theme) => (
+              {['light', 'dark', 'pink', 'system'].map((theme) => (
                 <TouchableOpacity
                   key={theme}
                   style={[styles.themeOption, { backgroundColor: colors.background, borderColor: colors.borderLight }]}
@@ -541,6 +541,7 @@ export default function ProfileScreen() {
                     <View style={styles.themeIcon}>
                       {theme === 'light' && <Sun size={16} color={colors.warning} strokeWidth={2} />}
                       {theme === 'dark' && <Moon size={16} color={colors.primary} strokeWidth={2} />}
+                      {theme === 'pink' && <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'linear-gradient(45deg, #EC4899, #F472B6)' }} />}
                       {theme === 'system' && <Smartphone size={16} color={colors.success} strokeWidth={2} />}
                     </View>
                     <Text style={[styles.themeTitle, { color: colors.text }]}>
