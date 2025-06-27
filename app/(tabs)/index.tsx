@@ -118,13 +118,11 @@ export default function TodayScreen() {
     setCurrentDate(newDate);
     // Reset all modal states when navigating dates
     setModalState('none');
-    setNewTaskTitle('');
   };
 
   const goToToday = () => {
     setCurrentDate(new Date());
     setModalState('none');
-    setNewTaskTitle('');
   };
 
   const isToday = () => {
