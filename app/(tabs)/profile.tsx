@@ -824,8 +824,10 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+    paddingHorizontal: 20,
   },
   profileImageContainer: {
     position: 'relative',
@@ -852,8 +854,9 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
   },
   profileInfo: {
-    flex: 1,
     justifyContent: 'center',
+    minWidth: 180,
+    maxWidth: 200,
   },
   profileName: {
     fontSize: 20,
