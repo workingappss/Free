@@ -1,19 +1,28 @@
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { Habit } from '@/types/habit';
 
-// Configure notification behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// Only import notifications on native platforms
+let Notifications: any = null;
+if (Platform.OS !== 'web') {
+  try {
+    Notifications = require('expo-notifications');
+    
+    // Configure notification behavior
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  } catch (error) {
+    console.warn('Expo notifications not available:', error);
+  }
+}
 
 export const notificationService = {
   async requestPermissions(): Promise<boolean> {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' || !Notifications) {
       return false; // Notifications not supported on web
     }
 
@@ -34,7 +43,7 @@ export const notificationService = {
   },
 
   async scheduleHabitReminder(habit: Habit): Promise<string | null> {
-    if (Platform.OS === 'web' || !habit.reminderTime) {
+    if (Platform.OS === 'web' || !habit.reminderTime || !Notifications) {
       return null;
     }
 
@@ -70,7 +79,7 @@ export const notificationService = {
   },
 
   async cancelHabitReminder(habitId: string): Promise<void> {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' || !Notifications) {
       return;
     }
 
@@ -88,7 +97,7 @@ export const notificationService = {
   },
 
   async cancelAllHabitReminders(): Promise<void> {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' || !Notifications) {
       return;
     }
 

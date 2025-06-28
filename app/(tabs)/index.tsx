@@ -305,6 +305,18 @@ export default function TodayScreen() {
     }
   };
 
+  const handleTaskUpdate = (updatedTask: Task) => {
+    setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
   const currentDateTasks = getCurrentDateTasks();
   const progress = calculateProgress();
 
@@ -312,6 +324,10 @@ export default function TodayScreen() {
     <TaskCard
       task={item}
       onToggle={() => toggleTask(item.id)}
+      onToggleSubtask={(subtaskId) => toggleSubtask(item.id, subtaskId)}
+      onDelete={() => deleteTask(item.id)}
+      formatTime={formatTime}
+      onTaskUpdate={handleTaskUpdate}
       onToggleSubtask={(subtaskId) => toggleSubtask(item.id, subtaskId)}
       onDelete={() => deleteTask(item.id)}
       drag={drag}
@@ -496,6 +512,10 @@ export default function TodayScreen() {
 function TaskCard({ 
   task, 
   onToggle, 
+  onToggleSubtask, 
+  onDelete, 
+  formatTime,
+  onTaskUpdate,
   formatTime,
   onTaskUpdate,
   drag,
@@ -503,6 +523,10 @@ function TaskCard({
 }: { 
   task: Task; 
   onToggle: () => void; 
+  onToggleSubtask: (subtaskId: string) => void;
+  onDelete: () => void;
+  formatTime: (date: Date) => string;
+  onTaskUpdate: (task: Task) => void;
   drag: () => void;
   isActive: boolean;
 }) {
@@ -565,11 +589,7 @@ function TaskCard({
                 <View style={styles.metaItem}>
                   <Clock size={12} color="#6B7280" strokeWidth={2} />
                   <Text style={styles.metaText}>
-                    {task.startTime.toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true,
-                    })}
+                    {formatTime(task.startTime)}
                   </Text>
                 </View>
               )}
@@ -636,7 +656,6 @@ function TaskCard({
           )}
         </View>
       </TouchableOpacity>
-
 
       <TouchableOpacity
         style={styles.deleteButton}
