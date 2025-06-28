@@ -11,11 +11,11 @@ import {
   Modal,
 } from 'react-native';
 import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck as CheckCircle2, Clock, Target, ArrowLeft, Play, Pause } from 'lucide-react-native';
+import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck as CheckCircle2, Clock, Target, ArrowLeft } from 'lucide-react-native';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import ComplexTaskForm from '@/components/ComplexTaskForm';
 import CalendarView from '@/components/CalendarView';
 import SimpleTaskInput from '@/components/SimpleTaskInput';
-import TaskTimer from '@/components/TaskTimer';
 import { taskStorage } from '@/utils/taskStorage';
 import { Task } from '@/types/task';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -306,18 +306,6 @@ export default function TodayScreen() {
     }
   };
 
-  const handleTaskUpdate = (updatedTask: Task) => {
-    setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
-  };
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
   const currentDateTasks = getCurrentDateTasks();
   const progress = calculateProgress();
 
@@ -327,8 +315,6 @@ export default function TodayScreen() {
       onToggle={() => toggleTask(item.id)}
       onToggleSubtask={(subtaskId) => toggleSubtask(item.id, subtaskId)}
       onDelete={() => deleteTask(item.id)}
-      formatTime={formatTime}
-      onTaskUpdate={handleTaskUpdate}
       drag={drag}
       isActive={isActive}
     />
@@ -511,8 +497,6 @@ export default function TodayScreen() {
 function TaskCard({ 
   task, 
   onToggle, 
-  onToggleSubtask, 
-  onDelete, 
   formatTime,
   onTaskUpdate,
   drag,
@@ -520,10 +504,6 @@ function TaskCard({
 }: { 
   task: Task; 
   onToggle: () => void; 
-  onToggleSubtask: (subtaskId: string) => void;
-  onDelete: () => void;
-  formatTime: (date: Date) => string;
-  onTaskUpdate: (task: Task) => void;
   drag: () => void;
   isActive: boolean;
 }) {
@@ -585,7 +565,13 @@ function TaskCard({
               {task.startTime && (
                 <View style={styles.metaItem}>
                   <Clock size={12} color="#6B7280" strokeWidth={2} />
-                  <Text style={styles.metaText}>{formatTime(task.startTime)}</Text>
+                  <Text style={styles.metaText}>
+                    {task.startTime.toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
+                  </Text>
                 </View>
               )}
               
@@ -652,14 +638,6 @@ function TaskCard({
         </View>
       </TouchableOpacity>
 
-      {/* Timer Component */}
-      {!task.completed && (
-        <TaskTimer 
-          task={task} 
-          onTaskUpdate={onTaskUpdate}
-          compact={true}
-        />
-      )}
 
       <TouchableOpacity
         style={styles.deleteButton}

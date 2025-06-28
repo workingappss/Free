@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
+  SafeAreaView,
+  Platform,
 } from 'react-native';
-import { Target } from 'lucide-react-native';
+import { Target, X } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import GoalSelector from './GoalSelector';
 
@@ -63,50 +65,60 @@ export default function SimpleTaskInput({
   };
 
   return (
-    <>
-      <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}>
-        <TextInput
-          style={[styles.input, { color: colors.text }]}
-          placeholder={placeholder}
-          placeholderTextColor={colors.textTertiary}
-          value={taskTitle}
-          onChangeText={setTaskTitle}
-          autoFocus
-          onSubmitEditing={handleSave}
-          returnKeyType="done"
-          multiline
-        />
-        
-        {/* Goal Link Button */}
-        <TouchableOpacity
-          style={[styles.goalButton, { borderColor: colors.borderLight }]}
-          onPress={() => setShowGoalSelector(true)}
-          activeOpacity={0.7}
-        >
-          <Target size={14} color={linkedGoalId ? colors.primary : colors.textTertiary} strokeWidth={2} />
-          <Text style={[
-            styles.goalButtonText, 
-            { color: linkedGoalId ? colors.primary : colors.textTertiary }
-          ]}>
-            {linkedGoalId ? `+${goalContribution} ${goalUnit}` : 'Link goal'}
-          </Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Create Simple Task</Text>
+        <TouchableOpacity style={[styles.closeButton, { backgroundColor: colors.card }]} onPress={handleCancel} activeOpacity={0.7}>
+          <X size={20} color={colors.textSecondary} strokeWidth={2} />
         </TouchableOpacity>
-        
-        <View style={styles.actions}>
+      </View>
+
+      <View style={styles.content}>
+        <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
+          <TextInput
+            style={[styles.input, { color: colors.text }]}
+            placeholder={placeholder}
+            placeholderTextColor={colors.textTertiary}
+            value={taskTitle}
+            onChangeText={setTaskTitle}
+            autoFocus
+            onSubmitEditing={handleSave}
+            returnKeyType="done"
+            multiline
+          />
+          
+          {/* Goal Link Button */}
           <TouchableOpacity
-            style={[styles.cancelButton, { backgroundColor: colors.card }]}
-            onPress={handleCancel}
+            style={[styles.goalButton, { borderColor: colors.borderLight }]}
+            onPress={() => setShowGoalSelector(true)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
+            <Target size={14} color={linkedGoalId ? colors.primary : colors.textTertiary} strokeWidth={2} />
+            <Text style={[
+              styles.goalButtonText, 
+              { color: linkedGoalId ? colors.primary : colors.textTertiary }
+            ]}>
+              {linkedGoalId ? `+${goalContribution} ${goalUnit}` : 'Link goal'}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.saveButton, { backgroundColor: colors.primary }]}
-            onPress={handleSave}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.saveButtonText}>Add task</Text>
-          </TouchableOpacity>
+          
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={[styles.cancelButton, { backgroundColor: colors.card, borderColor: colors.borderLight }]}
+              onPress={handleCancel}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.saveButton, { backgroundColor: colors.primary }]}
+              onPress={handleSave}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.saveButtonText}>Add task</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -124,13 +136,38 @@ export default function SimpleTaskInput({
           onGoalSelect={handleGoalSelect}
         />
       </Modal>
-    </>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    borderBottomWidth: 1,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  inputContainer: {
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -139,12 +176,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   input: {
     fontSize: 15,
     fontFamily: 'Inter-Medium',
-    color: '#1F2937',
     marginBottom: 16,
     paddingVertical: 4,
     minHeight: 20,
@@ -157,14 +192,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
     marginBottom: 12,
     gap: 4,
   },
   goalButtonText: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
   },
   actions: {
     flexDirection: 'row',
@@ -172,19 +205,17 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
+    borderWidth: 1,
   },
   cancelButtonText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#4F46E5',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',

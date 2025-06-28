@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Task, TimerSession, TaskCompletionData } from '@/types/task';
+import { Task, TaskCompletionData } from '@/types/task';
 import { Goal, GoalContribution } from '@/types/goal';
 
 const TASKS_KEY = 'tasks';
-const TIMER_SESSIONS_KEY = 'timer_sessions';
 const TASK_COMPLETIONS_KEY = 'task_completions';
 const GOALS_KEY = 'goals';
 const GOAL_CONTRIBUTIONS_KEY = 'goal_contributions';
@@ -19,12 +18,6 @@ export const taskStorage = {
       return tasks.map((task: any) => ({
         ...task,
         startTime: task.startTime ? new Date(task.startTime) : undefined,
-        currentSessionStartTime: task.currentSessionStartTime ? new Date(task.currentSessionStartTime) : undefined,
-        timerSessions: task.timerSessions?.map((session: any) => ({
-          ...session,
-          startTime: new Date(session.startTime),
-          endTime: session.endTime ? new Date(session.endTime) : undefined,
-        })) || [],
       }));
     } catch (error) {
       console.error('Error loading tasks:', error);
@@ -55,60 +48,9 @@ export const taskStorage = {
       const tasks = await this.getTasks();
       const filteredTasks = tasks.filter(t => t.id !== taskId);
       await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(filteredTasks));
-      
-      // Also delete timer sessions for this task
-      const sessions = await this.getTimerSessions();
-      const filteredSessions = sessions.filter(s => s.taskId !== taskId);
-      await AsyncStorage.setItem(TIMER_SESSIONS_KEY, JSON.stringify(filteredSessions));
     } catch (error) {
       console.error('Error deleting task:', error);
       throw error;
-    }
-  },
-
-  // Timer Sessions
-  async getTimerSessions(): Promise<TimerSession[]> {
-    try {
-      const sessionsJson = await AsyncStorage.getItem(TIMER_SESSIONS_KEY);
-      if (!sessionsJson) return [];
-      
-      const sessions = JSON.parse(sessionsJson);
-      return sessions.map((session: any) => ({
-        ...session,
-        startTime: new Date(session.startTime),
-        endTime: session.endTime ? new Date(session.endTime) : undefined,
-      }));
-    } catch (error) {
-      console.error('Error loading timer sessions:', error);
-      return [];
-    }
-  },
-
-  async saveTimerSession(session: TimerSession): Promise<void> {
-    try {
-      const sessions = await this.getTimerSessions();
-      const existingIndex = sessions.findIndex(s => s.id === session.id);
-      
-      if (existingIndex >= 0) {
-        sessions[existingIndex] = session;
-      } else {
-        sessions.push(session);
-      }
-      
-      await AsyncStorage.setItem(TIMER_SESSIONS_KEY, JSON.stringify(sessions));
-    } catch (error) {
-      console.error('Error saving timer session:', error);
-      throw error;
-    }
-  },
-
-  async getTimerSessionsForTask(taskId: string): Promise<TimerSession[]> {
-    try {
-      const sessions = await this.getTimerSessions();
-      return sessions.filter(session => session.taskId === taskId);
-    } catch (error) {
-      console.error('Error loading timer sessions for task:', error);
-      return [];
     }
   },
 
@@ -214,84 +156,11 @@ export const taskStorage = {
     }
   },
 
-  // Timer utilities
-  async startTimer(taskId: string): Promise<void> {
-    try {
-      const tasks = await this.getTasks();
-      const task = tasks.find(t => t.id === taskId);
-      if (!task) return;
-
-      // Stop any other running timers
-      await this.stopAllTimers();
-
-      task.isTimerRunning = true;
-      task.currentSessionStartTime = new Date();
-      
-      await this.saveTask(task);
-    } catch (error) {
-      console.error('Error starting timer:', error);
-      throw error;
-    }
-  },
-
-  async stopTimer(taskId: string): Promise<number> {
-    try {
-      const tasks = await this.getTasks();
-      const task = tasks.find(t => t.id === taskId);
-      if (!task || !task.isTimerRunning || !task.currentSessionStartTime) return 0;
-
-      const endTime = new Date();
-      const sessionDuration = Math.floor((endTime.getTime() - task.currentSessionStartTime.getTime()) / 1000);
-
-      // Create timer session
-      const session: TimerSession = {
-        id: Date.now().toString(),
-        taskId,
-        startTime: task.currentSessionStartTime,
-        endTime,
-        duration: sessionDuration,
-      };
-
-      await this.saveTimerSession(session);
-
-      // Update task
-      task.isTimerRunning = false;
-      task.currentSessionStartTime = undefined;
-      task.totalTimeSpent = (task.totalTimeSpent || 0) + sessionDuration;
-      task.timerSessions = [...(task.timerSessions || []), session];
-
-      await this.saveTask(task);
-      return sessionDuration;
-    } catch (error) {
-      console.error('Error stopping timer:', error);
-      throw error;
-    }
-  },
-
-  async stopAllTimers(): Promise<void> {
-    try {
-      const tasks = await this.getTasks();
-      const runningTasks = tasks.filter(t => t.isTimerRunning);
-      
-      for (const task of runningTasks) {
-        await this.stopTimer(task.id);
-      }
-    } catch (error) {
-      console.error('Error stopping all timers:', error);
-      throw error;
-    }
-  },
-
   async completeTaskWithGoalUpdate(taskId: string): Promise<void> {
     try {
       const tasks = await this.getTasks();
       const task = tasks.find(t => t.id === taskId);
       if (!task) return;
-
-      // Stop timer if running
-      if (task.isTimerRunning) {
-        await this.stopTimer(taskId);
-      }
 
       // Mark task as completed
       task.completed = true;
@@ -300,7 +169,6 @@ export const taskStorage = {
       const completionData: TaskCompletionData = {
         taskId: task.id,
         completedAt: new Date(),
-        totalTimeSpent: task.totalTimeSpent || 0,
         linkedGoalId: task.linkedGoalId,
         goalContribution: task.goalContribution,
         goalUnit: task.goalUnit,
@@ -337,7 +205,6 @@ export const taskStorage = {
       } else if (goal.type === 'non-quantifiable') {
         // For non-quantifiable goals, increment task count and hours
         goal.contributedTasks = (goal.contributedTasks || 0) + 1;
-        goal.contributedHours = (goal.contributedHours || 0) + (task.totalTimeSpent || 0) / 3600; // Convert seconds to hours
       }
 
       await this.saveGoal(goal);
@@ -357,32 +224,6 @@ export const taskStorage = {
     } catch (error) {
       console.error('Error updating goal progress:', error);
       throw error;
-    }
-  },
-
-  // Utility functions
-  formatTime(seconds: number): string {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-    } else {
-      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-    }
-  },
-
-  formatTimeShort(seconds: number): string {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else if (minutes > 0) {
-      return `${minutes}m`;
-    } else {
-      return `${seconds}s`;
     }
   },
 };

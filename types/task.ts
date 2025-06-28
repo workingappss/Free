@@ -10,12 +10,6 @@ export interface Task {
   isComplex?: boolean;
   order: number;
   
-  // Timer functionality
-  timerSessions: TimerSession[];
-  totalTimeSpent: number; // Total accumulated time in seconds
-  isTimerRunning: boolean;
-  currentSessionStartTime?: Date;
-  
   // Goal linking
   linkedGoalId?: string;
   goalContribution?: number; // Amount to contribute to goal when completed
@@ -28,18 +22,10 @@ export interface Subtask {
   completed: boolean;
 }
 
-export interface TimerSession {
-  id: string;
-  startTime: Date;
-  endTime?: Date;
-  duration: number; // Duration in seconds
-  taskId: string;
-}
 
 export interface TaskCompletionData {
   taskId: string;
   completedAt: Date;
-  totalTimeSpent: number;
   linkedGoalId?: string;
   goalContribution?: number;
   goalUnit?: string;
