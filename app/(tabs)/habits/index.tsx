@@ -27,6 +27,14 @@ export default function HabitsScreen() {
   const today = new Date();
   const todayStr = habitStorage.formatDate(today);
 
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   useFocusEffect(
     useCallback(() => {
       loadData();
@@ -102,14 +110,6 @@ export default function HabitsScreen() {
     router.push(`/habits/${habitId}`);
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
   const getProgressSummary = () => {
     const todaysHabits = getTodaysHabits();
     const completedCount = todaysHabits.filter(habit => {
@@ -138,42 +138,38 @@ export default function HabitsScreen() {
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View style={styles.headerContent}>
           <View style={styles.headerTop}>
-            <View>
+            <View style={styles.headerLeft}>
               <Text style={[styles.headerTitle, { color: colors.text }]}>Habits</Text>
-              <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{formatDate(today)}</Text>
+              <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>Track your progress</Text>
             </View>
-            <TouchableOpacity 
-              style={[styles.addButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]} 
-              onPress={() => router.push('/habits/create')}
-              activeOpacity={0.8}
-            >
-              <Plus size={18} color="#FFFFFF" strokeWidth={2.5} />
-            </TouchableOpacity>
+            <View style={styles.headerRight}>
+              <Text style={[styles.dateText, { color: colors.text }]}>{formatDate(today)}</Text>
+            </View>
           </View>
 
           {/* Progress Summary */}
           {progress.total > 0 && (
-            <View style={styles.progressCard}>
+            <View style={[styles.progressCard, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
               <View style={styles.progressHeader}>
-                <View style={styles.progressIconContainer}>
-                  <CheckSquare size={20} color="#10B981" strokeWidth={2} />
+                <View style={[styles.progressIconContainer, { backgroundColor: colors.success + '20' }]}>
+                  <CheckSquare size={20} color={colors.success} strokeWidth={2} />
                 </View>
                 <View style={styles.progressTextContainer}>
-                  <Text style={styles.progressTitle}>Today's Progress</Text>
-                  <Text style={styles.progressSubtitle}>
+                  <Text style={[styles.progressTitle, { color: colors.text }]}>Progress</Text>
+                  <Text style={[styles.progressSubtitle, { color: colors.textSecondary }]}>
                     {progress.completed} of {progress.total} completed
                   </Text>
                 </View>
-                <Text style={styles.progressPercentage}>
+                <Text style={[styles.progressPercentage, { color: colors.success }]}>
                   {progress.percentage}%
                 </Text>
               </View>
               <View style={styles.progressBarContainer}>
-                <View style={styles.progressBar}>
+                <View style={[styles.progressBar, { backgroundColor: colors.borderLight }]}>
                   <View 
                     style={[
                       styles.progressFill, 
-                      { width: `${progress.percentage}%` }
+                      { width: `${progress.percentage}%`, backgroundColor: colors.success }
                     ]} 
                   />
                 </View>
@@ -185,29 +181,29 @@ export default function HabitsScreen() {
           {habits.length > 0 && (
             <View style={styles.quickStats}>
               <View style={styles.quickStatItem}>
-                <View style={styles.quickStatIcon}>
-                  <Target size={16} color="#6366F1" strokeWidth={2} />
+                <View style={[styles.quickStatIcon, { backgroundColor: colors.primary + '20' }]}>
+                  <Target size={16} color={colors.primary} strokeWidth={2} />
                 </View>
-                <Text style={styles.quickStatValue}>{habits.length}</Text>
-                <Text style={styles.quickStatLabel}>Active Habits</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text }]}>{habits.length}</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>Active Habits</Text>
               </View>
               
               <View style={styles.quickStatItem}>
-                <View style={styles.quickStatIcon}>
-                  <Flame size={16} color="#F59E0B" strokeWidth={2} />
+                <View style={[styles.quickStatIcon, { backgroundColor: colors.warning + '20' }]}>
+                  <Flame size={16} color={colors.warning} strokeWidth={2} />
                 </View>
-                <Text style={styles.quickStatValue}>{totalStreaks}</Text>
-                <Text style={styles.quickStatLabel}>Total Streaks</Text>
+                <Text style={[styles.quickStatValue, { color: colors.text }]}>{totalStreaks}</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>Total Streaks</Text>
               </View>
               
               <View style={styles.quickStatItem}>
-                <View style={styles.quickStatIcon}>
-                  <TrendingUp size={16} color="#10B981" strokeWidth={2} />
+                <View style={[styles.quickStatIcon, { backgroundColor: colors.success + '20' }]}>
+                  <TrendingUp size={16} color={colors.success} strokeWidth={2} />
                 </View>
-                <Text style={styles.quickStatValue}>
+                <Text style={[styles.quickStatValue, { color: colors.text }]}>
                   {Object.values(habitStats).reduce((sum, stats) => sum + stats.totalCompletions, 0)}
                 </Text>
-                <Text style={styles.quickStatLabel}>Completions</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>Completions</Text>
               </View>
             </View>
           )}
@@ -224,24 +220,24 @@ export default function HabitsScreen() {
       >
         {loading ? (
           <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading habits...</Text>
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading habits...</Text>
           </View>
         ) : todaysHabits.length === 0 ? (
           <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <CheckSquare size={32} color="#9CA3AF" strokeWidth={1.5} />
+            <View style={[styles.emptyIconContainer, { backgroundColor: colors.card }]}>
+              <CheckSquare size={32} color={colors.textTertiary} strokeWidth={1.5} />
             </View>
-            <Text style={styles.emptyTitle}>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
               {habits.length === 0 ? 'No habits yet' : 'No habits due today'}
             </Text>
-            <Text style={styles.emptySubtitle}>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
               {habits.length === 0 
                 ? 'Create your first habit to start building better routines'
                 : 'All your habits are scheduled for other days'
               }
             </Text>
             <TouchableOpacity 
-              style={styles.emptyActionButton}
+              style={[styles.emptyActionButton, { backgroundColor: colors.primary }]}
               onPress={() => router.push('/habits/create')}
               activeOpacity={0.8}
             >
@@ -251,10 +247,22 @@ export default function HabitsScreen() {
           </View>
         ) : (
           <View style={styles.habitsContainer}>
+            {/* Add Habit Button */}
+            <View style={styles.addSection}>
+              <TouchableOpacity 
+                style={[styles.addButton, { backgroundColor: colors.primary }]}
+                onPress={() => router.push('/habits/create')}
+                activeOpacity={0.8}
+              >
+                <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
+                <Text style={styles.addButtonText}>Create New Habit</Text>
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Today's Habits</Text>
-              <View style={styles.sectionBadge}>
-                <Text style={styles.sectionBadgeText}>{todaysHabits.length}</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Today's Habits</Text>
+              <View style={[styles.sectionBadge, { backgroundColor: colors.card }]}>
+                <Text style={[styles.sectionBadgeText, { color: colors.textSecondary }]}>{todaysHabits.length}</Text>
               </View>
             </View>
 
@@ -280,9 +288,9 @@ export default function HabitsScreen() {
         {habits.length > todaysHabits.length && (
           <View style={styles.allHabitsContainer}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>All Habits</Text>
-              <View style={styles.sectionBadge}>
-                <Text style={styles.sectionBadgeText}>{habits.length}</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>All Habits</Text>
+              <View style={[styles.sectionBadge, { backgroundColor: colors.card }]}>
+                <Text style={[styles.sectionBadgeText, { color: colors.textSecondary }]}>{habits.length}</Text>
               </View>
             </View>
 
@@ -292,7 +300,7 @@ export default function HabitsScreen() {
               return (
                 <TouchableOpacity
                   key={habit.id}
-                  style={styles.inactiveHabitCard}
+                  style={[styles.inactiveHabitCard, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}
                   onPress={() => handleHabitPress(habit.id)}
                   activeOpacity={0.8}
                 >
@@ -304,8 +312,8 @@ export default function HabitsScreen() {
                         </Text>
                       </View>
                       <View>
-                        <Text style={styles.inactiveHabitName}>{habit.name}</Text>
-                        <Text style={styles.inactiveHabitFrequency}>
+                        <Text style={[styles.inactiveHabitName, { color: colors.text }]}>{habit.name}</Text>
+                        <Text style={[styles.inactiveHabitFrequency, { color: colors.textTertiary }]}>
                           {habit.frequency === 'daily' ? 'Daily' : 
                            habit.frequency === 'weekly' ? 'Weekly' : 'Custom'}
                         </Text>
@@ -313,8 +321,8 @@ export default function HabitsScreen() {
                     </View>
                     {stats && stats.currentStreak > 0 && (
                       <View style={styles.inactiveHabitStreak}>
-                        <Flame size={14} color="#F59E0B" strokeWidth={2} />
-                        <Text style={styles.inactiveHabitStreakText}>
+                        <Flame size={14} color={colors.warning} strokeWidth={2} />
+                        <Text style={[styles.inactiveHabitStreakText, { color: colors.warning }]}>
                           {stats.currentStreak}
                         </Text>
                       </View>
@@ -355,6 +363,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 16,
   },
+  headerLeft: {
+    flex: 1,
+  },
   headerTitle: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
@@ -366,18 +377,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     color: '#6B7280',
   },
-  addButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#6366F1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+  headerRight: {
+    alignItems: 'flex-end',
+  },
+  dateText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1F2937',
   },
   progressCard: {
     backgroundColor: '#F8FAFC',
@@ -524,6 +530,28 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   emptyActionButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+    marginLeft: 6,
+  },
+  addSection: {
+    marginBottom: 24,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#6366F1',
+    paddingVertical: 14,
+    borderRadius: 12,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  addButtonText: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',

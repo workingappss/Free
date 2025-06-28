@@ -64,6 +64,16 @@ export default function GoalsScreen() {
   const [newProgressValue, setNewProgressValue] = useState('');
   const { colors } = useTheme();
 
+  const today = new Date();
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   const openCreateModal = () => {
     setEditingGoal(null);
     setModalState('create');
@@ -188,24 +198,92 @@ export default function GoalsScreen() {
   const timeframeOrder = ['weekly', 'monthly', 'quarterly', 'yearly', 'custom'];
   const sortedTimeframes = timeframeOrder.filter(timeframe => groupedGoals[timeframe]?.length > 0);
 
+  const getProgressSummary = () => {
+    const activeGoals = goals.filter(goal => !goal.isCompleted);
+    const completedGoals = goals.filter(goal => goal.isCompleted);
+    
+    return {
+      completed: completedGoals.length,
+      total: goals.length,
+      percentage: goals.length > 0 ? Math.round((completedGoals.length / goals.length) * 100) : 0
+    };
+  };
+
+  const progress = getProgressSummary();
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View style={styles.headerContent}>
           <View style={styles.headerTop}>
-            <View>
+            <View style={styles.headerLeft}>
               <Text style={[styles.headerTitle, { color: colors.text }]}>Goals</Text>
               <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>Track your progress</Text>
             </View>
-            <TouchableOpacity 
-              style={[styles.addButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]} 
-              onPress={openCreateModal}
-              activeOpacity={0.8}
-            >
-              <Plus size={18} color="#FFFFFF" strokeWidth={2.5} />
-            </TouchableOpacity>
+            <View style={styles.headerRight}>
+              <Text style={[styles.dateText, { color: colors.text }]}>{formatDate(today)}</Text>
+            </View>
           </View>
+
+          {/* Progress Summary */}
+          {progress.total > 0 && (
+            <View style={[styles.progressCard, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
+              <View style={styles.progressHeader}>
+                <View style={[styles.progressIconContainer, { backgroundColor: colors.success + '20' }]}>
+                  <Target size={20} color={colors.success} strokeWidth={2} />
+                </View>
+                <View style={styles.progressTextContainer}>
+                  <Text style={[styles.progressTitle, { color: colors.text }]}>Progress</Text>
+                  <Text style={[styles.progressSubtitle, { color: colors.textSecondary }]}>
+                    {progress.completed} of {progress.total} completed
+                  </Text>
+                </View>
+                <Text style={[styles.progressPercentage, { color: colors.success }]}>
+                  {progress.percentage}%
+                </Text>
+              </View>
+              <View style={styles.progressBarContainer}>
+                <View style={[styles.progressBar, { backgroundColor: colors.borderLight }]}>
+                  <View 
+                    style={[
+                      styles.progressFill, 
+                      { width: `${progress.percentage}%`, backgroundColor: colors.success }
+                    ]} 
+                  />
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Quick Stats */}
+          {goals.length > 0 && (
+            <View style={styles.quickStats}>
+              <View style={styles.quickStatItem}>
+                <View style={[styles.quickStatIcon, { backgroundColor: colors.primary + '20' }]}>
+                  <Target size={16} color={colors.primary} strokeWidth={2} />
+                </View>
+                <Text style={[styles.quickStatValue, { color: colors.text }]}>{goals.length}</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>Total Goals</Text>
+              </View>
+              
+              <View style={styles.quickStatItem}>
+                <View style={[styles.quickStatIcon, { backgroundColor: colors.success + '20' }]}>
+                  <Check size={16} color={colors.success} strokeWidth={2} />
+                </View>
+                <Text style={[styles.quickStatValue, { color: colors.text }]}>{progress.completed}</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>Completed</Text>
+              </View>
+              
+              <View style={styles.quickStatItem}>
+                <View style={[styles.quickStatIcon, { backgroundColor: colors.warning + '20' }]}>
+                  <TrendingUp size={16} color={colors.warning} strokeWidth={2} />
+                </View>
+                <Text style={[styles.quickStatValue, { color: colors.text }]}>{progress.percentage}%</Text>
+                <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>Success Rate</Text>
+              </View>
+            </View>
+          )}
         </View>
       </View>
 
@@ -213,15 +291,15 @@ export default function GoalsScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {goals.length === 0 ? (
           <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <Target size={32} color="#9CA3AF" strokeWidth={1.5} />
+            <View style={[styles.emptyIconContainer, { backgroundColor: colors.card }]}>
+              <Target size={32} color={colors.textTertiary} strokeWidth={1.5} />
             </View>
-            <Text style={styles.emptyTitle}>No goals yet</Text>
-            <Text style={styles.emptySubtitle}>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>No goals yet</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
               Create your first goal to start tracking your progress
             </Text>
             <TouchableOpacity 
-              style={styles.emptyActionButton}
+              style={[styles.emptyActionButton, { backgroundColor: colors.primary }]}
               onPress={openCreateModal}
               activeOpacity={0.8}
             >
@@ -231,6 +309,18 @@ export default function GoalsScreen() {
           </View>
         ) : (
           <>
+            {/* Add Goal Button */}
+            <View style={styles.addSection}>
+              <TouchableOpacity 
+                style={[styles.addButton, { backgroundColor: colors.primary }]}
+                onPress={openCreateModal}
+                activeOpacity={0.8}
+              >
+                <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
+                <Text style={styles.addButtonText}>Create New Goal</Text>
+              </TouchableOpacity>
+            </View>
+
             {/* Goals grouped by timeframe */}
             {sortedTimeframes.map((timeframe) => {
               const timeframeGoals = groupedGoals[timeframe];
@@ -245,12 +335,12 @@ export default function GoalsScreen() {
                         styles.timeframeIndicator, 
                         { backgroundColor: TIMEFRAME_COLORS[timeframe as keyof typeof TIMEFRAME_COLORS] }
                       ]} />
-                      <Text style={styles.timeframeSectionTitle}>
+                      <Text style={[styles.timeframeSectionTitle, { color: colors.text }]}>
                         {TIMEFRAME_LABELS[timeframe as keyof typeof TIMEFRAME_LABELS]} Goals
                       </Text>
                     </View>
-                    <View style={styles.timeframeBadge}>
-                      <Text style={styles.timeframeBadgeText}>
+                    <View style={[styles.timeframeBadge, { backgroundColor: colors.card }]}>
+                      <Text style={[styles.timeframeBadgeText, { color: colors.textSecondary }]}>
                         {activeGoals.length} active
                       </Text>
                     </View>
@@ -271,7 +361,7 @@ export default function GoalsScreen() {
                   {completedGoals.length > 0 && (
                     <>
                       <View style={styles.completedSectionHeader}>
-                        <Text style={styles.completedSectionTitle}>
+                        <Text style={[styles.completedSectionTitle, { color: colors.textTertiary }]}>
                           Completed ({completedGoals.length})
                         </Text>
                       </View>
@@ -316,56 +406,56 @@ export default function GoalsScreen() {
         onRequestClose={closeModal}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.progressUpdateContainer}>
-            <View style={styles.progressUpdateHeader}>
-              <Text style={styles.progressUpdateTitle}>
+          <View style={[styles.progressUpdateContainer, { backgroundColor: colors.surface }]}>
+            <View style={[styles.progressUpdateHeader, { borderBottomColor: colors.borderLight }]}>
+              <Text style={[styles.progressUpdateTitle, { color: colors.text }]}>
                 {modalState === 'updateProgress' ? 'Update Progress' : 'Update Estimation'}
               </Text>
-              <Text style={styles.progressUpdateSubtitle}>
+              <Text style={[styles.progressUpdateSubtitle, { color: colors.textSecondary }]}>
                 {progressUpdateGoal?.title}
               </Text>
             </View>
 
             <View style={styles.progressUpdateContent}>
-              <Text style={styles.progressUpdateLabel}>
+              <Text style={[styles.progressUpdateLabel, { color: colors.text }]}>
                 {modalState === 'updateProgress' 
                   ? `Current Progress (${progressUpdateGoal?.unit || 'units'})`
                   : 'Estimated Progress (%)'
                 }
               </Text>
               <TextInput
-                style={styles.progressUpdateInput}
+                style={[styles.progressUpdateInput, { backgroundColor: colors.card, borderColor: colors.borderLight, color: colors.text }]}
                 value={newProgressValue}
                 onChangeText={setNewProgressValue}
                 keyboardType="numeric"
                 placeholder={modalState === 'updateProgress' ? 'Enter progress' : 'Enter percentage (0-100)'}
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.textTertiary}
                 autoFocus
               />
               
               {modalState === 'updateProgress' && progressUpdateGoal?.targetNumber && (
-                <Text style={styles.progressUpdateTarget}>
+                <Text style={[styles.progressUpdateTarget, { color: colors.textSecondary }]}>
                   Target: {progressUpdateGoal.targetNumber} {progressUpdateGoal.unit}
                 </Text>
               )}
               
               {modalState === 'updateEstimation' && (
-                <Text style={styles.progressUpdateTarget}>
+                <Text style={[styles.progressUpdateTarget, { color: colors.textSecondary }]}>
                   How much of this goal do you estimate is complete?
                 </Text>
               )}
             </View>
 
-            <View style={styles.progressUpdateActions}>
+            <View style={[styles.progressUpdateActions, { borderTopColor: colors.borderLight }]}>
               <TouchableOpacity
-                style={styles.progressUpdateCancelButton}
+                style={[styles.progressUpdateCancelButton, { backgroundColor: colors.card }]}
                 onPress={closeModal}
                 activeOpacity={0.7}
               >
-                <Text style={styles.progressUpdateCancelText}>Cancel</Text>
+                <Text style={[styles.progressUpdateCancelText, { color: colors.textSecondary }]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.progressUpdateSaveButton}
+                style={[styles.progressUpdateSaveButton, { backgroundColor: colors.primary }]}
                 onPress={handleProgressUpdate}
                 activeOpacity={0.8}
               >
@@ -390,6 +480,8 @@ function GoalCard({
   onDelete: () => void;
   onUpdateProgress: () => void;
 }) {
+  const { colors } = useTheme();
+
   const getProgressData = () => {
     if (goal.type === 'quantifiable' && goal.targetNumber && goal.currentProgress !== undefined) {
       const percentage = (goal.currentProgress / goal.targetNumber) * 100;
@@ -484,12 +576,12 @@ function GoalCard({
   const timeframeColor = TIMEFRAME_COLORS[goal.timeframe as keyof typeof TIMEFRAME_COLORS];
 
   return (
-    <View style={styles.goalCard}>
+    <View style={[styles.goalCard, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}>
       <View style={styles.goalHeader}>
         <View style={[styles.goalColorIndicator, { backgroundColor: goal.color }]} />
         <View style={styles.goalInfo}>
           <View style={styles.goalTitleContainer}>
-            <Text style={[styles.goalTitle, goal.isCompleted && styles.completedText]}>
+            <Text style={[styles.goalTitle, goal.isCompleted && styles.completedText, { color: goal.isCompleted ? colors.textTertiary : colors.text }]}>
               {goal.title}
             </Text>
             <View style={[styles.goalTypeBadge, { backgroundColor: timeframeColor + '20' }]}>
@@ -499,7 +591,7 @@ function GoalCard({
             </View>
           </View>
           {goal.description && (
-            <Text style={styles.goalDescription}>{goal.description}</Text>
+            <Text style={[styles.goalDescription, { color: colors.textSecondary }]}>{goal.description}</Text>
           )}
         </View>
         <View style={styles.goalActions}>
@@ -508,7 +600,7 @@ function GoalCard({
             onPress={onEdit}
             activeOpacity={0.7}
           >
-            <Edit3 size={16} color="#6B7280" strokeWidth={2} />
+            <Edit3 size={16} color={colors.textSecondary} strokeWidth={2} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionButton}
@@ -526,15 +618,15 @@ function GoalCard({
           // Quantifiable Goal Progress
           <>
             <View style={styles.progressInfo}>
-              <Text style={styles.progressText}>
+              <Text style={[styles.progressText, { color: colors.text }]}>
                 {progressData.current} of {progressData.target} {progressData.unit}
               </Text>
-              <Text style={styles.progressPercentage}>
+              <Text style={[styles.progressPercentage, { color: colors.primary }]}>
                 {progressData.percentage}%
               </Text>
             </View>
             
-            <View style={styles.progressBar}>
+            <View style={[styles.progressBar, { backgroundColor: colors.borderLight }]}>
               <View 
                 style={[
                   styles.progressFill, 
@@ -549,12 +641,12 @@ function GoalCard({
             {/* Update Progress Button */}
             {!goal.isCompleted && (
               <TouchableOpacity
-                style={styles.updateProgressButton}
+                style={[styles.updateProgressButton, { backgroundColor: colors.primaryLight, borderColor: colors.primary + '40' }]}
                 onPress={onUpdateProgress}
                 activeOpacity={0.7}
               >
-                <TrendingUp size={14} color="#4F46E5" strokeWidth={2} />
-                <Text style={styles.updateProgressButtonText}>Update Progress</Text>
+                <TrendingUp size={14} color={colors.primary} strokeWidth={2} />
+                <Text style={[styles.updateProgressButtonText, { color: colors.primary }]}>Update Progress</Text>
               </TouchableOpacity>
             )}
           </>
@@ -562,19 +654,19 @@ function GoalCard({
           // Non-Quantifiable Goal Contributions and Estimation
           <>
             {/* Compact Contributions Row */}
-            <View style={styles.contributionsRow}>
+            <View style={[styles.contributionsRow, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
               <View style={styles.contributionCompactItem}>
                 <Clock size={12} color="#F59E0B" strokeWidth={2} />
-                <Text style={styles.contributionCompactValue}>
+                <Text style={[styles.contributionCompactValue, { color: colors.text }]}>
                   {progressData.contributedHours}h
                 </Text>
               </View>
 
-              <View style={styles.contributionCompactDivider} />
+              <View style={[styles.contributionCompactDivider, { backgroundColor: colors.borderLight }]} />
 
               <View style={styles.contributionCompactItem}>
                 <Check size={12} color="#10B981" strokeWidth={2} />
-                <Text style={styles.contributionCompactValue}>
+                <Text style={[styles.contributionCompactValue, { color: colors.text }]}>
                   {progressData.contributedTasks} tasks
                 </Text>
               </View>
@@ -583,13 +675,13 @@ function GoalCard({
             {/* Progress Estimation */}
             <View style={styles.estimationContainer}>
               <View style={styles.estimationHeader}>
-                <Text style={styles.estimationLabel}>Estimated Progress</Text>
-                <Text style={styles.estimationPercentage}>
+                <Text style={[styles.estimationLabel, { color: colors.textSecondary }]}>Estimated Progress</Text>
+                <Text style={[styles.estimationPercentage, { color: colors.primary }]}>
                   {progressData.estimatedProgress}%
                 </Text>
               </View>
               
-              <View style={styles.progressBar}>
+              <View style={[styles.progressBar, { backgroundColor: colors.borderLight }]}>
                 <View 
                   style={[
                     styles.progressFill, 
@@ -604,12 +696,12 @@ function GoalCard({
               {/* Update Estimation Button */}
               {!goal.isCompleted && (
                 <TouchableOpacity
-                  style={styles.updateEstimationButton}
+                  style={[styles.updateEstimationButton, { backgroundColor: colors.primaryLight, borderColor: colors.primary + '40' }]}
                   onPress={onUpdateProgress}
                   activeOpacity={0.7}
                 >
-                  <Percent size={14} color="#4F46E5" strokeWidth={2} />
-                  <Text style={styles.updateEstimationButtonText}>Update Estimation</Text>
+                  <Percent size={14} color={colors.primary} strokeWidth={2} />
+                  <Text style={[styles.updateEstimationButtonText, { color: colors.primary }]}>Update Estimation</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -626,8 +718,8 @@ function GoalCard({
         
         {goal.deadline && (
           <View style={styles.dueDateContainer}>
-            <Calendar size={12} color="#9CA3AF" strokeWidth={2} />
-            <Text style={styles.dueDate}>{formatDeadline(goal.deadline)}</Text>
+            <Calendar size={12} color={colors.textTertiary} strokeWidth={2} />
+            <Text style={[styles.dueDate, { color: colors.textTertiary }]}>{formatDeadline(goal.deadline)}</Text>
             {!goal.isCompleted && (() => {
               const daysLeftInfo = getDaysLeftDisplay(goal.deadline);
               return (
@@ -682,6 +774,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  headerLeft: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: 24,
@@ -694,23 +790,129 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     color: '#6B7280',
   },
-  addButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#4F46E5',
+  headerRight: {
+    alignItems: 'flex-end',
+  },
+  dateText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1F2937',
+  },
+  progressCard: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginBottom: 16,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  progressIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#DCFCE7',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#4F46E5',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginRight: 12,
+  },
+  progressTextContainer: {
+    flex: 1,
+  },
+  progressTitle: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1F2937',
+    marginBottom: 2,
+  },
+  progressSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+  },
+  progressPercentage: {
+    fontSize: 18,
+    fontFamily: 'Inter-Bold',
+    color: '#10B981',
+  },
+  progressBarContainer: {
+    marginTop: 4,
+  },
+  progressBar: {
+    height: 6,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#10B981',
+    borderRadius: 3,
+  },
+  quickStats: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  quickStatItem: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  quickStatIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  quickStatValue: {
+    fontSize: 16,
+    fontFamily: 'Inter-Bold',
+    color: '#1F2937',
+    marginBottom: 2,
+  },
+  quickStatLabel: {
+    fontSize: 10,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    textAlign: 'center',
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
+  },
+  addSection: {
+    marginBottom: 24,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#6366F1',
+    paddingVertical: 14,
+    borderRadius: 12,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  addButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+    marginLeft: 6,
   },
   emptyState: {
     alignItems: 'center',
@@ -743,11 +945,11 @@ const styles = StyleSheet.create({
   emptyActionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#6366F1',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 12,
-    shadowColor: '#4F46E5',
+    shadowColor: '#6366F1',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -886,22 +1088,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Inter-Medium',
     color: '#1F2937',
-  },
-  progressPercentage: {
-    fontSize: 13,
-    fontFamily: 'Inter-SemiBold',
-    color: '#4F46E5',
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 3,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 3,
   },
   updateProgressButton: {
     flexDirection: 'row',
@@ -1123,7 +1309,7 @@ const styles = StyleSheet.create({
   },
   progressUpdateSaveButton: {
     flex: 1,
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#6366F1',
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: 'center',
