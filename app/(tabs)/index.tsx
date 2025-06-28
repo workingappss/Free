@@ -328,8 +328,6 @@ export default function TodayScreen() {
       onDelete={() => deleteTask(item.id)}
       formatTime={formatTime}
       onTaskUpdate={handleTaskUpdate}
-      onToggleSubtask={(subtaskId) => toggleSubtask(item.id, subtaskId)}
-      onDelete={() => deleteTask(item.id)}
       drag={drag}
       isActive={isActive}
     />
@@ -514,8 +512,6 @@ function TaskCard({
   onToggle, 
   onToggleSubtask, 
   onDelete, 
-  formatTime,
-  onTaskUpdate,
   formatTime,
   onTaskUpdate,
   drag,
