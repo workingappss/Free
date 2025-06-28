@@ -530,36 +530,63 @@ export default function ProfileScreen() {
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.text }]}>Theme</Text>
               
-              {['light', 'dark', 'pink', 'system'].map((theme) => (
-                <TouchableOpacity
-                  key={theme}
-                  style={[styles.themeOption, { backgroundColor: colors.background, borderColor: colors.borderLight }]}
-                  onPress={() => handleSettingChange('appearance', 'theme', theme)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.themeInfo}>
-                    <View style={styles.themeIcon}>
-                      {theme === 'light' && <Sun size={16} color={colors.warning} strokeWidth={2} />}
-                      {theme === 'dark' && <Moon size={16} color={colors.primary} strokeWidth={2} />}
-                      {theme === 'pink' && (
-                        <View style={{
-                          width: 16,
-                          height: 16,
-                          borderRadius: 8,
-                          backgroundColor: '#EC4899',
-                        }} />
+              <View style={styles.themeGrid}>
+                {[
+                  { id: 'light', name: 'Light', color: '#F59E0B', icon: 'sun' },
+                  { id: 'dark', name: 'Dark', color: '#6366F1', icon: 'moon' },
+                  { id: 'pink', name: 'Pink', color: '#EC4899', icon: 'color' },
+                  { id: 'blue', name: 'Blue', color: '#0EA5E9', icon: 'color' },
+                  { id: 'green', name: 'Green', color: '#16A34A', icon: 'color' },
+                  { id: 'orange', name: 'Orange', color: '#F59E0B', icon: 'color' },
+                  { id: 'purple', name: 'Purple', color: '#A855F7', icon: 'color' },
+                  { id: 'red', name: 'Red', color: '#EF4444', icon: 'color' },
+                  { id: 'system', name: 'System', color: '#10B981', icon: 'system' },
+                ].map((themeOption) => (
+                  <TouchableOpacity
+                    key={themeOption.id}
+                    style={[
+                      styles.themeCard,
+                      { backgroundColor: colors.background, borderColor: colors.borderLight },
+                      settings.appearance.theme === themeOption.id && {
+                        borderColor: colors.primary,
+                        backgroundColor: colors.primaryLight
+                      }
+                    ]}
+                    onPress={() => handleSettingChange('appearance', 'theme', themeOption.id)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.themeCardContent}>
+                      <View style={[styles.themeCardIcon, { backgroundColor: themeOption.color + '20' }]}>
+                        {themeOption.icon === 'sun' && (
+                          <Sun size={16} color={themeOption.color} strokeWidth={2} />
+                        )}
+                        {themeOption.icon === 'moon' && (
+                          <Moon size={16} color={themeOption.color} strokeWidth={2} />
+                        )}
+                        {themeOption.icon === 'system' && (
+                          <Smartphone size={16} color={themeOption.color} strokeWidth={2} />
+                        )}
+                        {themeOption.icon === 'color' && (
+                          <View style={{
+                            width: 16,
+                            height: 16,
+                            borderRadius: 8,
+                            backgroundColor: themeOption.color,
+                          }} />
+                        )}
+                      </View>
+                      <Text style={[styles.themeCardTitle, { color: colors.text }]}>
+                        {themeOption.name}
+                      </Text>
+                      {settings.appearance.theme === themeOption.id && (
+                        <View style={styles.themeCardCheck}>
+                          <Check size={12} color={colors.primary} strokeWidth={2} />
+                        </View>
                       )}
-                      {theme === 'system' && <Smartphone size={16} color={colors.success} strokeWidth={2} />}
                     </View>
-                    <Text style={[styles.themeTitle, { color: colors.text }]}>
-                      {theme.charAt(0).toUpperCase() + theme.slice(1)}
-                    </Text>
-                  </View>
-                  {settings.appearance.theme === theme && (
-                    <Check size={16} color={colors.primary} strokeWidth={2} />
-                  )}
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
 
             <View style={styles.settingsSection}>
@@ -1120,6 +1147,48 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
   },
   // Theme Options
+  themeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  themeCard: {
+    width: '48%',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    padding: 12,
+  },
+  themeCardContent: {
+    alignItems: 'center',
+    position: 'relative',
+  },
+  themeCardIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  themeCardTitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    textAlign: 'center',
+  },
+  themeCardCheck: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   themeOption: {
     flexDirection: 'row',
     justifyContent: 'space-between',
