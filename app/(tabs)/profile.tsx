@@ -60,13 +60,13 @@ export default function ProfileScreen() {
   const { theme, colors, setTheme } = useTheme();
   
   const [profile, setProfile] = useState<UserProfile>({
-    name: 'Alex Johnson',
-    email: 'alex.johnson@email.com',
+    name: 'Jiahui Ruan',
+    email: 'jr@email.com',
     avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=160&h=160&dpr=2',
     memberSince: new Date('2024-01-15'),
     bio: 'Productivity enthusiast focused on building better habits and achieving meaningful goals.',
     location: 'San Francisco, CA',
-    website: 'alexjohnson.dev',
+    website: 'jr.dev',
   });
 
   const [settings, setSettings] = useState<AppSettings>({
