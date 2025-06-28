@@ -207,14 +207,14 @@ export default function ProfileScreen() {
                 activeOpacity={0.8}
                 onPress={() => setActiveModal('profile')}
               >
-                <Edit3 size={14} color="#FFFFFF" strokeWidth={2.5} />
+                <Edit3 size={12} color="#FFFFFF" strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
             
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{profile.name}</Text>
-              <Text style={styles.profileEmail}>{profile.email}</Text>
-              <Text style={styles.memberSince}>
+              <Text style={[styles.profileName, { color: colors.text }]}>{profile.name}</Text>
+              <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>{profile.email}</Text>
+              <Text style={[styles.memberSince, { color: colors.textTertiary }]}>
                 Member since {formatMemberSince(profile.memberSince)}
               </Text>
             </View>
@@ -258,21 +258,6 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Achievement Banner */}
-        <View style={styles.achievementBanner}>
-          <Image
-            source={{ uri: 'https://images.pexels.com/photos/1181533/pexels-photo-1181533.jpeg?auto=compress&cs=tinysrgb&w=400&h=120&dpr=2' }}
-            style={styles.bannerImage}
-          />
-          <View style={styles.bannerOverlay}>
-            <Star size={20} color="#FFFFFF" strokeWidth={2} />
-            <Text style={[styles.bannerTitle, { color: '#FFFFFF' }]}>Productivity Master!</Text>
-            <Text style={styles.bannerText}>
-              You've completed {stats.tasksCompleted} tasks this month
-            </Text>
-          </View>
-        </View>
-
         {/* Settings Sections */}
         <View style={styles.menuSection}>
           <TouchableOpacity
@@ -838,27 +823,28 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   profileSection: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   profileImageContainer: {
     position: 'relative',
-    marginBottom: 8,
+    marginRight: 16,
   },
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 3,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 2,
     borderColor: '#E5E7EB',
   },
   editButton: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: '#6366F1',
     justifyContent: 'center',
     alignItems: 'center',
@@ -866,20 +852,21 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
   },
   profileInfo: {
-    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   profileName: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: 'Inter-Bold',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   profileEmail: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    marginBottom: 1,
+    marginBottom: 2,
   },
   memberSince: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'Inter-Medium',
   },
   statsContainer: {
@@ -915,42 +902,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
-  },
-  achievementBanner: {
-    height: 100,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 20,
-    position: 'relative',
-  },
-  bannerImage: {
-    width: '100%',
-    height: '100%',
-  },
-  bannerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(99, 102, 241, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  bannerTitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-Bold',
-    marginTop: 4,
-    marginBottom: 2,
-  },
-  bannerText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Medium',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    opacity: 0.9,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   menuSection: {
     marginBottom: 24,
