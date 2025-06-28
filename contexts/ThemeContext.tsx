@@ -91,9 +91,9 @@ const pinkColors: ThemeColors = {
   surface: '#FFFFFF',
   card: '#FCE7F3',
   
-  text: '#831843',
-  textSecondary: '#BE185D',
-  textTertiary: '#EC4899',
+  text: '#000000',
+  textSecondary: '#374151',
+  textTertiary: '#6B7280',
   
   border: '#F9A8D4',
   borderLight: '#FBCFE8',
@@ -105,8 +105,8 @@ const pinkColors: ThemeColors = {
   warning: '#D97706',
   error: '#DC2626',
   
-  shadow: '#831843',
-  overlay: 'rgba(131, 24, 67, 0.5)',
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
