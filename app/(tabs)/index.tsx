@@ -420,32 +420,25 @@ export default function TodayScreen() {
       <View style={styles.content}>
         {/* Add Task Section */}
         <View style={styles.addSection}>
-          {modalState === 'none' ? (
-            <View style={styles.addButtonsContainer}>
-              <TouchableOpacity
-                style={[styles.complexTaskButton, { backgroundColor: '#8B5CF6' }]}
-                onPress={openComplexTaskForm}
-                activeOpacity={0.8}
-              >
-                <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
-                <Text style={styles.complexTaskButtonText}>Complex Task</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
-                onPress={openSimpleTaskInput}
-                activeOpacity={0.8}
-              >
-                <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-                <Text style={styles.simpleTaskButtonText}>Simple Task</Text>
-              </TouchableOpacity>
-            </View>
-          ) : modalState === 'simple' ? (
-            <SimpleTaskInput
-              onSave={addSimpleTask}
-              onCancel={closeAllModals}
-            />
-          ) : null}
+          <View style={styles.addButtonsContainer}>
+            <TouchableOpacity
+              style={[styles.complexTaskButton, { backgroundColor: '#8B5CF6' }]}
+              onPress={openComplexTaskForm}
+              activeOpacity={0.8}
+            >
+              <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
+              <Text style={styles.complexTaskButtonText}>Complex Task</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
+              onPress={openSimpleTaskInput}
+              activeOpacity={0.8}
+            >
+              <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
+              <Text style={styles.simpleTaskButtonText}>Simple Task</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Tasks List */}
@@ -470,6 +463,19 @@ export default function TodayScreen() {
           />
         )}
       </View>
+
+      {/* Simple Task Input Modal */}
+      <Modal
+        visible={modalState === 'simple'}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={closeAllModals}
+      >
+        <SimpleTaskInput
+          onSave={addSimpleTask}
+          onCancel={closeAllModals}
+        />
+      </Modal>
 
       {/* Complex Task Form Modal - Fixed with proper key and state management */}
       <Modal
