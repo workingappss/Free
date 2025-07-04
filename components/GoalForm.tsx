@@ -11,270 +11,140 @@ import {
   SafeAreaView,
   Modal,
 } from 'react-native';
-import { X, Target, SquareCheck as CheckSquare, Calendar, Plus, Trash2, ChevronLeft, ChevronRight, Clock } from 'lucide-react-native';
+import {
+  X,
+  Calendar,
+  Target,
+  BarChart3,
+  Palette,
+  ChevronDown,
+  Clock,
+  Users,
+  TrendingUp,
+  BookOpen,
+  Heart,
+  Home,
+  Briefcase,
+  Dumbbell,
+  Coffee
+} from 'lucide-react-native';
+import { Goal } from '@/types/goal';
+import CalendarView from '@/components/CalendarView';
 import { useTheme } from '@/contexts/ThemeContext';
 
-interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  type: 'quantifiable' | 'non-quantifiable';
-  // For quantifiable goals
-  targetNumber?: number;
-  unit?: string;
-  currentProgress?: number;
-  // For non-quantifiable goals
-  contributedHours?: number;
-  contributedTasks?: number;
-  estimatedProgress?: number; // Percentage estimation (0-100)
-  // Common fields
-  deadline?: Date;
-  timeframe: 'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom';
-  category: string;
-  customCategory?: string;
-  color: string;
-  isCompleted: boolean;
-  createdAt: Date;
-}
-
 interface GoalFormProps {
-  goal: Goal | null;
+  goal?: Goal;
   onSave: (goalData: Omit<Goal, 'id' | 'createdAt'>) => void;
   onCancel: () => void;
-  isEditing: boolean;
+  isEditing?: boolean;
 }
 
-const DEFAULT_CATEGORIES = [
-  { name: 'Health', color: '#10B981' },
-  { name: 'Work', color: '#06B6D4' },
-  { name: 'Learning', color: '#8B5CF6' },
-  { name: 'Personal', color: '#F59E0B' },
-  { name: 'Fitness', color: '#84CC16' },
+const GOAL_COLORS = [
+  '#6366F1', // Indigo
+  '#10B981', // Emerald
+  '#F59E0B', // Amber
+  '#EF4444', // Red
+  '#8B5CF6', // Violet
+  '#06B6D4', // Cyan
+  '#84CC16', // Lime
+  '#F97316', // Orange
+  '#EC4899', // Pink
+  '#6B7280', // Gray
+];
+
+const GOAL_CATEGORIES = [
+  { id: 'health', label: 'Health & Fitness', icon: Dumbbell },
+  { id: 'career', label: 'Career & Work', icon: Briefcase },
+  { id: 'education', label: 'Education & Learning', icon: BookOpen },
+  { id: 'relationships', label: 'Relationships', icon: Heart },
+  { id: 'personal', label: 'Personal Development', icon: TrendingUp },
+  { id: 'lifestyle', label: 'Lifestyle', icon: Coffee },
+  { id: 'home', label: 'Home & Family', icon: Home },
+  { id: 'other', label: 'Other', icon: Target },
 ];
 
 const TIMEFRAME_OPTIONS = [
-  { 
-    id: 'weekly', 
-    label: 'Weekly', 
-    description: 'Complete within this week',
-    color: '#EF4444',
-    icon: Calendar
-  },
-  { 
-    id: 'monthly', 
-    label: 'Monthly', 
-    description: 'Complete within this month',
-    color: '#F59E0B',
-    icon: Calendar
-  },
-  { 
-    id: 'quarterly', 
-    label: 'Quarterly', 
-    description: 'Complete within a quarter',
-    color: '#8B5CF6',
-    icon: Calendar
-  },
-  { 
-    id: 'yearly', 
-    label: 'Yearly', 
-    description: 'Complete within this year',
-    color: '#06B6D4',
-    icon: Calendar
-  },
-  { 
-    id: 'custom', 
-    label: 'Custom Date', 
-    description: 'Set your own deadline',
-    color: '#6B7280',
-    icon: Clock
-  },
+  { id: 'weekly', label: 'Weekly', description: 'Complete within a week' },
+  { id: 'monthly', label: 'Monthly', description: 'Complete within a month' },
+  { id: 'quarterly', label: 'Quarterly', description: 'Complete within a quarter' },
+  { id: 'yearly', label: 'Yearly', description: 'Complete within a year' },
+  { id: 'custom', label: 'Custom', description: 'Set your own deadline' },
 ];
 
-export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalFormProps) {
-  // Basic fields
+const QUARTER_OPTIONS = [
+  { id: 'Q1', label: 'Q1', description: 'Jan - Mar' },
+  { id: 'Q2', label: 'Q2', description: 'Apr - Jun' },
+  { id: 'Q3', label: 'Q3', description: 'Jul - Sep' },
+  { id: 'Q4', label: 'Q4', description: 'Oct - Dec' },
+];
+
+export default function GoalForm({ goal, onSave, onCancel, isEditing = false }: GoalFormProps) {
   const [title, setTitle] = useState(goal?.title || '');
   const [description, setDescription] = useState(goal?.description || '');
-  const [goalType, setGoalType] = useState<'quantifiable' | 'non-quantifiable'>(
-    goal?.type || 'quantifiable'
-  );
-
-  // Timeframe selection
-  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'>(
-    goal?.timeframe || 'monthly'
-  );
-
-  // Quarterly selection state
-  const [showQuarterSelection, setShowQuarterSelection] = useState(goal?.timeframe === 'quarterly');
-  const [selectedQuarterIndex, setSelectedQuarterIndex] = useState<number | null>(
-    goal?.timeframe === 'quarterly' ? getCurrentQuarter() : null
-  );
-
-  // Quantifiable goal fields
+  const [type, setType] = useState<'quantifiable' | 'non-quantifiable'>(goal?.type || 'quantifiable');
+  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'>(goal?.timeframe || 'monthly');
+  const [quarter, setQuarter] = useState<'Q1' | 'Q2' | 'Q3' | 'Q4'>(goal?.quarter || 'Q1');
+  const [deadline, setDeadline] = useState<Date | null>(goal?.deadline || null);
+  const [category, setCategory] = useState(goal?.category || 'personal');
+  const [customCategory, setCustomCategory] = useState(goal?.customCategory || '');
+  const [selectedColor, setSelectedColor] = useState(goal?.color || GOAL_COLORS[0]);
   const [targetNumber, setTargetNumber] = useState(goal?.targetNumber?.toString() || '');
   const [unit, setUnit] = useState(goal?.unit || '');
-  const [currentProgress, setCurrentProgress] = useState(goal?.currentProgress?.toString() || '0');
-
-  // Non-quantifiable goal fields
-  const [contributedHours, setContributedHours] = useState(goal?.contributedHours?.toString() || '0');
-  const [contributedTasks, setContributedTasks] = useState(goal?.contributedTasks?.toString() || '0');
-  const [estimatedProgress, setEstimatedProgress] = useState(goal?.estimatedProgress?.toString() || '0');
-
-  // Common fields
-  const [deadline, setDeadline] = useState<Date | null>(goal?.deadline || null);
-  const [selectedCategory, setSelectedCategory] = useState(goal?.category || DEFAULT_CATEGORIES[0].name);
-  const [customCategory, setCustomCategory] = useState(goal?.customCategory || '');
-  const [showCustomCategory, setShowCustomCategory] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const { colors } = useTheme();
 
-  // Get available categories (default + custom)
-  const [customCategories, setCustomCategories] = useState<Array<{name: string, color: string}>>([]);
-  
-  const allCategories = [
-    ...DEFAULT_CATEGORIES,
-    ...customCategories,
-    ...(showCustomCategory ? [] : [{ name: 'Custom...', color: '#6B7280' }])
-  ];
-
-  const selectedCategoryData = allCategories.find(cat => cat.name === selectedCategory) || DEFAULT_CATEGORIES[0];
-  const selectedTimeframeData = TIMEFRAME_OPTIONS.find(tf => tf.id === timeframe) || TIMEFRAME_OPTIONS[1];
-
-  // Helper function to get current quarter
-  function getCurrentQuarter(): number {
-    const now = new Date();
-    return Math.floor(now.getMonth() / 3);
-  }
-
-  // Helper function to get quarter info
-  function getQuarterInfo(quarterIndex: number, year: number = new Date().getFullYear()) {
-    const quarterNames = ['Q1', 'Q2', 'Q3', 'Q4'];
-    const quarterMonths = [
-      ['Jan', 'Feb', 'Mar'],
-      ['Apr', 'May', 'Jun'],
-      ['Jul', 'Aug', 'Sep'],
-      ['Oct', 'Nov', 'Dec']
-    ];
-    
-    const startMonth = quarterIndex * 3;
-    const endMonth = startMonth + 2;
-    const startDate = new Date(year, startMonth, 1);
-    const endDate = new Date(year, endMonth + 1, 0, 23, 59, 59, 999);
-    
-    return {
-      name: quarterNames[quarterIndex],
-      months: quarterMonths[quarterIndex],
-      startDate,
-      endDate,
-      isPast: endDate < new Date(),
-      isCurrent: getCurrentQuarter() === quarterIndex,
-    };
-  }
-
-  // Calculate automatic deadline based on timeframe and quarter
-  const getAutomaticDeadline = (selectedTimeframe: string, quarterIndex?: number): Date => {
-    const now = new Date();
-    
-    switch (selectedTimeframe) {
-      case 'weekly':
-        // End of current week (Sunday at 11:59 PM)
-        const endOfWeek = new Date(now);
-        const daysUntilSunday = (7 - now.getDay()) % 7;
-        endOfWeek.setDate(now.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
-        endOfWeek.setHours(23, 59, 59, 999);
-        return endOfWeek;
-        
-      case 'monthly':
-        // End of current month at 11:59 PM
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-        return endOfMonth;
-        
-      case 'quarterly':
-        // End of specific quarter at 11:59 PM
-        if (quarterIndex !== undefined) {
-          const quarterInfo = getQuarterInfo(quarterIndex);
-          return quarterInfo.endDate;
-        }
-        // Fallback to current quarter
-        const currentQuarter = getCurrentQuarter();
-        const currentQuarterInfo = getQuarterInfo(currentQuarter);
-        return currentQuarterInfo.endDate;
-        
-      case 'yearly':
-        // End of current year at 11:59 PM
-        const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
-        return endOfYear;
-        
-      default:
-        // Default to end of current day
-        const endOfDay = new Date(now);
-        endOfDay.setHours(23, 59, 59, 999);
-        return endOfDay;
+  const handleSave = () => {
+    if (!title.trim()) {
+      Alert.alert('Error', 'Please enter a goal title');
+      return;
     }
-  };
 
-  const handleTimeframeChange = (newTimeframe: string) => {
-    setTimeframe(newTimeframe as any);
-    
-    if (newTimeframe === 'quarterly') {
-      setShowQuarterSelection(true);
-      const currentQuarter = getCurrentQuarter();
-      setSelectedQuarterIndex(currentQuarter);
-      setDeadline(getAutomaticDeadline(newTimeframe, currentQuarter));
-    } else {
-      setShowQuarterSelection(false);
-      setSelectedQuarterIndex(null);
-      
-      if (newTimeframe !== 'custom') {
-        // Automatically set deadline based on timeframe
-        setDeadline(getAutomaticDeadline(newTimeframe));
-      } else {
-        // For custom, clear deadline so user can set their own
-        setDeadline(null);
+    if (timeframe === 'custom' && !deadline) {
+      Alert.alert('Error', 'Please select a deadline for custom timeframe');
+      return;
+    }
+
+    if (type === 'quantifiable') {
+      const target = parseFloat(targetNumber);
+      if (!targetNumber || isNaN(target) || target <= 0) {
+        Alert.alert('Error', 'Please enter a valid target number');
+        return;
+      }
+      if (!unit.trim()) {
+        Alert.alert('Error', 'Please enter a unit of measurement');
+        return;
       }
     }
-  };
 
-  const handleQuarterSelect = (quarterIndex: number) => {
-    const quarterInfo = getQuarterInfo(quarterIndex);
-    
-    // Don't allow selection of past quarters
-    if (quarterInfo.isPast) {
-      return;
-    }
-    
-    setSelectedQuarterIndex(quarterIndex);
-    setDeadline(quarterInfo.endDate);
-  };
-
-  const handleCategorySelect = (categoryName: string) => {
-    if (categoryName === 'Custom...') {
-      setShowCustomCategory(true);
-      setSelectedCategory('');
-    } else {
-      setSelectedCategory(categoryName);
-      setShowCustomCategory(false);
-      setCustomCategory('');
-    }
-  };
-
-  const handleCustomCategoryAdd = () => {
-    if (!customCategory.trim()) {
-      Alert.alert('Error', 'Please enter a category name');
+    if (category === 'other' && !customCategory.trim()) {
+      Alert.alert('Error', 'Please enter a custom category');
       return;
     }
 
-    const newCategory = {
-      name: customCategory.trim(),
-      color: '#6366F1' // Default color for custom categories
+    const goalData: Omit<Goal, 'id' | 'createdAt'> = {
+      title: title.trim(),
+      description: description.trim() || undefined,
+      type,
+      timeframe,
+      quarter: timeframe === 'quarterly' ? quarter : undefined,
+      deadline: timeframe === 'custom' ? deadline : undefined,
+      category: category === 'other' ? customCategory.trim() : category,
+      customCategory: category === 'other' ? customCategory.trim() : undefined,
+      color: selectedColor,
+      targetNumber: type === 'quantifiable' ? parseFloat(targetNumber) : undefined,
+      unit: type === 'quantifiable' ? unit.trim() : undefined,
+      currentProgress: type === 'quantifiable' ? 0 : undefined,
+      contributedHours: type === 'non-quantifiable' ? 0 : undefined,
+      contributedTasks: type === 'non-quantifiable' ? 0 : undefined,
+      estimatedProgress: type === 'non-quantifiable' ? 0 : undefined,
+      isCompleted: false,
     };
 
-    setCustomCategories(prev => [...prev, newCategory]);
-    setSelectedCategory(newCategory.name);
-    setShowCustomCategory(false);
-    setCustomCategory('');
+    onSave(goalData);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDeadline = (date: Date | null) => {
+    if (!date) return 'Select deadline';
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -284,122 +154,18 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
 
   const handleDateSelect = (selectedDate: Date) => {
     setDeadline(selectedDate);
-    setShowDatePicker(false);
+    setShowCalendar(false);
   };
 
-  const clearDeadline = () => {
-    setDeadline(null);
-  };
-
-  const validateForm = () => {
-    if (!title.trim()) {
-      Alert.alert('Error', 'Please enter a goal title');
-      return false;
-    }
-
-    if (goalType === 'quantifiable') {
-      const targetNum = parseInt(targetNumber, 10);
-      if (!targetNumber || isNaN(targetNum) || targetNum <= 0) {
-        Alert.alert('Error', 'Please enter a valid target number');
-        return false;
-      }
-
-      if (!unit.trim()) {
-        Alert.alert('Error', 'Please enter a unit of measurement');
-        return false;
-      }
-
-      if (isEditing) {
-        const progressNum = parseInt(currentProgress, 10);
-        if (isNaN(progressNum) || progressNum < 0) {
-          Alert.alert('Error', 'Please enter a valid current progress');
-          return false;
-        }
-      }
-    }
-
-    if (goalType === 'non-quantifiable' && isEditing) {
-      const hoursNum = parseInt(contributedHours, 10);
-      const tasksNum = parseInt(contributedTasks, 10);
-      const estimationNum = parseInt(estimatedProgress, 10);
-      
-      if (isNaN(hoursNum) || hoursNum < 0) {
-        Alert.alert('Error', 'Please enter a valid number of contributed hours');
-        return false;
-      }
-      
-      if (isNaN(tasksNum) || tasksNum < 0) {
-        Alert.alert('Error', 'Please enter a valid number of contributed tasks');
-        return false;
-      }
-
-      if (isNaN(estimationNum) || estimationNum < 0 || estimationNum > 100) {
-        Alert.alert('Error', 'Please enter a valid progress estimation (0-100%)');
-        return false;
-      }
-    }
-
-    if (timeframe === 'custom' && !deadline) {
-      Alert.alert('Error', 'Please set a deadline for custom timeframe');
-      return false;
-    }
-
-    if (timeframe === 'quarterly' && selectedQuarterIndex === null) {
-      Alert.alert('Error', 'Please select a quarter');
-      return false;
-    }
-
-    if (showCustomCategory && !customCategory.trim()) {
-      Alert.alert('Error', 'Please enter a custom category name or select an existing category');
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSave = () => {
-    if (!validateForm()) return;
-
-    const finalCategory = showCustomCategory ? customCategory.trim() : selectedCategory;
-    const finalCategoryColor = showCustomCategory ? '#6366F1' : selectedCategoryData.color;
-
-    const goalData: Omit<Goal, 'id' | 'createdAt'> = {
-      title: title.trim(),
-      description: description.trim(),
-      type: goalType,
-      timeframe,
-      category: finalCategory,
-      customCategory: showCustomCategory ? customCategory.trim() : undefined,
-      color: finalCategoryColor,
-      deadline,
-      isCompleted: false,
-    };
-
-    if (goalType === 'quantifiable') {
-      const targetNum = parseInt(targetNumber, 10);
-      const progressNum = isEditing ? parseInt(currentProgress, 10) : 0;
-      
-      goalData.targetNumber = targetNum;
-      goalData.unit = unit.trim();
-      goalData.currentProgress = Math.min(progressNum, targetNum);
-      goalData.isCompleted = progressNum >= targetNum;
-    } else {
-      // For non-quantifiable goals, set contributed hours, tasks, and estimation
-      const hoursNum = isEditing ? parseInt(contributedHours, 10) : 0;
-      const tasksNum = isEditing ? parseInt(contributedTasks, 10) : 0;
-      const estimationNum = isEditing ? parseInt(estimatedProgress, 10) : 0;
-      
-      goalData.contributedHours = hoursNum;
-      goalData.contributedTasks = tasksNum;
-      goalData.estimatedProgress = estimationNum;
-      goalData.isCompleted = estimationNum >= 100;
-    }
-
-    onSave(goalData);
+  const getCategoryLabel = () => {
+    if (category === 'other') return customCategory || 'Other';
+    const categoryObj = GOAL_CATEGORIES.find(cat => cat.id === category);
+    return categoryObj?.label || 'Personal Development';
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
+      {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>
           {isEditing ? 'Edit Goal' : 'Create New Goal'}
@@ -409,14 +175,18 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Goal Title */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Goal Title *</Text>
+          <Text style={[styles.sectionLabel, { color: colors.text }]}>Goal Title *</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.card, borderColor: colors.borderLight, color: colors.text }]}
             placeholder="What do you want to achieve?"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textTertiary}
             value={title}
             onChangeText={setTitle}
             autoFocus
@@ -425,11 +195,11 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
 
         {/* Description */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Description</Text>
+          <Text style={[styles.sectionLabel, { color: colors.text }]}>Description</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Extra notes or personal motivation (optional)"
-            placeholderTextColor="#9CA3AF"
+            style={[styles.input, styles.textArea, { backgroundColor: colors.card, borderColor: colors.borderLight, color: colors.text }]}
+            placeholder="Describe your goal in detail (optional)"
+            placeholderTextColor={colors.textTertiary}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -438,209 +208,64 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
           />
         </View>
 
-        {/* Timeframe Selection - Now positioned after title and description */}
+        {/* Goal Type */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Goal Timeframe *</Text>
-          <Text style={styles.helpText}>When do you want to achieve this goal?</Text>
-          
-          <View style={styles.timeframeContainer}>
-            {TIMEFRAME_OPTIONS.map((option) => {
-              const IconComponent = option.icon;
-              return (
-                <TouchableOpacity
-                  key={option.id}
-                  style={[
-                    styles.timeframeOption,
-                    { borderColor: option.color + '40' },
-                    timeframe === option.id && { 
-                      borderColor: option.color,
-                      backgroundColor: option.color + '10'
-                    }
-                  ]}
-                  onPress={() => handleTimeframeChange(option.id)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.timeframeHeader}>
-                    <IconComponent 
-                      size={16} 
-                      color={option.color} 
-                      strokeWidth={2} 
-                    />
-                    <Text style={[
-                      styles.timeframeLabel,
-                      { color: option.color },
-                      timeframe === option.id && styles.timeframeLabelSelected
-                    ]}>
-                      {option.label}
-                    </Text>
-                  </View>
-                  <Text style={styles.timeframeDescription}>
-                    {option.description}
-                  </Text>
-                  {timeframe === option.id && deadline && (
-                    <View style={styles.timeframeDeadline}>
-                      <Calendar size={12} color={option.color} strokeWidth={2} />
-                      <Text style={[styles.timeframeDeadlineText, { color: option.color }]}>
-                        Due: {formatDate(deadline)}
-                      </Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
+          <Text style={[styles.sectionLabel, { color: colors.text }]}>Goal Type *</Text>
+          <Text style={[styles.helpText, { color: colors.textSecondary }]}>How do you want to track this goal?</Text>
 
-        {/* Quarter Selection - Only show for quarterly timeframe */}
-        {showQuarterSelection && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Select Quarter *</Text>
-            <Text style={styles.helpText}>Choose which quarter you want to complete this goal</Text>
-            
-            <View style={styles.quarterContainer}>
-              {[0, 1, 2, 3].map((quarterIndex) => {
-                const quarterInfo = getQuarterInfo(quarterIndex);
-                const isSelected = selectedQuarterIndex === quarterIndex;
-                
-                return (
-                  <TouchableOpacity
-                    key={quarterIndex}
-                    style={[
-                      styles.quarterOption,
-                      isSelected && styles.selectedQuarterOption,
-                      quarterInfo.isPast && styles.disabledQuarterOption,
-                    ]}
-                    onPress={() => handleQuarterSelect(quarterIndex)}
-                    disabled={quarterInfo.isPast}
-                    activeOpacity={quarterInfo.isPast ? 1 : 0.7}
-                  >
-                    <View style={styles.quarterHeader}>
-                      <Text style={[
-                        styles.quarterName,
-                        isSelected && styles.selectedQuarterName,
-                        quarterInfo.isPast && styles.disabledQuarterText,
-                      ]}>
-                        {quarterInfo.name}
-                      </Text>
-                      {quarterInfo.isCurrent && !quarterInfo.isPast && (
-                        <View style={styles.currentQuarterBadge}>
-                          <Text style={styles.currentQuarterBadgeText}>Current</Text>
-                        </View>
-                      )}
-                      {quarterInfo.isPast && (
-                        <View style={styles.pastQuarterBadge}>
-                          <Text style={styles.pastQuarterBadgeText}>Ended</Text>
-                        </View>
-                      )}
-                    </View>
-                    <Text style={[
-                      styles.quarterMonths,
-                      quarterInfo.isPast && styles.disabledQuarterText,
-                    ]}>
-                      {quarterInfo.months.join(' • ')}
-                    </Text>
-                    <Text style={[
-                      styles.quarterDates,
-                      quarterInfo.isPast && styles.disabledQuarterText,
-                    ]}>
-                      {formatDate(quarterInfo.startDate)} - {formatDate(quarterInfo.endDate)}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        )}
-
-        {/* Custom Date Selection - Only show for custom timeframe */}
-        {timeframe === 'custom' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Custom Deadline *</Text>
-            {deadline ? (
-              <View style={styles.deadlineContainer}>
-                <View style={styles.deadlineDisplay}>
-                  <Calendar size={16} color="#4F46E5" strokeWidth={2} />
-                  <Text style={styles.deadlineText}>{formatDate(deadline)}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.deadlineAction}
-                  onPress={clearDeadline}
-                  activeOpacity={0.7}
-                >
-                  <Trash2 size={14} color="#EF4444" strokeWidth={2} />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.deadlineButton}
-                onPress={() => setShowDatePicker(true)}
-                activeOpacity={0.7}
-              >
-                <Calendar size={16} color="#6B7280" strokeWidth={2} />
-                <Text style={styles.deadlineButtonText}>Set custom deadline</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-
-        {/* Goal Type Selection */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Goal Type *</Text>
-          <Text style={styles.helpText}>How do you want to track progress?</Text>
-          
-          <View style={styles.goalTypeContainer}>
+          <View style={styles.typeContainer}>
             <TouchableOpacity
               style={[
-                styles.goalTypeOption,
-                goalType === 'quantifiable' && styles.goalTypeOptionSelected
+                styles.typeOption,
+                { backgroundColor: colors.card, borderColor: colors.borderLight },
+                type === 'quantifiable' && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
               ]}
-              onPress={() => setGoalType('quantifiable')}
+              onPress={() => setType('quantifiable')}
               activeOpacity={0.7}
             >
-              <View style={styles.goalTypeIconContainer}>
-                <Target 
-                  size={20} 
-                  color={goalType === 'quantifiable' ? '#4F46E5' : '#6B7280'} 
-                  strokeWidth={2} 
-                />
-              </View>
-              <View style={styles.goalTypeContent}>
+              <BarChart3
+                size={20}
+                color={type === 'quantifiable' ? colors.primary : colors.textSecondary}
+                strokeWidth={2}
+              />
+              <View style={styles.typeContent}>
                 <Text style={[
-                  styles.goalTypeTitle,
-                  goalType === 'quantifiable' && styles.goalTypeTitleSelected
+                  styles.typeTitle,
+                  { color: colors.text },
+                  type === 'quantifiable' && { color: colors.primary }
                 ]}>
-                  Quantifiable
+                  Quantifiable Goal
                 </Text>
-                <Text style={styles.goalTypeDescription}>
-                  Track progress with measurable numbers
+                <Text style={[styles.typeDescription, { color: colors.textSecondary }]}>
+                  Track with specific numbers (e.g., "Read 12 books", "Save $5000")
                 </Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
-                styles.goalTypeOption,
-                goalType === 'non-quantifiable' && styles.goalTypeOptionSelected
+                styles.typeOption,
+                { backgroundColor: colors.card, borderColor: colors.borderLight },
+                type === 'non-quantifiable' && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
               ]}
-              onPress={() => setGoalType('non-quantifiable')}
+              onPress={() => setType('non-quantifiable')}
               activeOpacity={0.7}
             >
-              <View style={styles.goalTypeIconContainer}>
-                <CheckSquare 
-                  size={20} 
-                  color={goalType === 'non-quantifiable' ? '#4F46E5' : '#6B7280'} 
-                  strokeWidth={2} 
-                />
-              </View>
-              <View style={styles.goalTypeContent}>
+              <Target
+                size={20}
+                color={type === 'non-quantifiable' ? colors.primary : colors.textSecondary}
+                strokeWidth={2}
+              />
+              <View style={styles.typeContent}>
                 <Text style={[
-                  styles.goalTypeTitle,
-                  goalType === 'non-quantifiable' && styles.goalTypeTitleSelected
+                  styles.typeTitle,
+                  { color: colors.text },
+                  type === 'non-quantifiable' && { color: colors.primary }
                 ]}>
-                  Contribution-Based
+                  Non-Quantifiable Goal
                 </Text>
-                <Text style={styles.goalTypeDescription}>
-                  Track hours and tasks contributed to this goal
+                <Text style={[styles.typeDescription, { color: colors.textSecondary }]}>
+                  Track with time and tasks (e.g., "Learn Spanish", "Get promoted")
                 </Text>
               </View>
             </TouchableOpacity>
@@ -648,14 +273,14 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
         </View>
 
         {/* Quantifiable Goal Fields */}
-        {goalType === 'quantifiable' && (
+        {type === 'quantifiable' && (
           <>
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Target Number *</Text>
+              <Text style={[styles.sectionLabel, { color: colors.text }]}>Target Number *</Text>
               <TextInput
-                style={styles.input}
-                placeholder="How much?"
-                placeholderTextColor="#9CA3AF"
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.borderLight, color: colors.text }]}
+                placeholder="How much do you want to achieve?"
+                placeholderTextColor={colors.textTertiary}
                 value={targetNumber}
                 onChangeText={setTargetNumber}
                 keyboardType="numeric"
@@ -663,158 +288,185 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Unit *</Text>
+              <Text style={[styles.sectionLabel, { color: colors.text }]}>Unit *</Text>
               <TextInput
-                style={styles.input}
-                placeholder="What is being measured?"
-                placeholderTextColor="#9CA3AF"
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.borderLight, color: colors.text }]}
+                placeholder="books, dollars, pounds, etc."
+                placeholderTextColor={colors.textTertiary}
                 value={unit}
                 onChangeText={setUnit}
               />
             </View>
-
-            {isEditing && (
-              <View style={styles.section}>
-                <Text style={styles.sectionLabel}>Current Progress</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Current progress"
-                  placeholderTextColor="#9CA3AF"
-                  value={currentProgress}
-                  onChangeText={setCurrentProgress}
-                  keyboardType="numeric"
-                />
-              </View>
-            )}
           </>
         )}
 
-        {/* Non-Quantifiable Goal Fields */}
-        {goalType === 'non-quantifiable' && (
-          <>
-            {isEditing ? (
-              <>
-                <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Contributed Hours</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Hours contributed to this goal"
-                    placeholderTextColor="#9CA3AF"
-                    value={contributedHours}
-                    onChangeText={setContributedHours}
-                    keyboardType="numeric"
-                  />
-                </View>
-
-                <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Contributed Tasks</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Tasks completed for this goal"
-                    placeholderTextColor="#9CA3AF"
-                    value={contributedTasks}
-                    onChangeText={setContributedTasks}
-                    keyboardType="numeric"
-                  />
-                </View>
-
-                <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Progress Estimation (%)</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="How complete is this goal? (0-100%)"
-                    placeholderTextColor="#9CA3AF"
-                    value={estimatedProgress}
-                    onChangeText={setEstimatedProgress}
-                    keyboardType="numeric"
-                  />
-                </View>
-              </>
-            ) : (
-              <View style={styles.section}>
-                <View style={styles.infoCard}>
-                  <CheckSquare size={16} color="#6B7280" strokeWidth={2} />
-                  <Text style={styles.infoText}>
-                    Progress will be tracked by hours and tasks you contribute to this goal. 
-                    You can link tasks from your Task Page and log time spent working on this goal.
-                  </Text>
-                </View>
-              </View>
-            )}
-          </>
-        )}
-
-        {/* Category Selection */}
+        {/* Timeframe */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Category</Text>
-          
-          {showCustomCategory ? (
-            <View style={styles.customCategoryContainer}>
-              <TextInput
-                style={[styles.input, { flex: 1 }]}
-                placeholder="Enter custom category"
-                placeholderTextColor="#9CA3AF"
-                value={customCategory}
-                onChangeText={setCustomCategory}
-                autoFocus
-              />
+          <Text style={[styles.sectionLabel, { color: colors.text }]}>Timeframe *</Text>
+          <Text style={[styles.helpText, { color: colors.textSecondary }]}>When do you want to complete this goal?</Text>
+
+          <View style={styles.timeframeContainer}>
+            {TIMEFRAME_OPTIONS.map((option) => (
               <TouchableOpacity
-                style={styles.customCategoryButton}
-                onPress={handleCustomCategoryAdd}
+                key={option.id}
+                style={[
+                  styles.timeframeOption,
+                  { backgroundColor: colors.card, borderColor: colors.borderLight },
+                  timeframe === option.id && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+                ]}
+                onPress={() => setTimeframe(option.id as any)}
                 activeOpacity={0.7}
               >
-                <Plus size={16} color="#4F46E5" strokeWidth={2} />
+                <Text style={[
+                  styles.timeframeLabel,
+                  { color: colors.text },
+                  timeframe === option.id && { color: colors.primary }
+                ]}>
+                  {option.label}
+                </Text>
+                <Text style={[styles.timeframeDescription, { color: colors.textSecondary }]}>
+                  {option.description}
+                </Text>
               </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Quarter Selection for Quarterly Goals */}
+          {timeframe === 'quarterly' && (
+            <View style={styles.quarterContainer}>
+              <Text style={[styles.quarterLabel, { color: colors.text }]}>Select Quarter</Text>
+              <View style={styles.quarterGrid}>
+                {QUARTER_OPTIONS.map((quarterOption) => (
+                  <TouchableOpacity
+                    key={quarterOption.id}
+                    style={[
+                      styles.quarterOption,
+                      { backgroundColor: colors.card, borderColor: colors.borderLight },
+                      quarter === quarterOption.id && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+                    ]}
+                    onPress={() => setQuarter(quarterOption.id as any)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[
+                      styles.quarterOptionLabel,
+                      { color: colors.text },
+                      quarter === quarterOption.id && { color: colors.primary }
+                    ]}>
+                      {quarterOption.label}
+                    </Text>
+                    <Text style={[styles.quarterOptionDescription, { color: colors.textSecondary }]}>
+                      {quarterOption.description}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Custom Deadline for Custom Timeframe */}
+          {timeframe === 'custom' && (
+            <View style={styles.deadlineContainer}>
+              <Text style={[styles.deadlineLabel, { color: colors.text }]}>Deadline</Text>
               <TouchableOpacity
-                style={styles.customCategoryCancelButton}
-                onPress={() => {
-                  setShowCustomCategory(false);
-                  setCustomCategory('');
-                  setSelectedCategory(DEFAULT_CATEGORIES[0].name);
-                }}
+                style={[styles.deadlineButton, { backgroundColor: colors.card, borderColor: colors.borderLight }]}
+                onPress={() => setShowCalendar(true)}
                 activeOpacity={0.7}
               >
-                <X size={16} color="#6B7280" strokeWidth={2} />
+                <Calendar size={16} color={colors.textSecondary} strokeWidth={2} />
+                <Text style={[
+                  styles.deadlineButtonText, 
+                  { color: deadline ? colors.text : colors.textTertiary }
+                ]}>
+                  {formatDeadline(deadline)}
+                </Text>
+                <ChevronDown size={16} color={colors.textSecondary} strokeWidth={2} />
               </TouchableOpacity>
             </View>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-              {allCategories.map((category) => (
+          )}
+        </View>
+
+        {/* Category */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.text }]}>Category *</Text>
+          <View style={styles.categoryContainer}>
+            {GOAL_CATEGORIES.map((categoryOption) => {
+              const IconComponent = categoryOption.icon;
+              return (
                 <TouchableOpacity
-                  key={category.name}
+                  key={categoryOption.id}
                   style={[
                     styles.categoryOption,
-                    { backgroundColor: category.color + '20' },
-                    selectedCategory === category.name && styles.selectedCategoryOption
+                    { backgroundColor: colors.card, borderColor: colors.borderLight },
+                    category === categoryOption.id && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
                   ]}
-                  onPress={() => handleCategorySelect(category.name)}
+                  onPress={() => setCategory(categoryOption.id)}
                   activeOpacity={0.7}
                 >
+                  <IconComponent
+                    size={20}
+                    color={category === categoryOption.id ? colors.primary : colors.textSecondary}
+                    strokeWidth={2}
+                  />
                   <Text style={[
-                    styles.categoryOptionText,
-                    { color: category.color },
-                    selectedCategory === category.name && styles.selectedCategoryText
+                    styles.categoryLabel,
+                    { color: colors.text },
+                    category === categoryOption.id && { color: colors.primary }
                   ]}>
-                    {category.name}
+                    {categoryOption.label}
                   </Text>
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
+              );
+            })}
+          </View>
+
+          {category === 'other' && (
+            <View style={styles.customCategoryContainer}>
+              <TextInput
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.borderLight, color: colors.text }]}
+                placeholder="Enter custom category"
+                placeholderTextColor={colors.textTertiary}
+                value={customCategory}
+                onChangeText={setCustomCategory}
+              />
+            </View>
           )}
+        </View>
+
+        {/* Color Selection */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.text }]}>Color</Text>
+          <View style={styles.colorContainer}>
+            {GOAL_COLORS.map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  styles.colorOption,
+                  { backgroundColor: color },
+                  selectedColor === color && styles.selectedColorOption
+                ]}
+                onPress={() => setSelectedColor(color)}
+                activeOpacity={0.7}
+              >
+                {selectedColor === color && (
+                  <Palette size={16} color="#FFFFFF" strokeWidth={2} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </ScrollView>
 
       {/* Action Buttons */}
-      <View style={styles.actionButtons}>
+      <View style={[styles.actionButtons, { borderTopColor: colors.borderLight }]}>
         <TouchableOpacity
-          style={styles.cancelButton}
+          style={[styles.cancelButton, { backgroundColor: colors.card }]}
           onPress={onCancel}
           activeOpacity={0.7}
         >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.saveButton}
+          style={[styles.saveButton, { backgroundColor: selectedColor }]}
           onPress={handleSave}
           activeOpacity={0.8}
         >
@@ -824,272 +476,20 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing }: GoalForm
         </TouchableOpacity>
       </View>
 
-      {/* Enhanced Date Picker Modal */}
-      <EnhancedDatePickerModal
-        visible={showDatePicker}
-        onClose={() => setShowDatePicker(false)}
-        onDateSelect={handleDateSelect}
-        currentDate={deadline}
-      />
+      {/* Calendar Modal */}
+      <Modal
+        visible={showCalendar}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setShowCalendar(false)}
+      >
+        <CalendarView
+          selectedDate={deadline || new Date()}
+          onDateSelect={handleDateSelect}
+          onClose={() => setShowCalendar(false)}
+        />
+      </Modal>
     </SafeAreaView>
-  );
-}
-
-function EnhancedDatePickerModal({ 
-  visible, 
-  onClose, 
-  onDateSelect, 
-  currentDate 
-}: {
-  visible: boolean;
-  onClose: () => void;
-  onDateSelect: (date: Date) => void;
-  currentDate: Date | null;
-}) {
-  const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(currentDate || today);
-  const [currentMonth, setCurrentMonth] = useState(
-    new Date(currentDate?.getFullYear() || today.getFullYear(), currentDate?.getMonth() || today.getMonth(), 1)
-  );
-  const [selectedYear, setSelectedYear] = useState(currentDate?.getFullYear() || today.getFullYear());
-
-  // Generate years from current year to 10 years in the future
-  const availableYears = Array.from({ length: 11 }, (_, i) => today.getFullYear() + i);
-
-  const formatMonth = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric',
-    });
-  };
-
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-
-    const days = [];
-    
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-    
-    // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day));
-    }
-    
-    return days;
-  };
-
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    const newMonth = new Date(currentMonth);
-    if (direction === 'prev') {
-      newMonth.setMonth(newMonth.getMonth() - 1);
-    } else {
-      newMonth.setMonth(newMonth.getMonth() + 1);
-    }
-    setCurrentMonth(newMonth);
-    setSelectedYear(newMonth.getFullYear());
-  };
-
-  const handleYearChange = (year: number) => {
-    setSelectedYear(year);
-    const newMonth = new Date(year, currentMonth.getMonth(), 1);
-    setCurrentMonth(newMonth);
-  };
-
-  const isToday = (date: Date | null) => {
-    if (!date) return false;
-    return date.toDateString() === today.toDateString();
-  };
-
-  const isSelected = (date: Date | null) => {
-    if (!date) return false;
-    return date.toDateString() === selectedDate.toDateString();
-  };
-
-  const isPastDate = (date: Date | null) => {
-    if (!date) return false;
-    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    return dateOnly < todayOnly;
-  };
-
-  const handleDatePress = (date: Date) => {
-    setSelectedDate(date);
-  };
-
-  const handleConfirm = () => {
-    onDateSelect(selectedDate);
-  };
-
-  const goToToday = () => {
-    const todayDate = new Date();
-    setSelectedDate(todayDate);
-    setCurrentMonth(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
-    setSelectedYear(todayDate.getFullYear());
-  };
-
-  const days = getDaysInMonth(currentMonth);
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.datePickerContainer}>
-          {/* Header */}
-          <View style={styles.datePickerHeader}>
-            <Text style={styles.datePickerTitle}>Select Deadline</Text>
-            <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-              <X size={20} color="#6B7280" strokeWidth={2} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Year Selection */}
-          <View style={styles.yearSelectionContainer}>
-            <Text style={styles.yearSelectionLabel}>Year</Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false} 
-              style={styles.yearScroll}
-              contentContainerStyle={styles.yearScrollContent}
-            >
-              {availableYears.map((year) => (
-                <TouchableOpacity
-                  key={year}
-                  style={[
-                    styles.yearOption,
-                    selectedYear === year && styles.selectedYearOption
-                  ]}
-                  onPress={() => handleYearChange(year)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[
-                    styles.yearOptionText,
-                    selectedYear === year && styles.selectedYearOptionText
-                  ]}>
-                    {year}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-
-          {/* Calendar Navigation */}
-          <View style={styles.calendarHeader}>
-            <TouchableOpacity 
-              style={styles.navButton}
-              onPress={() => navigateMonth('prev')}
-              activeOpacity={0.7}
-            >
-              <ChevronLeft size={18} color="#6B7280" strokeWidth={2} />
-            </TouchableOpacity>
-            
-            <Text style={styles.monthTitle}>{formatMonth(currentMonth)}</Text>
-            
-            <TouchableOpacity 
-              style={styles.navButton}
-              onPress={() => navigateMonth('next')}
-              activeOpacity={0.7}
-            >
-              <ChevronRight size={18} color="#6B7280" strokeWidth={2} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Quick Actions */}
-          <View style={styles.quickActions}>
-            <TouchableOpacity 
-              style={styles.todayButton}
-              onPress={goToToday}
-              activeOpacity={0.8}
-            >
-              <Clock size={12} color="#4F46E5" strokeWidth={2} />
-              <Text style={styles.todayButtonText}>Go to Today</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Week Days Header */}
-          <View style={styles.weekDaysContainer}>
-            {weekDays.map((day) => (
-              <Text key={day} style={styles.weekDay}>
-                {day}
-              </Text>
-            ))}
-          </View>
-
-          {/* Calendar Grid */}
-          <View style={styles.calendarGrid}>
-            {days.map((date, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.dayCell,
-                  !date && styles.emptyCell,
-                  isToday(date) && styles.todayCell,
-                  isSelected(date) && styles.selectedCell,
-                  isPastDate(date) && styles.pastDateCell,
-                ]}
-                onPress={() => date && !isPastDate(date) && handleDatePress(date)}
-                disabled={!date || isPastDate(date)}
-                activeOpacity={0.7}
-              >
-                {date && (
-                  <Text style={[
-                    styles.dayText,
-                    isToday(date) && styles.todayText,
-                    isSelected(date) && styles.selectedText,
-                    isPastDate(date) && styles.pastDateText,
-                  ]}>
-                    {date.getDate()}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Selected Date Display */}
-          <View style={styles.selectedDateContainer}>
-            <Text style={styles.selectedDateLabel}>Selected Deadline</Text>
-            <Text style={styles.selectedDateText}>
-              {selectedDate.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </Text>
-          </View>
-
-          {/* Action Buttons */}
-          <View style={styles.datePickerActions}>
-            <TouchableOpacity
-              style={styles.datePickerCancelButton}
-              onPress={onClose}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.datePickerCancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.datePickerConfirmButton}
-              onPress={handleConfirm}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.datePickerConfirmText}>Set Deadline</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
   );
 }
 
@@ -1124,6 +524,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
+  scrollContent: {
+    paddingBottom: 20,
+  },
   section: {
     paddingVertical: 16,
   },
@@ -1132,6 +535,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#374151',
     marginBottom: 8,
+  },
+  helpText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#9CA3AF',
+    marginBottom: 12,
   },
   input: {
     fontSize: 16,
@@ -1148,221 +557,104 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: 'top',
   },
-  helpText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
-    marginBottom: 8,
+  typeContainer: {
+    gap: 12,
   },
-  // Timeframe Selection Styles
-  timeframeContainer: {
-    gap: 8,
-    marginTop: 8,
-  },
-  timeframeOption: {
+  typeOption: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     backgroundColor: '#F9FAFB',
-    borderWidth: 2,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
     borderRadius: 12,
     padding: 16,
   },
-  timeframeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  typeContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  typeTitle: {
+    fontSize: 15,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
     marginBottom: 4,
+  },
+  typeDescription: {
+    fontSize: 13,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    lineHeight: 18,
+  },
+  timeframeContainer: {
+    gap: 8,
+  },
+  timeframeOption: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
   },
   timeframeLabel: {
     fontSize: 15,
     fontFamily: 'Inter-SemiBold',
-    marginLeft: 8,
-  },
-  timeframeLabelSelected: {
-    fontFamily: 'Inter-Bold',
+    color: '#374151',
+    marginBottom: 2,
   },
   timeframeDescription: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'Inter-Medium',
     color: '#6B7280',
-    marginLeft: 24,
   },
-  timeframeDeadline: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    marginLeft: 24,
-  },
-  timeframeDeadlineText: {
-    fontSize: 11,
-    fontFamily: 'Inter-SemiBold',
-    marginLeft: 4,
-  },
-  // Quarter Selection Styles
   quarterContainer: {
-    gap: 12,
-    marginTop: 8,
+    marginTop: 16,
+  },
+  quarterLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+    marginBottom: 12,
+  },
+  quarterGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   quarterOption: {
+    flex: 1,
+    minWidth: '48%',
     backgroundColor: '#F9FAFB',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 12,
-    padding: 16,
-  },
-  selectedQuarterOption: {
-    borderColor: '#8B5CF6',
-    backgroundColor: '#8B5CF610',
-  },
-  disabledQuarterOption: {
-    backgroundColor: '#F3F4F6',
-    borderColor: '#D1D5DB',
-    opacity: 0.6,
-  },
-  quarterHeader: {
-    flexDirection: 'row',
+    padding: 12,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
   },
-  quarterName: {
+  quarterOptionLabel: {
     fontSize: 16,
     fontFamily: 'Inter-Bold',
     color: '#374151',
+    marginBottom: 2,
   },
-  selectedQuarterName: {
-    color: '#8B5CF6',
-  },
-  disabledQuarterText: {
-    color: '#9CA3AF',
-  },
-  currentQuarterBadge: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  currentQuarterBadgeText: {
-    fontSize: 10,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  pastQuarterBadge: {
-    backgroundColor: '#6B7280',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  pastQuarterBadgeText: {
-    fontSize: 10,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  quarterMonths: {
-    fontSize: 13,
-    fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  quarterDates: {
+  quarterOptionDescription: {
     fontSize: 11,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
-  },
-  goalTypeContainer: {
-    gap: 12,
-  },
-  goalTypeOption: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    padding: 16,
-  },
-  goalTypeOptionSelected: {
-    borderColor: '#6366F1',
-    backgroundColor: '#EEF2FF',
-  },
-  goalTypeIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  goalTypeContent: {
-    flex: 1,
-  },
-  goalTypeTitle: {
-    fontSize: 15,
-    fontFamily: 'Inter-SemiBold',
-    color: '#374151',
-    marginBottom: 4,
-  },
-  goalTypeTitleSelected: {
-    color: '#4F46E5',
-  },
-  goalTypeDescription: {
-    fontSize: 13,
-    fontFamily: 'Inter-Medium',
     color: '#6B7280',
-    lineHeight: 18,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#F0F9FF',
-    borderWidth: 1,
-    borderColor: '#BAE6FD',
-    borderRadius: 12,
-    padding: 16,
-  },
-  infoText: {
-    fontSize: 13,
-    fontFamily: 'Inter-Medium',
-    color: '#0369A1',
-    lineHeight: 18,
-    marginLeft: 8,
-    flex: 1,
+    textAlign: 'center',
   },
   deadlineContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    marginTop: 16,
   },
-  deadlineDisplay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  deadlineText: {
+  deadlineLabel: {
     fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#1F2937',
-    marginLeft: 8,
-  },
-  deadlineAction: {
-    padding: 4,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+    marginBottom: 8,
   },
   deadlineButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#F9FAFB',
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -1373,54 +665,56 @@ const styles = StyleSheet.create({
   deadlineButtonText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
+    color: '#1F2937',
     marginLeft: 8,
+    flex: 1,
   },
-  customCategoryContainer: {
+  categoryContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 8,
   },
-  customCategoryButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#EEF2FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#C7D2FE',
-  },
-  customCategoryCancelButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  categoryScroll: {
-    marginTop: 4,
-  },
   categoryOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 4,
   },
-  selectedCategoryOption: {
-    borderColor: '#4F46E5',
-  },
-  categoryOptionText: {
+  categoryLabel: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    color: '#374151',
+    marginLeft: 6,
   },
-  selectedCategoryText: {
-    color: '#4F46E5',
+  customCategoryContainer: {
+    marginTop: 12,
+  },
+  colorContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  colorOption: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  selectedColorOption: {
+    borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -1430,6 +724,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 34 : 16,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
   },
   cancelButton: {
     flex: 1,
@@ -1445,241 +740,12 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#4F46E5',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
   },
   saveButtonText: {
     fontSize: 15,
-    fontFamily: 'Inter-SemiBold',
-    color: '#FFFFFF',
-  },
-  // Enhanced Date Picker Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  datePickerContainer: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  datePickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  datePickerTitle: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
-  },
-  yearSelectionContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-    backgroundColor: '#F8FAFC',
-  },
-  yearSelectionLabel: {
-    fontSize: 12,
-    fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  yearScroll: {
-    maxHeight: 40,
-  },
-  yearScrollContent: {
-    paddingRight: 20,
-  },
-  yearOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  selectedYearOption: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
-  },
-  yearOptionText: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#374151',
-  },
-  selectedYearOptionText: {
-    color: '#FFFFFF',
-  },
-  calendarHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  navButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  monthTitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
-  },
-  quickActions: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-  },
-  todayButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EEF2FF',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#C7D2FE',
-  },
-  todayButtonText: {
-    fontSize: 12,
-    fontFamily: 'Inter-SemiBold',
-    color: '#4F46E5',
-    marginLeft: 4,
-  },
-  weekDaysContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    marginBottom: 8,
-  },
-  weekDay: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 11,
-    fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
-    paddingVertical: 6,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  calendarGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 20,
-    paddingBottom: 8,
-  },
-  dayCell: {
-    width: '14.28%',
-    aspectRatio: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    marginBottom: 4,
-  },
-  emptyCell: {
-    opacity: 0,
-  },
-  todayCell: {
-    backgroundColor: '#FEF3C7',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-  },
-  selectedCell: {
-    backgroundColor: '#4F46E5',
-  },
-  pastDateCell: {
-    opacity: 0.3,
-  },
-  dayText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#1F2937',
-  },
-  todayText: {
-    color: '#F59E0B',
-    fontFamily: 'Inter-SemiBold',
-  },
-  selectedText: {
-    color: '#FFFFFF',
-    fontFamily: 'Inter-SemiBold',
-  },
-  pastDateText: {
-    color: '#9CA3AF',
-  },
-  selectedDateContainer: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 20,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  selectedDateLabel: {
-    fontSize: 12,
-    fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  selectedDateText: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
-  },
-  datePickerActions: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    backgroundColor: '#FFFFFF',
-  },
-  datePickerCancelButton: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  datePickerCancelText: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
-  },
-  datePickerConfirmButton: {
-    flex: 1,
-    backgroundColor: '#4F46E5',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  datePickerConfirmText: {
-    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
   },
