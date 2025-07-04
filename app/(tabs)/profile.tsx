@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import { User, Settings, Bell, Shield, CircleHelp as HelpCircle, Star, Award, TrendingUp, ChevronRight, CreditCard as Edit3, LogOut, Moon, Sun, Smartphone, Globe, Lock, Eye, EyeOff, Camera, X, Check, Trash2, Download, Upload, RefreshCw } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { statsCalculator, ProfileStats } from '@/utils/statsCalculator';
+import { useFocusEffect } from 'expo-router';
 
 interface UserProfile {
   name: string;
@@ -47,13 +49,6 @@ interface AppSettings {
     autoBackup: boolean;
     lastBackup: Date | null;
   };
-}
-
-interface ProfileStats {
-  tasksCompleted: number;
-  goalsAchieved: number;
-  streakDays: number;
-  totalHabits: number;
 }
 
 export default function ProfileScreen() {
@@ -93,14 +88,35 @@ export default function ProfileScreen() {
   });
 
   const [stats, setStats] = useState<ProfileStats>({
-    tasksCompleted: 127,
-    goalsAchieved: 8,
-    streakDays: 23,
-    totalHabits: 12,
+    tasksCompleted: 0,
+    goalsAchieved: 0,
+    streakDays: 0,
+    totalHabits: 0,
   });
+
+  const [loading, setLoading] = useState(true);
 
   const [activeModal, setActiveModal] = useState<'none' | 'profile' | 'notifications' | 'appearance' | 'privacy' | 'backup' | 'help'>('none');
   const [editingProfile, setEditingProfile] = useState<UserProfile>(profile);
+
+  // Load real stats when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadStats();
+    }, [])
+  );
+
+  const loadStats = async () => {
+    try {
+      setLoading(true);
+      const realStats = await statsCalculator.calculateProfileStats();
+      setStats(realStats);
+    } catch (error) {
+      console.error('Error loading profile stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatMemberSince = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -226,7 +242,9 @@ export default function ProfileScreen() {
               <View style={[styles.statIcon, { backgroundColor: colors.primary + '20' }]}>
                 <Award size={16} color={colors.primary} strokeWidth={2} />
               </View>
-              <Text style={[styles.statValue, { color: colors.text }]}>{stats.tasksCompleted}</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>
+                {loading ? '...' : stats.tasksCompleted}
+              </Text>
               <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Tasks</Text>
             </View>
             
@@ -234,7 +252,9 @@ export default function ProfileScreen() {
               <View style={[styles.statIcon, { backgroundColor: colors.success + '20' }]}>
                 <Star size={16} color={colors.success} strokeWidth={2} />
               </View>
-              <Text style={[styles.statValue, { color: colors.text }]}>{stats.goalsAchieved}</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>
+                {loading ? '...' : stats.goalsAchieved}
+              </Text>
               <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Goals</Text>
             </View>
             
@@ -242,7 +262,9 @@ export default function ProfileScreen() {
               <View style={[styles.statIcon, { backgroundColor: colors.warning + '20' }]}>
                 <TrendingUp size={16} color={colors.warning} strokeWidth={2} />
               </View>
-              <Text style={[styles.statValue, { color: colors.text }]}>{stats.streakDays}</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>
+                {loading ? '...' : stats.streakDays}
+              </Text>
               <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Streak</Text>
             </View>
 
@@ -250,7 +272,9 @@ export default function ProfileScreen() {
               <View style={[styles.statIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
                 <TrendingUp size={16} color="#8B5CF6" strokeWidth={2} />
               </View>
-              <Text style={[styles.statValue, { color: colors.text }]}>{stats.totalHabits}</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>
+                {loading ? '...' : stats.totalHabits}
+              </Text>
               <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Habits</Text>
             </View>
           </View>

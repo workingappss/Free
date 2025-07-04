@@ -16,6 +16,7 @@ import ComplexTaskForm from '@/components/ComplexTaskForm';
 import CalendarView from '@/components/CalendarView';
 import SimpleTaskInput from '@/components/SimpleTaskInput';
 import { useTheme } from '@/contexts/ThemeContext';
+import { taskStorage } from '@/utils/taskStorage';
 
 interface Subtask {
   id: string;
@@ -42,10 +43,40 @@ type ModalState = 'none' | 'simple' | 'complex' | 'calendar';
 export default function TodayScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
   
   // Use a single state to manage which modal is open
   const [modalState, setModalState] = useState<ModalState>('none');
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  useEffect(() => {
+    loadTasks();
+  }, [currentDate]);
+
+  const loadTasks = async () => {
+    try {
+      setLoading(true);
+      const allTasks = await taskStorage.getTasks();
+      setTasks(allTasks);
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveTasks = async (updatedTasks: Task[]) => {
+    try {
+      await taskStorage.saveTasks(updatedTasks);
+      setTasks(updatedTasks);
+    } catch (error) {
+      console.error('Error saving tasks:', error);
+    }
+  };
 
   const formatDate = (date: Date) => {
     const today = new Date();
@@ -162,7 +193,8 @@ export default function TodayScreen() {
       order: getNextOrder(),
     };
 
-    setTasks(prev => [...prev, newTask]);
+    const updatedTasks = [...tasks, newTask];
+    saveTasks(updatedTasks);
     closeAllModals();
   };
 
@@ -186,7 +218,8 @@ export default function TodayScreen() {
       order: getNextOrder(),
     };
 
-    setTasks(prev => [...prev, newTask]);
+    const updatedTasks = [...tasks, newTask];
+    saveTasks(updatedTasks);
     setModalState('none');
   };
 
@@ -196,8 +229,7 @@ export default function TodayScreen() {
   };
 
   const toggleTask = (taskId: string) => {
-    setTasks(prev =>
-      prev.map(task => {
+    const updatedTasks = tasks.map(task => {
         if (task.id === taskId) {
           const newCompleted = !task.completed;
           
@@ -216,13 +248,13 @@ export default function TodayScreen() {
           return { ...task, completed: newCompleted };
         }
         return task;
-      })
-    );
+      });
+    
+    saveTasks(updatedTasks);
   };
 
   const toggleSubtask = (taskId: string, subtaskId: string) => {
-    setTasks(prev =>
-      prev.map(task => {
+    const updatedTasks = tasks.map(task => {
         if (task.id === taskId && task.subtasks) {
           const updatedSubtasks = task.subtasks.map(subtask =>
             subtask.id === subtaskId
@@ -240,12 +272,14 @@ export default function TodayScreen() {
           };
         }
         return task;
-      })
-    );
+      });
+    
+    saveTasks(updatedTasks);
   };
 
   const deleteTask = (taskId: string) => {
-    setTasks(prev => prev.filter(task => task.id !== taskId));
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    saveTasks(updatedTasks);
   };
 
   const handleDragEnd = ({ data }: { data: Task[] }) => {
@@ -256,10 +290,9 @@ export default function TodayScreen() {
     }));
 
     // Update the tasks state with reordered tasks
-    setTasks(prev => {
-      const otherDateTasks = prev.filter(task => task.dateKey !== getDateKey(currentDate));
-      return [...otherDateTasks, ...updatedTasks];
-    });
+    const otherDateTasks = tasks.filter(task => task.dateKey !== getDateKey(currentDate));
+    const allUpdatedTasks = [...otherDateTasks, ...updatedTasks];
+    saveTasks(allUpdatedTasks);
   };
 
   const formatTime = (date: Date) => {

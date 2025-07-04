@@ -15,6 +15,7 @@ import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit
 import GoalForm from '@/components/GoalForm';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Goal } from '@/types/goal';
+import { goalStorage } from '@/utils/goalStorage';
 
 type ModalState = 'none' | 'create' | 'edit' | 'updateProgress' | 'updateEstimation';
 
@@ -40,7 +41,24 @@ export default function GoalsScreen() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [progressUpdateGoal, setProgressUpdateGoal] = useState<Goal | null>(null);
   const [newProgressValue, setNewProgressValue] = useState('');
+  const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
+
+  useEffect(() => {
+    loadGoals();
+  }, []);
+
+  const loadGoals = async () => {
+    try {
+      setLoading(true);
+      const savedGoals = await goalStorage.getGoals();
+      setGoals(savedGoals);
+    } catch (error) {
+      console.error('Error loading goals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const today = new Date();
 
@@ -81,21 +99,31 @@ export default function GoalsScreen() {
   };
 
   const handleSaveGoal = (goalData: Omit<Goal, 'id' | 'createdAt'>) => {
-    if (editingGoal) {
-      // Update existing goal
-      setGoals(prev => prev.map(goal => 
-        goal.id === editingGoal.id 
-          ? { ...goalData, id: editingGoal.id, createdAt: editingGoal.createdAt }
-          : goal
-      ));
-    } else {
-      // Create new goal
-      const newGoal: Goal = {
-        ...goalData,
-        id: Date.now().toString(),
-        createdAt: new Date(),
-      };
-      setGoals(prev => [...prev, newGoal]);
+    try {
+      if (editingGoal) {
+        // Update existing goal
+        const updatedGoal: Goal = {
+          ...goalData,
+          id: editingGoal.id,
+          createdAt: editingGoal.createdAt,
+        };
+        goalStorage.saveGoal(updatedGoal);
+        setGoals(prev => prev.map(goal => 
+          goal.id === editingGoal.id ? updatedGoal : goal
+        ));
+      } else {
+        // Create new goal
+        const newGoal: Goal = {
+          ...goalData,
+          id: Date.now().toString(),
+          createdAt: new Date(),
+        };
+        goalStorage.saveGoal(newGoal);
+        setGoals(prev => [...prev, newGoal]);
+      }
+    } catch (error) {
+      console.error('Error saving goal:', error);
+      Alert.alert('Error', 'Failed to save goal. Please try again.');
     }
     closeModal();
   };
@@ -109,7 +137,15 @@ export default function GoalsScreen() {
         { 
           text: 'Delete', 
           style: 'destructive',
-          onPress: () => setGoals(prev => prev.filter(goal => goal.id !== goalId))
+          onPress: async () => {
+            try {
+              await goalStorage.deleteGoal(goalId);
+              setGoals(prev => prev.filter(goal => goal.id !== goalId));
+            } catch (error) {
+              console.error('Error deleting goal:', error);
+              Alert.alert('Error', 'Failed to delete goal. Please try again.');
+            }
+          }
         },
       ]
     );
@@ -133,11 +169,13 @@ export default function GoalsScreen() {
 
       setGoals(prev => prev.map(goal => {
         if (goal.id === progressUpdateGoal.id && goal.type === 'quantifiable' && goal.targetNumber) {
-          return {
+          const updatedGoal = {
             ...goal,
             currentProgress: newProgress,
             isCompleted: newProgress >= goal.targetNumber
           };
+          goalStorage.saveGoal(updatedGoal);
+          return updatedGoal;
         }
         return goal;
       }));
@@ -150,11 +188,13 @@ export default function GoalsScreen() {
 
       setGoals(prev => prev.map(goal => {
         if (goal.id === progressUpdateGoal.id && goal.type === 'non-quantifiable') {
-          return {
+          const updatedGoal = {
             ...goal,
             estimatedProgress: newProgress,
             isCompleted: newProgress >= 100
           };
+          goalStorage.saveGoal(updatedGoal);
+          return updatedGoal;
         }
         return goal;
       }));
