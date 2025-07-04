@@ -64,19 +64,19 @@ const lightColors: ThemeColors = {
 };
 
 const darkColors: ThemeColors = {
-  background: '#000000',
-  surface: '#111111',
-  card: '#1A1A1A',
+  background: '#0F172A',
+  surface: '#1E293B',
+  card: '#334155',
   
-  text: '#F1F5F9',
-  textSecondary: '#CBD5E1',
-  textTertiary: '#94A3B8',
+  text: '#F8FAFC',
+  textSecondary: '#E2E8F0',
+  textTertiary: '#CBD5E1',
   
-  border: '#333333',
-  borderLight: '#222222',
+  border: '#475569',
+  borderLight: '#374151',
   
   primary: '#6366F1',
-  primaryLight: '#1A1A2E',
+  primaryLight: '#312E81',
   
   success: '#10B981',
   warning: '#F59E0B',
@@ -87,16 +87,16 @@ const darkColors: ThemeColors = {
 };
 
 const pinkColors: ThemeColors = {
-  background: '#FDF2F8',
+  background: '#FEFCFE',
   surface: '#FFFFFF',
-  card: '#FCE7F3',
+  card: '#FDF2F8',
   
-  text: '#831843',
-  textSecondary: '#BE185D',
-  textTertiary: '#EC4899',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
   
-  border: '#F9A8D4',
-  borderLight: '#FBCFE8',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
   
   primary: '#EC4899',
   primaryLight: '#FCE7F3',
@@ -105,123 +105,123 @@ const pinkColors: ThemeColors = {
   warning: '#D97706',
   error: '#DC2626',
   
-  shadow: '#831843',
-  overlay: 'rgba(131, 24, 67, 0.5)',
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 const blueColors: ThemeColors = {
-  background: '#F0F9FF',
+  background: '#FEFEFE',
   surface: '#FFFFFF',
-  card: '#E0F2FE',
+  card: '#F0F9FF',
   
-  text: '#0C4A6E',
-  textSecondary: '#0369A1',
-  textTertiary: '#0284C7',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
   
-  border: '#7DD3FC',
-  borderLight: '#BAE6FD',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
   
   primary: '#0EA5E9',
-  primaryLight: '#E0F2FE',
+  primaryLight: '#F0F9FF',
   
   success: '#059669',
   warning: '#D97706',
   error: '#DC2626',
   
-  shadow: '#0C4A6E',
-  overlay: 'rgba(12, 74, 110, 0.5)',
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 const greenColors: ThemeColors = {
-  background: '#F0FDF4',
+  background: '#FEFEFE',
   surface: '#FFFFFF',
-  card: '#DCFCE7',
+  card: '#F0FDF4',
   
-  text: '#14532D',
-  textSecondary: '#166534',
-  textTertiary: '#15803D',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
   
-  border: '#86EFAC',
-  borderLight: '#BBF7D0',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
   
   primary: '#16A34A',
-  primaryLight: '#DCFCE7',
+  primaryLight: '#F0FDF4',
   
   success: '#059669',
   warning: '#D97706',
   error: '#DC2626',
   
-  shadow: '#14532D',
-  overlay: 'rgba(20, 83, 45, 0.5)',
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 const orangeColors: ThemeColors = {
-  background: '#FFFBEB',
+  background: '#FEFEFE',
   surface: '#FFFFFF',
-  card: '#FEF3C7',
+  card: '#FFFBEB',
   
-  text: '#92400E',
-  textSecondary: '#B45309',
-  textTertiary: '#D97706',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
   
-  border: '#FCD34D',
-  borderLight: '#FDE68A',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
   
   primary: '#F59E0B',
-  primaryLight: '#FEF3C7',
+  primaryLight: '#FFFBEB',
   
   success: '#059669',
   warning: '#D97706',
   error: '#DC2626',
   
-  shadow: '#92400E',
-  overlay: 'rgba(146, 64, 14, 0.5)',
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 const purpleColors: ThemeColors = {
-  background: '#FAF5FF',
+  background: '#FEFEFE',
   surface: '#FFFFFF',
-  card: '#F3E8FF',
+  card: '#FAF5FF',
   
-  text: '#581C87',
-  textSecondary: '#7C2D92',
-  textTertiary: '#A21CAF',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
   
-  border: '#C084FC',
-  borderLight: '#DDD6FE',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
   
   primary: '#A855F7',
-  primaryLight: '#F3E8FF',
+  primaryLight: '#FAF5FF',
   
   success: '#059669',
   warning: '#D97706',
   error: '#DC2626',
   
-  shadow: '#581C87',
-  overlay: 'rgba(88, 28, 135, 0.5)',
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 const redColors: ThemeColors = {
-  background: '#FEF2F2',
+  background: '#FEFEFE',
   surface: '#FFFFFF',
-  card: '#FEE2E2',
+  card: '#FEF2F2',
   
-  text: '#7F1D1D',
-  textSecondary: '#991B1B',
-  textTertiary: '#DC2626',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
   
-  border: '#FCA5A5',
-  borderLight: '#FECACA',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
   
   primary: '#EF4444',
-  primaryLight: '#FEE2E2',
+  primaryLight: '#FEF2F2',
   
   success: '#059669',
   warning: '#D97706',
   error: '#DC2626',
   
-  shadow: '#7F1D1D',
-  overlay: 'rgba(127, 29, 29, 0.5)',
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
