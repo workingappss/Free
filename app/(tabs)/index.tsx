@@ -371,32 +371,25 @@ export default function TodayScreen() {
       <View style={styles.content}>
         {/* Add Task Section */}
         <View style={styles.addSection}>
-          {modalState === 'none' ? (
-            <View style={styles.addButtonsContainer}>
-              <TouchableOpacity
-                style={[styles.complexTaskButton, { backgroundColor: '#8B5CF6' }]}
-                onPress={openComplexTaskForm}
-                activeOpacity={0.8}
-              >
-                <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
-                <Text style={styles.complexTaskButtonText}>Complex Task</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
-                onPress={openSimpleTaskInput}
-                activeOpacity={0.8}
-              >
-                <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-                <Text style={styles.simpleTaskButtonText}>Simple Task</Text>
-              </TouchableOpacity>
-            </View>
-          ) : modalState === 'simple' ? (
-            <SimpleTaskInput
-              onSave={addSimpleTask}
-              onCancel={closeAllModals}
-            />
-          ) : null}
+          <View style={styles.addButtonsContainer}>
+            <TouchableOpacity
+              style={[styles.complexTaskButton, { backgroundColor: '#8B5CF6' }]}
+              onPress={openComplexTaskForm}
+              activeOpacity={0.8}
+            >
+              <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
+              <Text style={styles.complexTaskButtonText}>Complex Task</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
+              onPress={openSimpleTaskInput}
+              activeOpacity={0.8}
+            >
+              <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
+              <Text style={styles.simpleTaskButtonText}>Simple Task</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Tasks List */}
@@ -421,6 +414,30 @@ export default function TodayScreen() {
           />
         )}
       </View>
+
+      {/* Simple Task Input Modal */}
+      <Modal
+        visible={modalState === 'simple'}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={closeAllModals}
+      >
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: colors.surface }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: colors.borderLight }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Create Simple Task</Text>
+            <TouchableOpacity style={[styles.modalCloseButton, { backgroundColor: colors.card }]} onPress={closeAllModals} activeOpacity={0.7}>
+              <X size={20} color={colors.textSecondary} strokeWidth={2} />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.modalContent}>
+            <SimpleTaskInput
+              onSave={addSimpleTask}
+              onCancel={closeAllModals}
+            />
+          </View>
+        </SafeAreaView>
+      </Modal>
 
       {/* Complex Task Form Modal - Fixed with proper key and state management */}
       <Modal
@@ -987,5 +1004,36 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 8,
     marginLeft: 8,
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1F2937',
+  },
+  modalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
   },
 });

@@ -39,7 +39,7 @@ export default function SimpleTaskInput({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.borderLight }]}>
+    <View style={styles.container}>
       <TextInput
         style={[styles.input, { color: colors.text }]}
         placeholder={placeholder}
@@ -73,16 +73,7 @@ export default function SimpleTaskInput({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    flex: 1,
   },
   input: {
     fontSize: 15,
