@@ -11,6 +11,7 @@ import {
   Modal,
 } from 'react-native';
 import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck as CheckCircle2, Clock, Target, ArrowLeft } from 'lucide-react-native';
+import { Plus, Check, Trash2, ChevronLeft, ChevronRight, Calendar, CircleCheck as CheckCircle2, Clock, Target, ArrowLeft, X } from 'lucide-react-native';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import ComplexTaskForm from '@/components/ComplexTaskForm';
 import CalendarView from '@/components/CalendarView';
