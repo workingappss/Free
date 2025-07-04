@@ -14,29 +14,7 @@ import {
 import { Target, Plus, ChevronRight, Calendar, Check, Trash2, CreditCard as Edit3, Clock, TrendingUp, Users, Percent } from 'lucide-react-native';
 import GoalForm from '@/components/GoalForm';
 import { useTheme } from '@/contexts/ThemeContext';
-
-interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  type: 'quantifiable' | 'non-quantifiable';
-  // For quantifiable goals
-  targetNumber?: number;
-  unit?: string;
-  currentProgress?: number;
-  // For non-quantifiable goals
-  contributedHours?: number;
-  contributedTasks?: number;
-  estimatedProgress?: number; // Percentage estimation (0-100)
-  // Common fields
-  deadline?: Date;
-  timeframe: 'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom';
-  category: string;
-  customCategory?: string;
-  color: string;
-  isCompleted: boolean;
-  createdAt: Date;
-}
+import { Goal } from '@/types/goal';
 
 type ModalState = 'none' | 'create' | 'edit' | 'updateProgress' | 'updateEstimation';
 
