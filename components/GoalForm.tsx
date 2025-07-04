@@ -174,10 +174,6 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing = false }: 
     setShowCalendar(false);
   };
 
-  const handleQuarterSelect = (selectedQuarter: 'Q1' | 'Q2' | 'Q3' | 'Q4') => {
-    setQuarter(selectedQuarter);
-    setShowQuarterDropdown(false);
-  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
@@ -329,96 +325,69 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing = false }: 
               { id: 'yearly', label: 'Yearly', description: 'Complete within a year' },
               { id: 'custom', label: 'Custom', description: 'Set your own deadline' },
             ].map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[
-                  styles.timeframeOption,
-                  { backgroundColor: colors.card, borderColor: colors.borderLight },
-                  timeframe === option.id && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
-                ]}
-                onPress={() => {
-                  setTimeframe(option.id as any);
-                  if (option.id !== 'quarterly') {
-                    setQuarter(undefined);
-                    setShowQuarterDropdown(false);
-                  }
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={[
-                  styles.timeframeLabel,
-                  { color: colors.text },
-                  timeframe === option.id && { color: colors.primary }
-                ]}>
-                  {option.label}
-                </Text>
-                <Text style={[styles.timeframeDescription, { color: colors.textSecondary }]}>
-                  {option.description}
-                </Text>
-              </TouchableOpacity>
+              <View key={option.id}>
+                <TouchableOpacity
+                  style={[
+                    styles.timeframeOption,
+                    { backgroundColor: colors.card, borderColor: colors.borderLight },
+                    timeframe === option.id && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+                  ]}
+                  onPress={() => {
+                    setTimeframe(option.id as any);
+                    if (option.id !== 'quarterly') {
+                      setQuarter(undefined);
+                      setShowQuarterDropdown(false);
+                    }
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[
+                    styles.timeframeLabel,
+                    { color: colors.text },
+                    timeframe === option.id && { color: colors.primary }
+                  ]}>
+                    {option.label}
+                  </Text>
+                  <Text style={[styles.timeframeDescription, { color: colors.textSecondary }]}>
+                    {option.description}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Quarter Selection - Positioned immediately after quarterly option */}
+                {option.id === 'quarterly' && timeframe === 'quarterly' && (
+                  <View style={styles.quarterSection}>
+                    <Text style={[styles.quarterLabel, { color: colors.text }]}>Select Quarter *</Text>
+                    
+                    <View style={styles.quarterGrid}>
+                      {QUARTERS.map((quarterOption) => (
+                        <TouchableOpacity
+                          key={quarterOption.id}
+                          style={[
+                            styles.quarterCard,
+                            { backgroundColor: colors.card, borderColor: colors.borderLight },
+                            quarter === quarterOption.id && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+                          ]}
+                          onPress={() => setQuarter(quarterOption.id as 'Q1' | 'Q2' | 'Q3' | 'Q4')}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[
+                            styles.quarterCardLabel,
+                            { color: colors.text },
+                            quarter === quarterOption.id && { color: colors.primary }
+                          ]}>
+                            {quarterOption.id}
+                          </Text>
+                          <Text style={[styles.quarterCardMonths, { color: colors.textSecondary }]}>
+                            {quarterOption.months}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
+              </View>
             ))}
           </View>
-
-          {/* Quarter Selection - Positioned immediately after quarterly option */}
-          {timeframe === 'quarterly' && (
-            <View style={styles.quarterSection}>
-              <Text style={[styles.quarterLabel, { color: colors.text }]}>Select Quarter *</Text>
-              
-              <TouchableOpacity
-                style={[
-                  styles.quarterDropdownButton,
-                  { backgroundColor: colors.card, borderColor: colors.borderLight }
-                ]}
-                onPress={() => setShowQuarterDropdown(!showQuarterDropdown)}
-                activeOpacity={0.7}
-              >
-                <Text style={[
-                  styles.quarterDropdownText,
-                  { color: quarter ? colors.text : colors.textTertiary }
-                ]}>
-                  {quarter ? QUARTERS.find(q => q.id === quarter)?.label : 'Choose a quarter'}
-                </Text>
-                {showQuarterDropdown ? (
-                  <ChevronUp size={16} color={colors.textSecondary} strokeWidth={2} />
-                ) : (
-                  <ChevronDown size={16} color={colors.textSecondary} strokeWidth={2} />
-                )}
-              </TouchableOpacity>
-
-              {showQuarterDropdown && (
-                <View style={[styles.quarterDropdown, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
-                  {QUARTERS.map((quarterOption) => (
-                    <TouchableOpacity
-                      key={quarterOption.id}
-                      style={[
-                        styles.quarterOption,
-                        { borderBottomColor: colors.borderLight },
-                        quarter === quarterOption.id && { backgroundColor: colors.primaryLight }
-                      ]}
-                      onPress={() => handleQuarterSelect(quarterOption.id as 'Q1' | 'Q2' | 'Q3' | 'Q4')}
-                      activeOpacity={0.7}
-                    >
-                      <View>
-                        <Text style={[
-                          styles.quarterOptionLabel,
-                          { color: colors.text },
-                          quarter === quarterOption.id && { color: colors.primary }
-                        ]}>
-                          {quarterOption.label}
-                        </Text>
-                        <Text style={[styles.quarterOptionMonths, { color: colors.textSecondary }]}>
-                          {quarterOption.months}
-                        </Text>
-                      </View>
-                      {quarter === quarterOption.id && (
-                        <CheckSquare size={16} color={colors.primary} strokeWidth={2} />
-                      )}
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-          )}
         </View>
 
         {/* Deadline */}
@@ -540,7 +509,7 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing = false }: 
       <Modal
         visible={showCalendar}
         animationType="slide"
-        presentationStyle="fullScreen"
+        presentationStyle="pageSheet"
         onRequestClose={() => setShowCalendar(false)}
       >
         <CalendarView
@@ -668,16 +637,41 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   quarterSection: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    marginTop: 12,
+    paddingTop: 12,
   },
   quarterLabel: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#374151',
     marginBottom: 8,
+  },
+  quarterGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  quarterCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+  },
+  quarterCardLabel: {
+    fontSize: 16,
+    fontFamily: 'Inter-Bold',
+    color: '#374151',
+    marginBottom: 4,
+  },
+  quarterCardMonths: {
+    fontSize: 11,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    textAlign: 'center',
   },
   quarterDropdownButton: {
     flexDirection: 'row',
