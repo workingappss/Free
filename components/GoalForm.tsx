@@ -11,23 +11,7 @@ import {
   SafeAreaView,
   Modal,
 } from 'react-native';
-import {
-  X,
-  Calendar,
-  Target,
-  BarChart3,
-  Palette,
-  ChevronDown,
-  Clock,
-  Users,
-  TrendingUp,
-  BookOpen,
-  Heart,
-  Home,
-  Briefcase,
-  Dumbbell,
-  Coffee
-} from 'lucide-react-native';
+import { X, Calendar, Target, ChartBar as BarChart3, Palette, ChevronDown, Clock, Users, TrendingUp, BookOpen, Heart, Chrome as Home, Briefcase, Dumbbell, Coffee } from 'lucide-react-native';
 import { Goal } from '@/types/goal';
 import CalendarView from '@/components/CalendarView';
 import { useTheme } from '@/contexts/ThemeContext';
