@@ -73,6 +73,14 @@ const GOAL_COLORS = [
   '#6B7280', // Gray
 ];
 
+const TIMEFRAME_COLORS = {
+  weekly: '#EF4444',    // Red
+  monthly: '#F59E0B',   // Orange
+  quarterly: '#8B5CF6', // Purple
+  yearly: '#06B6D4',    // Cyan
+  custom: '#6B7280',    // Gray
+};
+
 const CATEGORIES = [
   'Health & Fitness',
   'Career & Professional',
@@ -174,6 +182,37 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing = false }: 
     setShowCalendar(false);
   };
 
+  const getTimeframeDescription = (timeframeId: string) => {
+    const now = new Date();
+    
+    switch (timeframeId) {
+      case 'weekly': {
+        // Get the end of this week (Sunday)
+        const endOfWeek = new Date(now);
+        const daysUntilSunday = 7 - now.getDay();
+        endOfWeek.setDate(now.getDate() + daysUntilSunday);
+        return `Complete by ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+      }
+      case 'monthly': {
+        // Get the end of this month
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        return `Complete by ${endOfMonth.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+      }
+      case 'quarterly': {
+        return 'Complete within the selected quarter';
+      }
+      case 'yearly': {
+        // Get the end of this year
+        const endOfYear = new Date(now.getFullYear(), 11, 31);
+        return `Complete by ${endOfYear.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+      }
+      case 'custom': {
+        return 'Set your own deadline';
+      }
+      default:
+        return '';
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
@@ -319,18 +358,27 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing = false }: 
 
           <View style={styles.timeframeContainer}>
             {[
-              { id: 'weekly', label: 'Weekly', description: 'Complete within a week' },
-              { id: 'monthly', label: 'Monthly', description: 'Complete within a month' },
-              { id: 'quarterly', label: 'Quarterly', description: 'Complete within a quarter' },
-              { id: 'yearly', label: 'Yearly', description: 'Complete within a year' },
-              { id: 'custom', label: 'Custom', description: 'Set your own deadline' },
+              { id: 'weekly', label: 'This Week' },
+              { id: 'monthly', label: 'This Month' },
+              { id: 'quarterly', label: 'This Quarter' },
+              { id: 'yearly', label: 'This Year' },
+              { id: 'custom', label: 'Custom' },
             ].map((option) => (
               <View key={option.id}>
                 <TouchableOpacity
                   style={[
                     styles.timeframeOption,
-                    { backgroundColor: colors.card, borderColor: colors.borderLight },
-                    timeframe === option.id && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+                    { 
+                      backgroundColor: colors.card, 
+                      borderColor: colors.borderLight,
+                      borderLeftColor: TIMEFRAME_COLORS[option.id as keyof typeof TIMEFRAME_COLORS],
+                      borderLeftWidth: 4,
+                    },
+                    timeframe === option.id && { 
+                      borderColor: TIMEFRAME_COLORS[option.id as keyof typeof TIMEFRAME_COLORS], 
+                      backgroundColor: TIMEFRAME_COLORS[option.id as keyof typeof TIMEFRAME_COLORS] + '10',
+                      borderLeftColor: TIMEFRAME_COLORS[option.id as keyof typeof TIMEFRAME_COLORS],
+                    }
                   ]}
                   onPress={() => {
                     setTimeframe(option.id as any);
@@ -341,16 +389,31 @@ export default function GoalForm({ goal, onSave, onCancel, isEditing = false }: 
                   }}
                   activeOpacity={0.7}
                 >
-                  <Text style={[
+                  <View style={styles.timeframeContent}>
+                    <View style={styles.timeframeHeader}>
+                      <Text style={[
                     styles.timeframeLabel,
-                    { color: colors.text },
-                    timeframe === option.id && { color: colors.primary }
+                        { color: colors.text },
+                        timeframe === option.id && { color: TIMEFRAME_COLORS[option.id as keyof typeof TIMEFRAME_COLORS] }
                   ]}>
                     {option.label}
                   </Text>
-                  <Text style={[styles.timeframeDescription, { color: colors.textSecondary }]}>
-                    {option.description}
+                      <View style={[
+                        styles.timeframeBadge,
+                        { backgroundColor: TIMEFRAME_COLORS[option.id as keyof typeof TIMEFRAME_COLORS] + '20' }
+                      ]}>
+                        <Text style={[
+                          styles.timeframeBadgeText,
+                          { color: TIMEFRAME_COLORS[option.id as keyof typeof TIMEFRAME_COLORS] }
+                        ]}>
+                          {option.id.toUpperCase()}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={[styles.timeframeDescription, { color: colors.textSecondary }]}>
+                      {getTimeframeDescription(option.id)}
                   </Text>
+                  </View>
                 </TouchableOpacity>
 
                 {/* Quarter Selection - Positioned immediately after quarterly option */}
@@ -619,22 +682,49 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   timeframeOption: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E5E7EB',
+    borderLeftWidth: 4,
     borderRadius: 12,
     padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  timeframeContent: {
+    flex: 1,
+  },
+  timeframeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   timeframeLabel: {
     fontSize: 15,
     fontFamily: 'Inter-SemiBold',
     color: '#374151',
-    marginBottom: 2,
+    flex: 1,
+  },
+  timeframeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  timeframeBadgeText: {
+    fontSize: 10,
+    fontFamily: 'Inter-Bold',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   timeframeDescription: {
     fontSize: 13,
     fontFamily: 'Inter-Medium',
     color: '#6B7280',
+    lineHeight: 18,
   },
   quarterSection: {
     marginTop: 12,
