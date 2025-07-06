@@ -77,10 +77,22 @@ export default function SimpleTaskForm({ onSave, onCancel }: SimpleTaskFormProps
         </View>
 
         {/* Tips */}
+        <View style={[styles.tips, { backgroundColor: colors.primaryLight }]}>
+          <Text style={[styles.tipsTitle, { color: colors.primary }]}>💡 Quick Tips</Text>
+          <Text style={[styles.tipsText, { color: colors.primary }]}>
+            • Start with an action verb (e.g., "Call", "Write", "Buy")
+          </Text>
+          <Text style={[styles.tipsText, { color: colors.primary }]}>
+            • Be specific about what you want to accomplish
+          </Text>
+          <Text style={[styles.tipsText, { color: colors.primary }]}>
+            • Keep it under 50 characters for best readability
+          </Text>
+        </View>
       </View>
 
       {/* Action Buttons */}
-      <View style={[styles.actions, { backgroundColor: colors.surface, borderTopColor: colors.borderLight }]}>
+      <View style={styles.actions}>
         <TouchableOpacity
           style={[
             styles.cancelButton, 
@@ -197,11 +209,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    backgroundColor: '#FFFFFF',
+    paddingVertical: 20,
+    paddingBottom: 40,
   },
   cancelButton: {
     flex: 1,
