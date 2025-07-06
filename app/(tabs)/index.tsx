@@ -349,21 +349,21 @@ export default function TodayScreen() {
         <View style={styles.addSection}>
           <View style={styles.addButtonsContainer}>
             <TouchableOpacity
-              style={[styles.quickAddButton, { backgroundColor: colors.primary }]}
-              onPress={() => setShowTaskCreation(true)}
-              activeOpacity={0.8}
-            >
-              <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.quickAddButtonText}>Quick Add Task</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
               style={[styles.detailedTaskButton, { backgroundColor: '#8B5CF6' }]}
               onPress={() => setShowTaskCreation(true)}
               activeOpacity={0.8}
             >
               <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.detailedTaskButtonText}>Add Detailed Task</Text>
+              <Text style={styles.detailedTaskButtonText}>+ Detailed Task</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
+              onPress={() => setShowTaskCreation(true)}
+              activeOpacity={0.8}
+            >
+              <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
+              <Text style={styles.simpleTaskButtonText}>+ Simple Task</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -401,6 +401,7 @@ export default function TodayScreen() {
         <TaskCreationModal
           onSave={handleTaskCreated}
           onCancel={() => setShowTaskCreation(false)}
+          initialType="simple"
         />
       </Modal>
 
@@ -557,26 +558,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  quickAddButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4F46E5',
-    paddingVertical: 16,
-    borderRadius: 16,
-    shadowColor: '#4F46E5',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  quickAddButtonText: {
-    fontSize: 15,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
-    marginLeft: 8,
-  },
   detailedTaskButton: {
     flex: 1,
     flexDirection: 'row',
@@ -592,6 +573,26 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   detailedTaskButtonText: {
+    fontSize: 15,
+    fontFamily: 'Inter-Bold',
+    color: '#FFFFFF',
+    marginLeft: 8,
+  },
+  simpleTaskButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4F46E5',
+    paddingVertical: 16,
+    borderRadius: 16,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  simpleTaskButtonText: {
     fontSize: 15,
     fontFamily: 'Inter-Bold',
     color: '#FFFFFF',
