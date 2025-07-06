@@ -15,7 +15,6 @@ import CalendarView from '@/components/CalendarView';
 import TaskCard from '@/components/TaskCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { taskStorage } from '@/utils/taskStorage';
-import { LinearGradient } from 'expo-linear-gradient';
 
 interface Subtask {
   id: string;
@@ -43,7 +42,7 @@ export default function TodayScreen() {
   const [showTaskCreation, setShowTaskCreation] = useState(false);
   const [taskCreationType, setTaskCreationType] = useState<'simple' | 'complex'>('simple');
   const [showCalendar, setShowCalendar] = useState(false);
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   useEffect(() => {
     loadTasks();
@@ -278,19 +277,16 @@ export default function TodayScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header with Gradient */}
-      <LinearGradient
-        colors={isDark ? [colors.surface, colors.background] : [colors.surface, colors.background]}
-        style={styles.headerGradient}
-      >
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View style={styles.headerContent}>
           <View style={styles.dateNavigation}>
             <TouchableOpacity 
-              style={[styles.navButton, { backgroundColor: colors.card, borderColor: colors.borderLight }]}
+              style={[styles.navButton, { backgroundColor: colors.card }]}
               onPress={() => navigateDate('prev')}
               activeOpacity={0.7}
             >
-              <ChevronLeft size={20} color={colors.textSecondary} strokeWidth={2.5} />
+              <ChevronLeft size={18} color={colors.textSecondary} strokeWidth={2} />
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -309,11 +305,11 @@ export default function TodayScreen() {
             </TouchableOpacity>
             
             <TouchableOpacity 
-              style={[styles.navButton, { backgroundColor: colors.card, borderColor: colors.borderLight }]}
+              style={[styles.navButton, { backgroundColor: colors.card }]}
               onPress={() => navigateDate('next')}
               activeOpacity={0.7}
             >
-              <ChevronRight size={20} color={colors.textSecondary} strokeWidth={2.5} />
+              <ChevronRight size={18} color={colors.textSecondary} strokeWidth={2} />
             </TouchableOpacity>
           </View>
 
@@ -323,7 +319,7 @@ export default function TodayScreen() {
               onPress={goToToday}
               activeOpacity={0.8}
             >
-              <ArrowLeft size={14} color={colors.primary} strokeWidth={2.5} />
+              <ArrowLeft size={14} color={colors.primary} strokeWidth={2} />
               <Text style={[styles.todayButtonText, { color: colors.primary }]}>Back to Today</Text>
             </TouchableOpacity>
           )}
@@ -332,7 +328,7 @@ export default function TodayScreen() {
             <View style={[styles.progressCard, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
               <View style={styles.progressHeader}>
                 <View style={[styles.progressIconContainer, { backgroundColor: colors.success + '20' }]}>
-                  <CheckCircle2 size={22} color={colors.success} strokeWidth={2.5} />
+                  <CheckCircle2 size={20} color={colors.success} strokeWidth={2} />
                 </View>
                 <View style={styles.progressTextContainer}>
                   <Text style={[styles.progressTitle, { color: colors.text }]}>Progress</Text>
@@ -357,7 +353,7 @@ export default function TodayScreen() {
             </View>
           )}
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Content */}
       <View style={styles.content}>
@@ -365,11 +361,11 @@ export default function TodayScreen() {
         <View style={styles.addSection}>
           <View style={styles.addButtonsContainer}>
             <TouchableOpacity
-              style={[styles.detailedTaskButton, { backgroundColor: colors.accent }]}
+              style={[styles.detailedTaskButton, { backgroundColor: '#8B5CF6' }]}
               onPress={handleDetailedTaskPress}
               activeOpacity={0.8}
             >
-              <Target size={18} color="#FFFFFF" strokeWidth={2.5} />
+              <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
               <Text style={styles.detailedTaskButtonText}>Detailed Task</Text>
             </TouchableOpacity>
             
@@ -378,8 +374,8 @@ export default function TodayScreen() {
               onPress={handleSimpleTaskPress}
               activeOpacity={0.8}
             >
-              <Plus size={18} color={isDark ? colors.background : '#FFFFFF'} strokeWidth={2.5} />
-              <Text style={[styles.simpleTaskButtonText, { color: isDark ? colors.background : '#FFFFFF' }]}>Simple Task</Text>
+              <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
+              <Text style={styles.simpleTaskButtonText}>Simple Task</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -388,7 +384,7 @@ export default function TodayScreen() {
         {currentDateTasks.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={[styles.emptyIconContainer, { backgroundColor: colors.card }]}>
-              <Calendar size={36} color={colors.textTertiary} strokeWidth={1.5} />
+              <Calendar size={32} color={colors.textTertiary} strokeWidth={1.5} />
             </View>
             <Text style={[styles.emptyTitle, { color: colors.text }]}>No tasks yet</Text>
             <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
@@ -444,206 +440,207 @@ export default function TodayScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8FAFC',
   },
-  headerGradient: {
+  header: {
+    backgroundColor: '#FFFFFF',
     paddingTop: Platform.OS === 'ios' ? 0 : 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   headerContent: {
-    paddingHorizontal: 24,
-    paddingVertical: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   dateNavigation: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   navButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   dateContainer: {
     alignItems: 'center',
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
   },
   dateText: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: 'Inter-Bold',
-    marginBottom: 4,
-    letterSpacing: -0.5,
+    color: '#1F2937',
+    marginBottom: 2,
   },
   dateSubtext: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    letterSpacing: 0.2,
+    color: '#6B7280',
   },
   todayButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    backgroundColor: '#EEF2FF',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 16,
     alignSelf: 'center',
     borderWidth: 1,
+    borderColor: '#C7D2FE',
   },
   todayButtonText: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    marginLeft: 6,
-    letterSpacing: 0.3,
+    color: '#4F46E5',
+    marginLeft: 4,
   },
   progressCard: {
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    borderColor: '#E5E7EB',
   },
   progressHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   progressIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#DCFCE7',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   progressTextContainer: {
     flex: 1,
   },
   progressTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    marginBottom: 4,
-    letterSpacing: 0.2,
+    color: '#1F2937',
+    marginBottom: 2,
   },
   progressSubtitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Inter-Medium',
-    letterSpacing: 0.1,
+    color: '#6B7280',
   },
   progressPercentage: {
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: 'Inter-Bold',
-    letterSpacing: -0.5,
+    color: '#10B981',
   },
   progressBarContainer: {
     marginTop: 4,
   },
   progressBar: {
-    height: 8,
-    borderRadius: 4,
+    height: 6,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: 4,
+    backgroundColor: '#10B981',
+    borderRadius: 3,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   addSection: {
-    marginBottom: 28,
+    marginBottom: 24,
   },
   addButtonsContainer: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
   },
   detailedTaskButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    borderRadius: 20,
-    shadowColor: '#000',
+    backgroundColor: '#8B5CF6',
+    paddingVertical: 16,
+    borderRadius: 16,
+    shadowColor: '#8B5CF6',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
   },
   detailedTaskButtonText: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Inter-Bold',
     color: '#FFFFFF',
-    marginLeft: 10,
-    letterSpacing: 0.3,
+    marginLeft: 8,
   },
   simpleTaskButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    borderRadius: 20,
-    shadowColor: '#000',
+    backgroundColor: '#4F46E5',
+    paddingVertical: 16,
+    borderRadius: 16,
+    shadowColor: '#4F46E5',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  simpleTaskButtonText: {
-    fontSize: 16,
-    fontFamily: 'Inter-Bold',
-    marginLeft: 10,
-    letterSpacing: 0.3,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 24,
-  },
-  emptyIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
   },
+  simpleTaskButtonText: {
+    fontSize: 15,
+    fontFamily: 'Inter-Bold',
+    color: '#FFFFFF',
+    marginLeft: 8,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 20,
+  },
+  emptyIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   emptyTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    marginBottom: 12,
-    letterSpacing: -0.3,
+    color: '#1F2937',
+    marginBottom: 8,
   },
   emptySubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
+    color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 24,
-    letterSpacing: 0.1,
+    lineHeight: 20,
   },
   tasksList: {
-    paddingBottom: 120,
+    paddingBottom: 100,
   },
 });

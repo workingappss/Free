@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
-import { LinearGradient } from 'expo-linear-gradient';
 
 interface CalendarViewProps {
   selectedDate: Date;
@@ -20,7 +19,7 @@ interface CalendarViewProps {
 
 export default function CalendarView({ selectedDate, onDateSelect, onClose }: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   const formatMonth = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -92,66 +91,59 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header with Gradient */}
-      <LinearGradient
-        colors={isDark ? [colors.surface, colors.background] : [colors.surface, colors.background]}
-        style={[styles.header, { borderBottomColor: colors.borderLight }]}
-      >
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Select Date</Text>
-        <TouchableOpacity 
-          style={[styles.closeButton, { backgroundColor: colors.card }]} 
-          onPress={onClose} 
-          activeOpacity={0.7}
-        >
-          <X size={22} color={colors.textSecondary} strokeWidth={2.5} />
+        <TouchableOpacity style={[styles.closeButton, { backgroundColor: colors.card }]} onPress={onClose} activeOpacity={0.7}>
+          <X size={20} color={colors.textSecondary} strokeWidth={2} />
         </TouchableOpacity>
-      </LinearGradient>
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Calendar Navigation */}
         <View style={styles.calendarHeader}>
           <TouchableOpacity 
-            style={[styles.navButton, { backgroundColor: colors.card, borderColor: colors.borderLight }]}
+            style={styles.navButton}
             onPress={() => navigateMonth('prev')}
             activeOpacity={0.7}
           >
-            <ChevronLeft size={20} color={colors.textSecondary} strokeWidth={2.5} />
+            <ChevronLeft size={18} color="#6B7280" strokeWidth={2} />
           </TouchableOpacity>
           
-          <Text style={[styles.monthTitle, { color: colors.text }]}>{formatMonth(currentMonth)}</Text>
+          <Text style={styles.monthTitle}>{formatMonth(currentMonth)}</Text>
           
           <TouchableOpacity 
-            style={[styles.navButton, { backgroundColor: colors.card, borderColor: colors.borderLight }]}
+            style={styles.navButton}
             onPress={() => navigateMonth('next')}
             activeOpacity={0.7}
           >
-            <ChevronRight size={20} color={colors.textSecondary} strokeWidth={2.5} />
+            <ChevronRight size={18} color="#6B7280" strokeWidth={2} />
           </TouchableOpacity>
         </View>
 
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity 
-            style={[styles.todayButton, { backgroundColor: colors.primaryLight, borderColor: colors.primary }]}
+            style={styles.todayButton}
             onPress={goToToday}
             activeOpacity={0.8}
           >
-            <Text style={[styles.todayButtonText, { color: colors.primary }]}>Go to Today</Text>
+            <Text style={styles.todayButtonText}>Go to Today</Text>
           </TouchableOpacity>
         </View>
 
         {/* Week Days Header */}
-        <View style={[styles.weekDaysContainer, { backgroundColor: colors.card }]}>
+        <View style={styles.weekDaysContainer}>
           {weekDays.map((day) => (
-            <Text key={day} style={[styles.weekDay, { color: colors.textSecondary }]}>
+            <Text key={day} style={styles.weekDay}>
               {day}
             </Text>
           ))}
         </View>
 
         {/* Calendar Grid */}
-        <View style={[styles.calendarGrid, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
+        <View style={styles.calendarGrid}>
           {days.map((date, index) => (
             <TouchableOpacity
               key={index}
@@ -169,10 +161,10 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
               {date && (
                 <Text style={[
                   styles.dayText,
-                  !isSameMonth(date) && [styles.otherMonthText, { color: colors.textTertiary }],
+                  !isSameMonth(date) && styles.otherMonthText,
                   { color: colors.text },
                   isToday(date) && { color: colors.warning, fontFamily: 'Inter-SemiBold' },
-                  isSelected(date) && { color: isDark ? colors.background : '#FFFFFF', fontFamily: 'Inter-SemiBold' },
+                  isSelected(date) && { color: '#FFFFFF', fontFamily: 'Inter-SemiBold' },
                 ]}>
                   {date.getDate()}
                 </Text>
@@ -182,20 +174,23 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
         </View>
 
         {/* Legend */}
-        <View style={styles.legend}>
-          <View style={styles.legendItem}>
+        <View style={styles.selectedDateContainer}>
+          <Text style={styles.selectedDateLabel}>Selected Date</Text>
+          <Text style={styles.selectedDateText}>
             <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Selected</Text>
-          </View>
-          <View style={styles.legendItem}>
+            {selectedDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+            })}
             <View style={[styles.legendDot, { backgroundColor: colors.warning + '20', borderWidth: 1, borderColor: colors.warning }]} />
             <Text style={[styles.legendText, { color: colors.textSecondary }]}>Today</Text>
-          </View>
+          </Text>
         </View>
       </ScrollView>
 
       {/* Action Buttons */}
-      <View style={[styles.actionButtons, { backgroundColor: colors.surface, borderTopColor: colors.borderLight }]}>
+      <View style={styles.actionButtons}>
         <TouchableOpacity
           style={[styles.cancelButton, { backgroundColor: colors.card }]}
           onPress={onClose}
@@ -208,7 +203,7 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
           onPress={() => onDateSelect(selectedDate)}
           activeOpacity={0.8}
         >
-          <Text style={[styles.confirmButtonText, { color: isDark ? colors.background : '#FFFFFF' }]}>Select Date</Text>
+          <Text style={styles.confirmButtonText}>Select Date</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -218,203 +213,151 @@ export default function CalendarView({ selectedDate, onDateSelect, onClose }: Ca
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: -0.3,
+    color: '#1F2937',
   },
   closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
   },
   calendarHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 24,
+    paddingVertical: 20,
   },
   navButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   monthTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: -0.3,
+    color: '#1F2937',
   },
   quickActions: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   todayButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    backgroundColor: '#EEF2FF',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderColor: '#C7D2FE',
   },
   todayButtonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.3,
+    color: '#4F46E5',
   },
   weekDaysContainer: {
     flexDirection: 'row',
     marginBottom: 12,
-    borderRadius: 16,
-    paddingVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   weekDay: {
     flex: 1,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
+    paddingVertical: 8,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   calendarGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    borderRadius: 20,
-    padding: 12,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   dayCell: {
     width: '14.28%',
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
-    margin: 2,
+    borderRadius: 8,
+    marginBottom: 4,
   },
   emptyCell: {
-    backgroundColor: 'transparent',
-  },
-  otherMonthCell: {
-    opacity: 0.3,
-  },
-  todayCell: {
-    borderWidth: 2,
+    opacity: 0,
   },
   selectedCell: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    backgroundColor: '#4F46E5',
   },
-  dayText: {
-    fontSize: 14,
+  todayText: {
+    color: '#F59E0B',
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.2,
   },
-  otherMonthText: {
-    opacity: 0.5,
+  selectedText: {
+    color: '#FFFFFF',
   },
-  legend: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 24,
-    marginTop: 20,
+  selectedDateContainer: {
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 24,
     marginBottom: 20,
   },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  selectedDateLabel: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  legendDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-  },
-  legendText: {
-    fontSize: 13,
-    fontFamily: 'Inter-Medium',
-    letterSpacing: 0.2,
+  selectedDateText: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 16,
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    borderTopWidth: 1,
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   cancelButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.3,
   },
   confirmButton: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
   },
   confirmButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.3,
+    color: '#FFFFFF',
   },
 });

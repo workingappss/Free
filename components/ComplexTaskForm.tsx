@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { Plus, X, Clock, Target } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
-import { LinearGradient } from 'expo-linear-gradient';
 
 interface Subtask {
   id: string;
@@ -39,7 +38,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
   const [duration, setDuration] = useState(30);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [customDuration, setCustomDuration] = useState('');
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   const addSubtask = () => {
     if (newSubtaskTitle.trim()) {
@@ -83,7 +82,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
   const durationOptions = [15, 30, 45, 60, 90, 120, 180, 240];
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.surface }]} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         {/* Title Input */}
         <View style={styles.section}>
@@ -163,9 +162,9 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
               activeOpacity={0.7}
             >
               <Plus
-                size={18}
-                color={newSubtaskTitle.trim() ? (isDark ? colors.background : '#FFFFFF') : colors.textTertiary}
-                strokeWidth={2.5}
+                size={16}
+                color={newSubtaskTitle.trim() ? '#FFFFFF' : colors.textTertiary}
+                strokeWidth={2}
               />
             </TouchableOpacity>
           </View>
@@ -195,7 +194,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
                     onPress={() => removeSubtask(subtask.id)}
                     activeOpacity={0.7}
                   >
-                    <X size={16} color={colors.error} strokeWidth={2.5} />
+                    <X size={14} color={colors.error} strokeWidth={2} />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -220,7 +219,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
               onPress={() => setShowTimePicker(true)}
               activeOpacity={0.7}
             >
-              <Clock size={18} color={startTime ? colors.primary : colors.textSecondary} strokeWidth={2.5} />
+              <Clock size={16} color={startTime ? colors.primary : colors.textSecondary} strokeWidth={2} />
               <Text
                 style={[
                   styles.timeButtonText,
@@ -237,7 +236,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
                 onPress={() => setStartTime(null)}
                 activeOpacity={0.7}
               >
-                <X size={16} color={colors.textSecondary} strokeWidth={2.5} />
+                <X size={14} color={colors.textSecondary} strokeWidth={2} />
               </TouchableOpacity>
             )}
           </View>
@@ -245,7 +244,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
           {/* Duration */}
           <View style={styles.durationContainer}>
             <View style={styles.durationHeader}>
-              <Target size={18} color={colors.textSecondary} strokeWidth={2.5} />
+              <Target size={16} color={colors.textSecondary} strokeWidth={2} />
               <Text style={[styles.durationLabel, { color: colors.text }]}>
                 Duration: {duration} minutes
               </Text>
@@ -267,7 +266,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
                   <Text
                     style={[
                       styles.durationOptionText,
-                      { color: duration === option ? (isDark ? colors.background : '#FFFFFF') : colors.text },
+                      { color: duration === option ? '#FFFFFF' : colors.text },
                     ]}
                   >
                     {option}m
@@ -336,7 +335,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
             <Text
               style={[
                 styles.saveButtonText,
-                { color: title.trim() ? (isDark ? colors.background : '#FFFFFF') : colors.textTertiary },
+                { color: title.trim() ? '#FFFFFF' : colors.textTertiary },
               ]}
             >
               Create Task
@@ -376,7 +375,7 @@ function SimpleTimePickerModal({
   const [selectedMinute, setSelectedMinute] = useState(currentTime ? Math.round(currentTime.getMinutes() / 15) * 15 : 0);
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = [0, 15, 30, 45];
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   const handleConfirm = () => {
     const selectedTime = new Date();
@@ -403,15 +402,12 @@ function SimpleTimePickerModal({
     >
       <View style={styles.modalOverlay}>
         <View style={[styles.timePickerContainer, { backgroundColor: colors.surface }]}>
-          <LinearGradient
-            colors={isDark ? [colors.surface, colors.card] : [colors.surface, colors.card]}
-            style={[styles.timePickerHeader, { borderBottomColor: colors.borderLight }]}
-          >
+          <View style={[styles.timePickerHeader, { borderBottomColor: colors.borderLight }]}>
             <Text style={[styles.timePickerTitle, { color: colors.text }]}>Set Start Time</Text>
             <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-              <X size={22} color={colors.textSecondary} strokeWidth={2.5} />
+              <X size={20} color={colors.textSecondary} strokeWidth={2} />
             </TouchableOpacity>
-          </LinearGradient>
+          </View>
 
           <View style={styles.timeSelectorsContainer}>
             <View style={styles.timeColumn}>
@@ -433,7 +429,7 @@ function SimpleTimePickerModal({
                       <Text style={[
                         styles.timeOptionText,
                         { color: colors.text },
-                        isSelected && { color: isDark ? colors.background : '#FFFFFF', fontFamily: 'Inter-SemiBold' }
+                        isSelected && { color: '#FFFFFF', fontFamily: 'Inter-SemiBold' }
                       ]}>
                         {hour.toString().padStart(2, '0')}
                       </Text>
@@ -462,7 +458,7 @@ function SimpleTimePickerModal({
                       <Text style={[
                         styles.timeOptionText,
                         { color: colors.text },
-                        isSelected && { color: isDark ? colors.background : '#FFFFFF', fontFamily: 'Inter-SemiBold' }
+                        isSelected && { color: '#FFFFFF', fontFamily: 'Inter-SemiBold' }
                       ]}>
                         {minute.toString().padStart(2, '0')}
                       </Text>
@@ -474,7 +470,7 @@ function SimpleTimePickerModal({
           </View>
 
           <View style={[styles.selectedTimeDisplay, { backgroundColor: colors.card, borderColor: colors.borderLight }]}>
-            <Clock size={18} color={colors.primary} strokeWidth={2.5} />
+            <Clock size={16} color={colors.primary} strokeWidth={2} />
             <Text style={[styles.selectedTimeText, { color: colors.text }]}>
               {getDisplayTime()}
             </Text>
@@ -493,7 +489,7 @@ function SimpleTimePickerModal({
               onPress={handleConfirm}
               activeOpacity={0.8}
             >
-              <Text style={[styles.timePickerConfirmText, { color: isDark ? colors.background : '#FFFFFF' }]}>Set Time</Text>
+              <Text style={styles.timePickerConfirmText}>Set Time</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -505,379 +501,348 @@ function SimpleTimePickerModal({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
-    padding: 24,
+    padding: 20,
     paddingBottom: 40,
   },
   section: {
-    marginBottom: 28,
+    marginBottom: 24,
   },
   label: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    marginBottom: 12,
-    letterSpacing: -0.2,
+    color: '#1F2937',
+    marginBottom: 8,
   },
   input: {
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderRadius: 16,
-    padding: 20,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
     fontFamily: 'Inter-Medium',
-    minHeight: 56,
+    color: '#1F2937',
+    minHeight: 50,
     textAlignVertical: 'top',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   textArea: {
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderRadius: 16,
-    padding: 20,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
     fontFamily: 'Inter-Medium',
-    minHeight: 100,
+    color: '#1F2937',
+    minHeight: 80,
     textAlignVertical: 'top',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   timeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 20,
+    gap: 8,
+    marginBottom: 16,
   },
   timeButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 12,
+    gap: 8,
     flex: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   timeButtonText: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    letterSpacing: 0.1,
+    color: '#6B7280',
   },
   clearButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   durationContainer: {
-    gap: 16,
+    gap: 12,
   },
   durationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
   durationLabel: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    letterSpacing: 0.1,
+    color: '#6B7280',
   },
   durationOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 8,
   },
   durationOption: {
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   durationOptionText: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.2,
+    color: '#374151',
   },
   customDurationContainer: {
-    marginTop: 20,
-    paddingTop: 20,
+    marginTop: 16,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    borderTopColor: '#F3F4F6',
   },
   customDurationLabel: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    marginBottom: 12,
-    letterSpacing: 0.1,
+    color: '#6B7280',
+    marginBottom: 8,
   },
   customDurationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
   },
   customDurationInput: {
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    fontSize: 15,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    width: 120,
+    color: '#1F2937',
+    width: 100,
     textAlign: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   customDurationUnit: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    letterSpacing: 0.1,
+    color: '#6B7280',
   },
   addSubtaskContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 20,
+    gap: 8,
+    marginBottom: 16,
   },
   subtaskInput: {
     flex: 1,
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 15,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    color: '#1F2937',
   },
   addSubtaskButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   subtasksList: {
-    gap: 12,
+    gap: 8,
   },
   subtaskItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 12,
+    gap: 8,
   },
   subtaskNumber: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    minWidth: 24,
-    letterSpacing: 0.2,
+    color: '#9CA3AF',
+    minWidth: 20,
   },
   subtaskTitle: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-    letterSpacing: 0.1,
+    color: '#374151',
   },
   removeSubtaskButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
   },
   actions: {
     flexDirection: 'row',
-    gap: 16,
-    marginTop: 12,
+    gap: 12,
+    marginTop: 8,
   },
   cancelButton: {
     flex: 1,
+    backgroundColor: '#F3F4F6',
     borderWidth: 1,
-    borderRadius: 16,
-    paddingVertical: 18,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   cancelButtonText: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.3,
+    color: '#6B7280',
   },
   saveButton: {
     flex: 2,
-    borderRadius: 16,
-    paddingVertical: 18,
+    backgroundColor: '#4F46E5',
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   saveButtonText: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.3,
+    color: '#FFFFFF',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   timePickerContainer: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     maxHeight: '70%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
     elevation: 8,
   },
   timePickerHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
     borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
   timePickerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: -0.3,
+    color: '#1F2937',
   },
   timeSelectorsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
     maxHeight: 200,
   },
   timeColumn: {
     flex: 1,
     alignItems: 'center',
-    marginHorizontal: 8,
+    marginHorizontal: 4,
   },
   timeColumnLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    marginBottom: 16,
+    color: '#6B7280',
+    marginBottom: 12,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   timeScrollView: {
     maxHeight: 150,
     width: '100%',
   },
   timeOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 4,
     alignItems: 'center',
-    minHeight: 44,
+    minHeight: 36,
     justifyContent: 'center',
+    backgroundColor: '#F8FAFC',
   },
   timeOptionText: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: 'Inter-Medium',
-    letterSpacing: 0.2,
+    color: '#374151',
   },
   selectedTimeDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
-    marginHorizontal: 24,
-    borderRadius: 16,
+    paddingVertical: 16,
+    marginHorizontal: 20,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
     borderWidth: 1,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderColor: '#E5E7EB',
+    gap: 8,
   },
   selectedTimeText: {
-    fontSize: 24,
+    fontSize: 20,
     fontFamily: 'Inter-Bold',
-    letterSpacing: -0.5,
+    color: '#1F2937',
   },
   timePickerActions: {
     flexDirection: 'row',
-    gap: 16,
-    padding: 24,
+    gap: 12,
+    padding: 20,
     borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
   },
   timePickerCancelButton: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   timePickerCancelText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.3,
+    color: '#6B7280',
   },
   timePickerConfirmButton: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 16,
+    backgroundColor: '#6366F1',
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
   },
   timePickerConfirmText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    letterSpacing: 0.3,
+    color: '#FFFFFF',
   },
 });
