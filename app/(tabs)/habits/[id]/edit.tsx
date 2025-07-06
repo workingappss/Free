@@ -23,21 +23,18 @@ export default function EditHabitScreen() {
       const habits = await habitStorage.getHabits();
       const foundHabit = habits.find(h => h.id === id);
       
-      setHabit(foundHabit || null);
+      if (foundHabit) {
+        setHabit(foundHabit);
+      } else {
+        router.back();
+      }
     } catch (error) {
       console.error('Error loading habit:', error);
-      setHabit(null);
+      router.back();
     } finally {
       setLoading(false);
     }
   };
-
-  // Handle navigation after loading completes
-  useEffect(() => {
-    if (!loading && !habit) {
-      router.back();
-    }
-  }, [loading, habit]);
 
   const handleSave = async (habitData: Omit<Habit, 'id' | 'createdAt'>) => {
     if (!habit) return;
@@ -72,6 +69,7 @@ export default function EditHabitScreen() {
   }
 
   if (!habit) {
+    router.back();
     return null;
   }
 
