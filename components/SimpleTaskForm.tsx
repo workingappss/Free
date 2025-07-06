@@ -77,18 +77,6 @@ export default function SimpleTaskForm({ onSave, onCancel }: SimpleTaskFormProps
         </View>
 
         {/* Tips */}
-        <View style={[styles.tips, { backgroundColor: colors.primaryLight }]}>
-          <Text style={[styles.tipsTitle, { color: colors.primary }]}>💡 Quick Tips</Text>
-          <Text style={[styles.tipsText, { color: colors.primary }]}>
-            • Start with an action verb (e.g., "Call", "Write", "Buy")
-          </Text>
-          <Text style={[styles.tipsText, { color: colors.primary }]}>
-            • Be specific about what you want to accomplish
-          </Text>
-          <Text style={[styles.tipsText, { color: colors.primary }]}>
-            • Keep it under 50 characters for best readability
-          </Text>
-        </View>
       </View>
 
       {/* Action Buttons */}
@@ -101,7 +89,6 @@ export default function SimpleTaskForm({ onSave, onCancel }: SimpleTaskFormProps
           onPress={onCancel}
           activeOpacity={0.7}
         >
-          <X size={16} color={colors.textSecondary} strokeWidth={2} />
           <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>
             Cancel
           </Text>
@@ -120,11 +107,6 @@ export default function SimpleTaskForm({ onSave, onCancel }: SimpleTaskFormProps
           activeOpacity={canSave ? 0.8 : 1}
           disabled={!canSave}
         >
-          <Check 
-            size={16} 
-            color={canSave ? '#FFFFFF' : colors.textTertiary} 
-            strokeWidth={2} 
-          />
           <Text style={[
             styles.saveButtonText, 
             { color: canSave ? '#FFFFFF' : colors.textTertiary }
@@ -187,24 +169,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-Medium',
   },
-  tips: {
-    backgroundColor: '#EEF2FF',
-    borderRadius: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    marginBottom: 32,
-  },
-  tipsTitle: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    marginBottom: 8,
-  },
-  tipsText: {
-    fontSize: 13,
-    fontFamily: 'Inter-Medium',
-    lineHeight: 18,
-    marginBottom: 4,
-  },
   actions: {
     flexDirection: 'row',
     gap: 12,
@@ -214,7 +178,6 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#F3F4F6',
@@ -222,7 +185,6 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     paddingVertical: 16,
     borderRadius: 12,
-    gap: 8,
   },
   cancelButtonText: {
     fontSize: 16,
@@ -230,13 +192,11 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
     borderRadius: 12,
     borderWidth: 1,
-    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
