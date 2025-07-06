@@ -1067,6 +1067,7 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     padding: 20,
+    justifyContent: 'flex-start',
   },
   },
 });
