@@ -347,25 +347,14 @@ export default function TodayScreen() {
       <View style={styles.content}>
         {/* Add Task Buttons */}
         <View style={styles.addSection}>
-          <View style={styles.addButtonsContainer}>
-            <TouchableOpacity
-              style={[styles.quickTaskButton, { backgroundColor: colors.primary }]}
-              onPress={() => setShowTaskCreation(true)}
-              activeOpacity={0.8}
-            >
-              <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.quickTaskButtonText}>Quick Task</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.complexTaskButton, { backgroundColor: '#8B5CF6' }]}
-              onPress={() => setShowTaskCreation(true)}
-              activeOpacity={0.8}
-            >
-              <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.detailedTaskButtonText}>Detailed Task</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.primary }]}
+            onPress={() => setShowTaskCreation(true)}
+            activeOpacity={0.8}
+          >
+            <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
+            <Text style={styles.addButtonText}>Add Task</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Tasks List */}
@@ -553,12 +542,7 @@ const styles = StyleSheet.create({
   addSection: {
     marginBottom: 24,
   },
-  addButtonsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  quickTaskButton: {
-    flex: 1,
+  addButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -571,27 +555,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  quickTaskButtonText: {
-    fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#FFFFFF',
-    marginLeft: 6,
-  },
-  complexTaskButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#8B5CF6',
-    paddingVertical: 14,
-    borderRadius: 12,
-    shadowColor: '#8B5CF6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  detailedTaskButtonText: {
+  addButtonText: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
