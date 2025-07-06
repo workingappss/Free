@@ -455,21 +455,10 @@ export default function TodayScreen() {
         presentationStyle="fullScreen"
         onRequestClose={closeAllModals}
       >
-        <SafeAreaView style={[styles.modalContainer, { backgroundColor: colors.surface }]}>
-          <View style={[styles.modalHeader, { borderBottomColor: colors.borderLight }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Create Simple Task</Text>
-            <TouchableOpacity style={[styles.modalCloseButton, { backgroundColor: colors.card }]} onPress={closeAllModals} activeOpacity={0.7}>
-              <X size={20} color={colors.textSecondary} strokeWidth={2} />
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.modalContent}>
-            <SimpleTaskInput
-              onSave={addSimpleTask}
-              onCancel={closeAllModals}
-            />
-          </View>
-        </SafeAreaView>
+        <SimpleTaskInput
+          onSave={addSimpleTask}
+          onCancel={closeAllModals}
+        />
       </Modal>
 
       {/* Complex Task Form Modal - Fixed with proper key and state management */}
