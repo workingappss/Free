@@ -41,6 +41,7 @@ export default function TodayScreen() {
   const [loading, setLoading] = useState(true);
   const [showTaskCreation, setShowTaskCreation] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [taskCreationType, setTaskCreationType] = useState<'simple' | 'complex'>('simple');
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -350,20 +351,26 @@ export default function TodayScreen() {
           <View style={styles.addButtonsContainer}>
             <TouchableOpacity
               style={[styles.detailedTaskButton, { backgroundColor: '#8B5CF6' }]}
-              onPress={() => setShowTaskCreation(true)}
+              onPress={() => {
+                setTaskCreationType('complex');
+                setShowTaskCreation(true);
+              }}
               activeOpacity={0.8}
             >
               <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.detailedTaskButtonText}>+ Detailed Task</Text>
+              <Text style={styles.detailedTaskButtonText}>Detailed Task</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
-              onPress={() => setShowTaskCreation(true)}
+              onPress={() => {
+                setTaskCreationType('simple');
+                setShowTaskCreation(true);
+              }}
               activeOpacity={0.8}
             >
               <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.simpleTaskButtonText}>+ Simple Task</Text>
+              <Text style={styles.simpleTaskButtonText}>Simple Task</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -401,7 +408,7 @@ export default function TodayScreen() {
         <TaskCreationModal
           onSave={handleTaskCreated}
           onCancel={() => setShowTaskCreation(false)}
-          initialType="simple"
+          initialType={taskCreationType}
         />
       </Modal>
 
