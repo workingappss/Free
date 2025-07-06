@@ -41,18 +41,18 @@ interface ThemeContextType {
 }
 
 const lightColors: ThemeColors = {
-  background: '#F8FAFC',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#FFFFFF',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
-  primary: '#6366F1',
+  primary: '#4F46E5',
   primaryLight: '#EEF2FF',
   
   success: '#10B981',
@@ -64,19 +64,19 @@ const lightColors: ThemeColors = {
 };
 
 const darkColors: ThemeColors = {
-  background: '#0F172A',
-  surface: '#1E293B',
-  card: '#334155',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#2A2A2A',
   
-  text: '#F8FAFC',
-  textSecondary: '#E2E8F0',
-  textTertiary: '#CBD5E1',
+  text: '#FAFAFA',
+  textSecondary: '#E0E0E0',
+  textTertiary: '#A0A0A0',
   
-  border: '#475569',
-  borderLight: '#374151',
+  border: '#333333',
+  borderLight: '#222222',
   
-  primary: '#6366F1',
-  primaryLight: '#312E81',
+  primary: '#00E676',
+  primaryLight: '#00E67620',
   
   success: '#10B981',
   warning: '#F59E0B',
@@ -91,12 +91,12 @@ const pinkColors: ThemeColors = {
   surface: '#FFFFFF',
   card: '#FDF2F8',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
   primary: '#EC4899',
   primaryLight: '#FCE7F3',
@@ -110,16 +110,16 @@ const pinkColors: ThemeColors = {
 };
 
 const blueColors: ThemeColors = {
-  background: '#FEFEFE',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#F0F9FF',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
   primary: '#0EA5E9',
   primaryLight: '#F0F9FF',
@@ -133,16 +133,16 @@ const blueColors: ThemeColors = {
 };
 
 const greenColors: ThemeColors = {
-  background: '#FEFEFE',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#F0FDF4',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
   primary: '#16A34A',
   primaryLight: '#F0FDF4',
@@ -156,16 +156,16 @@ const greenColors: ThemeColors = {
 };
 
 const orangeColors: ThemeColors = {
-  background: '#FEFEFE',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#FFFBEB',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
   primary: '#F59E0B',
   primaryLight: '#FFFBEB',
@@ -179,16 +179,16 @@ const orangeColors: ThemeColors = {
 };
 
 const purpleColors: ThemeColors = {
-  background: '#FEFEFE',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#FAF5FF',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
   primary: '#A855F7',
   primaryLight: '#FAF5FF',
@@ -202,16 +202,16 @@ const purpleColors: ThemeColors = {
 };
 
 const redColors: ThemeColors = {
-  background: '#FEFEFE',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#FEF2F2',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
   primary: '#EF4444',
   primaryLight: '#FEF2F2',

@@ -217,12 +217,13 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
+    position: 'relative',
   },
   headerTitle: {
     fontSize: 18,
@@ -230,6 +231,8 @@ const styles = StyleSheet.create({
     color: '#1F2937',
   },
   closeButton: {
+    position: 'absolute',
+    right: 20,
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -306,7 +309,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   selectedCell: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: colors.primary,
   },
   todayText: {
     color: '#F59E0B',
@@ -315,11 +318,32 @@ const styles = StyleSheet.create({
   selectedText: {
     color: '#FFFFFF',
   },
+  legend: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    marginTop: 12,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  legendText: {
+    fontSize: 11,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+  },
   selectedDateContainer: {
     borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.warning + '20',
     marginTop: 24,
-    marginBottom: 20,
+    borderColor: colors.warning,
   },
   selectedDateLabel: {
     fontSize: 12,
@@ -358,6 +382,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    color: '#FFFFFF',
+    color: colors.text,
   },
 });
+    color: colors.warning,

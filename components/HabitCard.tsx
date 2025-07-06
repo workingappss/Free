@@ -312,21 +312,16 @@ export default function HabitCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
   },
   completedContainer: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.card,
   },
   header: {
     flexDirection: 'row',
@@ -426,7 +421,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: colors.borderLight,
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 8,
@@ -446,7 +441,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.card,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -458,11 +453,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   motivationContainer: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.card,
     borderRadius: 8,
     padding: 12,
     borderLeftWidth: 3,
-    borderLeftColor: '#E5E7EB',
+    borderLeftColor: colors.borderLight,
   },
   motivationText: {
     fontSize: 13,
@@ -480,15 +475,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   valueInputContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     width: '100%',
     maxWidth: 400,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
   },
   valueInputHeader: {
     flexDirection: 'row',
@@ -496,7 +486,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: colors.borderLight,
   },
   valueInputTitle: {
     fontSize: 18,
@@ -515,10 +505,10 @@ const styles = StyleSheet.create({
   valueInput: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
-    color: '#1F2937',
-    backgroundColor: '#F9FAFB',
+    color: colors.text,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.borderLight,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -536,11 +526,11 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: colors.borderLight,
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.card,
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: 'center',
@@ -548,7 +538,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
+    color: colors.textSecondary,
   },
   saveButton: {
     flex: 1,

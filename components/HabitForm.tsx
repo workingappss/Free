@@ -982,11 +982,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '70%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
   },
   timePickerHeader: {
     flexDirection: 'row',
@@ -1028,7 +1023,7 @@ const styles = StyleSheet.create({
   timeOption: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 4,
     alignItems: 'center',
     minHeight: 36,
@@ -1036,7 +1031,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   selectedTimeOption: {
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
   },
   timeOptionText: {
     fontSize: 16,
@@ -1044,7 +1039,7 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   selectedTimeOptionText: {
-    color: '#FFFFFF',
+    color: colors.text,
     fontFamily: 'Inter-SemiBold',
   },
   selectedTimeDisplay: {
@@ -1053,10 +1048,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 16,
     marginHorizontal: 20,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.card,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.borderLight,
     gap: 8,
   },
   selectedTimeText: {

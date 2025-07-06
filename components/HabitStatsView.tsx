@@ -412,12 +412,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   statCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
   },
   statCardCompact: {
     width: '47%', // Slightly less than 50% to account for gap
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
   },
   statIcon: {
     width: 40,
@@ -463,12 +463,12 @@ const styles = StyleSheet.create({
   },
   measurableCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
   },
   measurableValue: {
     fontSize: 20,
@@ -496,11 +496,11 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.borderLight,
   },
   monthTitle: {
     fontSize: 16,
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
   weekDaysContainer: {
     flexDirection: 'row',
     marginBottom: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 8,
     paddingVertical: 8,
   },
@@ -526,28 +526,28 @@ const styles = StyleSheet.create({
   calendarGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
   },
   dayCell: {
     width: '14.28%',
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 6,
+    borderRadius: 8,
     margin: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.card,
   },
   emptyCell: {
     backgroundColor: 'transparent',
   },
   todayCell: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: colors.warning + '20',
     borderWidth: 1,
-    borderColor: '#F59E0B',
+    borderColor: colors.warning,
   },
   dayText: {
     fontSize: 12,
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   todayText: {
-    color: '#F59E0B',
+    color: colors.warning,
   },
   valueText: {
     fontSize: 8,
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   completedValueText: {
-    color: '#FFFFFF',
+    color: colors.text,
   },
   legend: {
     flexDirection: 'row',
@@ -598,12 +598,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
   },
   historyDate: {
     flexDirection: 'row',
@@ -639,11 +639,11 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   infoGrid: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
     marginBottom: 16,
   },
   infoItem: {
@@ -652,7 +652,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: colors.borderLight,
   },
   infoLabel: {
     fontSize: 14,
@@ -665,13 +665,13 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   motivationCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: colors.borderLight,
     borderLeftWidth: 4,
-    borderLeftColor: '#4F46E5',
+    borderLeftColor: colors.primary,
   },
   motivationTitle: {
     fontSize: 14,

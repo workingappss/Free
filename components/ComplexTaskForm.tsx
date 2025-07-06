@@ -739,11 +739,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '70%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
   },
   timePickerHeader: {
     flexDirection: 'row',
@@ -785,7 +780,7 @@ const styles = StyleSheet.create({
   timeOption: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 4,
     alignItems: 'center',
     minHeight: 36,
@@ -835,14 +830,14 @@ const styles = StyleSheet.create({
   },
   timePickerConfirmButton: {
     flex: 1,
-    backgroundColor: '#6366F1',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-  },
+    backgroundColor: colors.card,
   timePickerConfirmText: {
     fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
-    color: '#FFFFFF',
+    borderColor: colors.borderLight,
+    color: colors.text,
   },
 });
