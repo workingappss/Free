@@ -49,7 +49,7 @@ const HABIT_ICONS = [
 const FREQUENCY_OPTIONS = [
   { id: 'daily', label: 'Daily', description: 'Every day' },
   { id: 'weekly', label: 'Weekly', description: 'Once per week' },
-  { id: 'custom', label: 'Custom', description: 'Specific days' },
+  { id: 'custom', label: 'Custom', description: 'Choose days and frequency' },
 ];
 
 export default function HabitForm({ habit, onSave, onCancel, isEditing = false }: HabitFormProps) {
@@ -58,6 +58,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
   const [type, setType] = useState<'boolean' | 'measurable'>(habit?.type || 'boolean');
   const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'custom'>(habit?.frequency || 'daily');
   const [customDays, setCustomDays] = useState<number[]>(habit?.customDays || []);
+  const [weeklyTarget, setWeeklyTarget] = useState(habit?.weeklyTarget?.toString() || '3');
   const [reminderTime, setReminderTime] = useState<Date | null>(habit?.reminderTime || null);
   const [motivationalQuestion, setMotivationalQuestion] = useState(habit?.motivationalQuestion || '');
   const [selectedColor, setSelectedColor] = useState(habit?.color || HABIT_COLORS[0]);
@@ -77,6 +78,13 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
       return;
     }
 
+    if (frequency === 'custom') {
+      const target = parseInt(weeklyTarget);
+      if (!weeklyTarget || isNaN(target) || target <= 0 || target > customDays.length) {
+        Alert.alert('Error', `Weekly target must be between 1 and ${customDays.length} (selected days)`);
+        return;
+      }
+    }
     if (type === 'measurable') {
       const target = parseFloat(targetValue);
       if (!targetValue || isNaN(target) || target <= 0) {
@@ -95,6 +103,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
       type,
       frequency,
       customDays: frequency === 'custom' ? customDays : undefined,
+      weeklyTarget: frequency === 'custom' ? parseInt(weeklyTarget) : undefined,
       reminderTime: reminderTime || undefined,
       motivationalQuestion: motivationalQuestion.trim() || undefined,
       color: selectedColor,
@@ -298,6 +307,7 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
           {frequency === 'custom' && (
             <View style={styles.dayPickerContainer}>
               <Text style={styles.dayPickerLabel}>Select Days</Text>
+              <Text style={styles.dayPickerHelp}>Choose which days this habit can be completed</Text>
               <View style={styles.daysContainer}>
                 {DAYS.map((day) => {
                   const isSelected = customDays.includes(day.value);
@@ -323,6 +333,29 @@ export default function HabitForm({ habit, onSave, onCancel, isEditing = false }
               </View>
               {customDays.length === 0 && (
                 <Text style={styles.errorText}>Please select at least one day</Text>
+              )}
+              
+              {/* Weekly Target */}
+              {customDays.length > 0 && (
+                <View style={styles.weeklyTargetContainer}>
+                  <Text style={styles.weeklyTargetLabel}>Weekly Target *</Text>
+                  <Text style={styles.weeklyTargetHelp}>
+                    How many times per week do you want to complete this habit?
+                  </Text>
+                  <View style={styles.weeklyTargetInputContainer}>
+                    <TextInput
+                      style={styles.weeklyTargetInput}
+                      value={weeklyTarget}
+                      onChangeText={setWeeklyTarget}
+                      keyboardType="numeric"
+                      placeholder="3"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                    <Text style={styles.weeklyTargetSuffix}>
+                      times per week (max {customDays.length})
+                    </Text>
+                  </View>
+                </View>
               )}
             </View>
           )}
@@ -720,6 +753,12 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
   },
+  dayPickerHelp: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    marginBottom: 12,
+  },
   daysContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -751,6 +790,48 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     color: '#EF4444',
     marginTop: 4,
+  },
+  weeklyTargetContainer: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  weeklyTargetLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+    marginBottom: 4,
+  },
+  weeklyTargetHelp: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    marginBottom: 12,
+  },
+  weeklyTargetInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  weeklyTargetInput: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1F2937',
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    width: 80,
+    textAlign: 'center',
+  },
+  weeklyTargetSuffix: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    flex: 1,
   },
   reminderContainer: {
     flexDirection: 'row',

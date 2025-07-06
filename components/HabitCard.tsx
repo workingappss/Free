@@ -25,6 +25,12 @@ interface HabitCardProps {
   onToggle: (completed: boolean, value?: number) => void;
   onPress: () => void;
   streak?: number;
+  weeklyProgress?: {
+    completed: number;
+    target: number;
+    remaining: number;
+    percentage: number;
+  };
 }
 
 export default function HabitCard({ 
@@ -32,7 +38,8 @@ export default function HabitCard({
   entry, 
   onToggle, 
   onPress,
-  streak = 0 
+  streak = 0,
+  weeklyProgress
 }: HabitCardProps) {
   const [showValueInput, setShowValueInput] = useState(false);
   const [inputValue, setInputValue] = useState(entry?.value?.toString() || '');
@@ -109,7 +116,20 @@ export default function HabitCard({
                   <View style={styles.metaItem}>
                     <Flame size={12} color={colors.warning} strokeWidth={2} />
                     <Text style={[styles.metaText, { color: colors.warning }]}>
-                      {streak} day{streak !== 1 ? 's' : ''}
+                      {habit.frequency === 'custom' && habit.weeklyTarget 
+                        ? `${streak} week${streak !== 1 ? 's' : ''}` 
+                        : `${streak} day${streak !== 1 ? 's' : ''}`
+                      }
+                    </Text>
+                  </View>
+                )}
+                
+                {/* Weekly Progress for Custom Frequency */}
+                {habit.frequency === 'custom' && habit.weeklyTarget && weeklyProgress && (
+                  <View style={styles.metaItem}>
+                    <Target size={12} color={colors.primary} strokeWidth={2} />
+                    <Text style={[styles.metaText, { color: colors.primary }]}>
+                      {weeklyProgress.completed}/{weeklyProgress.target} this week
                     </Text>
                   </View>
                 )}
@@ -133,6 +153,34 @@ export default function HabitCard({
             )}
           </TouchableOpacity>
         </View>
+
+        {/* Weekly Progress Bar for Custom Frequency */}
+        {habit.frequency === 'custom' && habit.weeklyTarget && weeklyProgress && (
+          <View style={styles.weeklyProgressSection}>
+            <View style={styles.weeklyProgressHeader}>
+              <Text style={styles.weeklyProgressText}>
+                Weekly Progress: {weeklyProgress.completed}/{weeklyProgress.target}
+              </Text>
+              {weeklyProgress.remaining > 0 && (
+                <Text style={[styles.weeklyProgressRemaining, { color: colors.warning }]}>
+                  {weeklyProgress.remaining} more needed
+                </Text>
+              )}
+            </View>
+            
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { 
+                    width: `${Math.min(weeklyProgress.percentage, 100)}%`,
+                    backgroundColor: habit.color 
+                  }
+                ]} 
+              />
+            </View>
+          </View>
+        )}
 
         {/* Progress Section */}
         {habit.type === 'measurable' && (
@@ -328,6 +376,28 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-Medium',
     color: '#9CA3AF',
+  },
+  weeklyProgressSection: {
+    marginBottom: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  weeklyProgressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  weeklyProgressText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#374151',
+  },
+  weeklyProgressRemaining: {
+    fontSize: 11,
+    fontFamily: 'Inter-Medium',
+    color: '#F59E0B',
   },
   checkButton: {
     width: 36,

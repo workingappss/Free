@@ -20,6 +20,7 @@ export default function HabitsScreen() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [todayEntries, setTodayEntries] = useState<HabitEntry[]>([]);
   const [habitStats, setHabitStats] = useState<Record<string, HabitStats>>({});
+  const [weeklyProgress, setWeeklyProgress] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { colors } = useTheme();
@@ -55,10 +56,15 @@ export default function HabitsScreen() {
 
       // Load stats for each habit
       const stats: Record<string, HabitStats> = {};
+      const progress: Record<string, any> = {};
       for (const habit of activeHabits) {
         stats[habit.id] = await habitStorage.calculateHabitStats(habit.id);
+        if (habit.frequency === 'custom' && habit.weeklyTarget) {
+          progress[habit.id] = await habitStorage.getWeeklyProgress(habit);
+        }
       }
       setHabitStats(stats);
+      setWeeklyProgress(progress);
     } catch (error) {
       console.error('Error loading habits:', error);
     } finally {
@@ -73,7 +79,14 @@ export default function HabitsScreen() {
   };
 
   const getTodaysHabits = () => {
-    return habits.filter(habit => habitStorage.isHabitDueToday(habit, today));
+    return habits.filter(habit => {
+      if (habit.frequency === 'custom' && habit.weeklyTarget) {
+        // For custom frequency, check if it should show today
+        const progress = weeklyProgress[habit.id];
+        return progress && progress.remaining > 0 && habit.customDays?.includes(today.getDay());
+      }
+      return habitStorage.isHabitDueToday(habit, today);
+    });
   };
 
   const handleHabitToggle = async (habitId: string, completed: boolean, value?: number) => {
@@ -269,6 +282,7 @@ export default function HabitsScreen() {
             {todaysHabits.map((habit) => {
               const entry = todayEntries.find(e => e.habitId === habit.id);
               const stats = habitStats[habit.id];
+              const progress = weeklyProgress[habit.id];
               
               return (
                 <HabitCard
@@ -278,6 +292,7 @@ export default function HabitsScreen() {
                   onToggle={(completed, value) => handleHabitToggle(habit.id, completed, value)}
                   onPress={() => handleHabitPress(habit.id)}
                   streak={stats?.currentStreak}
+                  weeklyProgress={progress}
                 />
               );
             })}

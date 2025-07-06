@@ -117,48 +117,56 @@ export const habitStorage = {
   // Statistics
   async calculateHabitStats(habitId: string): Promise<HabitStats> {
     try {
+      const habit = (await this.getHabits()).find(h => h.id === habitId);
       const entries = await this.getHabitEntriesForHabit(habitId);
       const completedEntries = entries.filter(e => e.completed);
       
-      // Calculate streaks
+      // Calculate streaks - enhanced for custom frequency
       const sortedEntries = entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       let currentStreak = 0;
       let bestStreak = 0;
-      let tempStreak = 0;
       
       const today = new Date();
-      const todayStr = this.formatDate(today);
-      const yesterdayStr = this.formatDate(new Date(today.getTime() - 24 * 60 * 60 * 1000));
       
-      // Calculate current streak
-      for (let i = 0; i < sortedEntries.length; i++) {
-        const entry = sortedEntries[i];
-        if (entry.completed) {
-          if (i === 0 && (entry.date === todayStr || entry.date === yesterdayStr)) {
-            currentStreak++;
-          } else if (i > 0) {
-            const prevDate = new Date(sortedEntries[i - 1].date);
-            const currDate = new Date(entry.date);
-            const dayDiff = Math.floor((prevDate.getTime() - currDate.getTime()) / (24 * 60 * 60 * 1000));
-            
-            if (dayDiff === 1) {
+      if (habit?.frequency === 'custom' && habit.weeklyTarget) {
+        // Calculate streak based on weekly targets
+        currentStreak = await this.calculateCustomFrequencyStreak(habit, entries, today);
+        bestStreak = await this.calculateBestCustomFrequencyStreak(habit, entries);
+      } else {
+        // Original daily streak calculation
+        const todayStr = this.formatDate(today);
+        const yesterdayStr = this.formatDate(new Date(today.getTime() - 24 * 60 * 60 * 1000));
+        
+        for (let i = 0; i < sortedEntries.length; i++) {
+          const entry = sortedEntries[i];
+          if (entry.completed) {
+            if (i === 0 && (entry.date === todayStr || entry.date === yesterdayStr)) {
               currentStreak++;
-            } else {
-              break;
+            } else if (i > 0) {
+              const prevDate = new Date(sortedEntries[i - 1].date);
+              const currDate = new Date(entry.date);
+              const dayDiff = Math.floor((prevDate.getTime() - currDate.getTime()) / (24 * 60 * 60 * 1000));
+              
+              if (dayDiff === 1) {
+                currentStreak++;
+              } else {
+                break;
+              }
             }
+          } else {
+            break;
           }
-        } else {
-          break;
         }
-      }
-      
-      // Calculate best streak
-      for (const entry of sortedEntries) {
-        if (entry.completed) {
-          tempStreak++;
-          bestStreak = Math.max(bestStreak, tempStreak);
-        } else {
-          tempStreak = 0;
+        
+        // Calculate best streak for daily habits
+        let tempStreak = 0;
+        for (const entry of sortedEntries) {
+          if (entry.completed) {
+            tempStreak++;
+            bestStreak = Math.max(bestStreak, tempStreak);
+          } else {
+            tempStreak = 0;
+          }
         }
       }
       
@@ -200,6 +208,72 @@ export const habitStorage = {
     }
   },
 
+  async calculateCustomFrequencyStreak(habit: Habit, entries: HabitEntry[], currentDate: Date): Promise<number> {
+    if (!habit.weeklyTarget) return 0;
+
+    let streak = 0;
+    let checkDate = new Date(currentDate);
+    
+    // Go back week by week and check if weekly target was met
+    while (true) {
+      const weekProgress = await this.getWeeklyProgress(habit, checkDate);
+      
+      if (weekProgress.completed >= weekProgress.target) {
+        streak++;
+        // Move to previous week
+        checkDate.setDate(checkDate.getDate() - 7);
+      } else {
+        // Check if current week is still in progress
+        const startOfWeek = new Date(checkDate);
+        startOfWeek.setDate(checkDate.getDate() - checkDate.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        const now = new Date();
+        if (startOfWeek <= now && checkDate >= startOfWeek) {
+          // Current week in progress, don't break streak yet
+          break;
+        } else {
+          // Past week didn't meet target, break streak
+          break;
+        }
+      }
+    }
+    
+    return streak;
+  },
+
+  async calculateBestCustomFrequencyStreak(habit: Habit, entries: HabitEntry[]): Promise<number> {
+    if (!habit.weeklyTarget || entries.length === 0) return 0;
+
+    let bestStreak = 0;
+    let currentStreak = 0;
+    
+    // Get all weeks that have entries
+    const weeks = new Set<string>();
+    entries.forEach(entry => {
+      const entryDate = new Date(entry.date);
+      const startOfWeek = new Date(entryDate);
+      startOfWeek.setDate(entryDate.getDate() - entryDate.getDay());
+      weeks.add(this.formatDate(startOfWeek));
+    });
+    
+    const sortedWeeks = Array.from(weeks).sort().reverse();
+    
+    for (const weekStart of sortedWeeks) {
+      const weekDate = new Date(weekStart);
+      const weekProgress = await this.getWeeklyProgress(habit, weekDate);
+      
+      if (weekProgress.completed >= weekProgress.target) {
+        currentStreak++;
+        bestStreak = Math.max(bestStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+      }
+    }
+    
+    return bestStreak;
+  },
+
   // Utility functions
   formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
@@ -214,9 +288,82 @@ export const habitStorage = {
       case 'weekly':
         return dayOfWeek === 1; // Monday
       case 'custom':
-        return habit.customDays?.includes(dayOfWeek) || false;
+        if (!habit.customDays?.includes(dayOfWeek)) {
+          return false;
+        }
+        
+        // For custom frequency, check if weekly target is already met
+        if (habit.weeklyTarget) {
+          return this.shouldShowCustomHabitToday(habit, date);
+        }
+        
+        return true;
       default:
         return false;
     }
+  },
+
+  async shouldShowCustomHabitToday(habit: Habit, date: Date = new Date()): Promise<boolean> {
+    if (!habit.weeklyTarget || !habit.customDays?.includes(date.getDay())) {
+      return false;
+    }
+
+    // Get start of current week (Sunday)
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // Get end of current week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Count completions this week
+    const entries = await this.getHabitEntriesForHabit(habit.id);
+    const thisWeekCompletions = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entry.completed && 
+             entryDate >= startOfWeek && 
+             entryDate <= endOfWeek;
+    }).length;
+
+    // Show if target not yet reached
+    return thisWeekCompletions < habit.weeklyTarget;
+  },
+
+  async getWeeklyProgress(habit: Habit, date: Date = new Date()): Promise<{
+    completed: number;
+    target: number;
+    remaining: number;
+    percentage: number;
+  }> {
+    if (habit.frequency !== 'custom' || !habit.weeklyTarget) {
+      return { completed: 0, target: 0, remaining: 0, percentage: 0 };
+    }
+
+    // Get start of current week (Sunday)
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // Get end of current week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Count completions this week
+    const entries = await this.getHabitEntriesForHabit(habit.id);
+    const completed = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entry.completed && 
+             entryDate >= startOfWeek && 
+             entryDate <= endOfWeek;
+    }).length;
+
+    const target = habit.weeklyTarget;
+    const remaining = Math.max(0, target - completed);
+    const percentage = Math.round((completed / target) * 100);
+
+    return { completed, target, remaining, percentage };
   },
 };

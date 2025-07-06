@@ -5,6 +5,7 @@ export interface Habit {
   type: 'boolean' | 'measurable';
   frequency: 'daily' | 'weekly' | 'custom';
   customDays?: number[]; // 0-6 for Sunday-Saturday
+  weeklyTarget?: number; // For custom frequency: how many times per week
   reminderTime?: Date;
   motivationalQuestion?: string;
   color: string;
