@@ -163,13 +163,6 @@ export default function TaskCreationModal({ onSave, onCancel, initialType }: Tas
     >
       <SafeAreaView style={styles.container}>
         <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
-          <TouchableOpacity 
-            style={[styles.backButton, { backgroundColor: colors.card }]} 
-            onPress={handleBack} 
-            activeOpacity={0.7}
-          >
-            <X size={20} color={colors.textSecondary} strokeWidth={2} />
-          </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
             {selectedType === 'simple' ? 'Quick Task' : 'Detailed Task'}
           </Text>
@@ -207,29 +200,24 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     padding: 20,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
+    position: 'relative',
   },
   headerTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
     color: '#1F2937',
-    flex: 1,
+    position: 'absolute',
+    left: 20,
+    right: 60,
     textAlign: 'center',
   },
   closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
