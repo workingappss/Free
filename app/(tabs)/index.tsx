@@ -40,6 +40,7 @@ export default function TodayScreen() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [showTaskCreation, setShowTaskCreation] = useState(false);
+  const [taskCreationType, setTaskCreationType] = useState<'simple' | 'complex'>('simple');
   const [showCalendar, setShowCalendar] = useState(false);
   const { colors } = useTheme();
 
@@ -154,6 +155,16 @@ export default function TodayScreen() {
     return currentTasks.length > 0 ? Math.max(...currentTasks.map(t => t.order)) + 1 : 0;
   };
 
+  const handleSimpleTaskPress = () => {
+    setTaskCreationType('simple');
+    setShowTaskCreation(true);
+  };
+
+  const handleDetailedTaskPress = () => {
+    setTaskCreationType('complex');
+    setShowTaskCreation(true);
+  };
+
   const handleTaskCreated = (taskData: {
     title: string;
     taskType?: 'simple' | 'complex';
@@ -179,6 +190,7 @@ export default function TodayScreen() {
     const updatedTasks = [...tasks, newTask];
     saveTasks(updatedTasks);
     setShowTaskCreation(false);
+    setTaskCreationType('simple');
   };
 
   const handleDateSelect = (selectedDate: Date) => {
@@ -350,20 +362,20 @@ export default function TodayScreen() {
           <View style={styles.addButtonsContainer}>
             <TouchableOpacity
               style={[styles.detailedTaskButton, { backgroundColor: '#8B5CF6' }]}
-              onPress={() => setShowTaskCreation(true)}
+              onPress={handleDetailedTaskPress}
               activeOpacity={0.8}
             >
               <Target size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.detailedTaskButtonText}>+ Detailed Task</Text>
+              <Text style={styles.detailedTaskButtonText}>Detailed Task</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={[styles.simpleTaskButton, { backgroundColor: colors.primary }]}
-              onPress={() => setShowTaskCreation(true)}
+              onPress={handleSimpleTaskPress}
               activeOpacity={0.8}
             >
               <Plus size={16} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.simpleTaskButtonText}>+ Simple Task</Text>
+              <Text style={styles.simpleTaskButtonText}>Simple Task</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -400,8 +412,11 @@ export default function TodayScreen() {
       >
         <TaskCreationModal
           onSave={handleTaskCreated}
-          onCancel={() => setShowTaskCreation(false)}
-          initialType="simple"
+          onCancel={() => {
+            setShowTaskCreation(false);
+            setTaskCreationType('simple');
+          }}
+          initialType={taskCreationType}
         />
       </Modal>
 
