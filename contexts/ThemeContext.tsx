@@ -31,6 +31,12 @@ interface ThemeColors {
   // Special colors
   shadow: string;
   overlay: string;
+  
+  // New modern colors
+  glass: string;
+  accent: string;
+  surfaceElevated: string;
+  surfaceHighest: string;
 }
 
 interface ThemeContextType {
@@ -41,187 +47,227 @@ interface ThemeContextType {
 }
 
 const lightColors: ThemeColors = {
-  background: '#F8FAFC',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#FFFFFF',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#0A0A0A',
+  textSecondary: '#525252',
+  textTertiary: '#A3A3A3',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#E5E5E5',
+  borderLight: '#F5F5F5',
   
-  primary: '#6366F1',
-  primaryLight: '#EEF2FF',
+  primary: '#0A0A0A',
+  primaryLight: '#F5F5F5',
   
-  success: '#10B981',
+  success: '#22C55E',
   warning: '#F59E0B',
   error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.4)',
+  
+  glass: 'rgba(255, 255, 255, 0.8)',
+  accent: '#6366F1',
+  surfaceElevated: '#FFFFFF',
+  surfaceHighest: '#F9FAFB',
 };
 
 const darkColors: ThemeColors = {
-  background: '#0F172A',
-  surface: '#1E293B',
-  card: '#334155',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#262626',
   
-  text: '#F8FAFC',
-  textSecondary: '#E2E8F0',
-  textTertiary: '#CBD5E1',
+  text: '#FAFAFA',
+  textSecondary: '#D4D4D4',
+  textTertiary: '#737373',
   
-  border: '#475569',
-  borderLight: '#374151',
+  border: '#404040',
+  borderLight: '#2A2A2A',
   
-  primary: '#6366F1',
-  primaryLight: '#312E81',
+  primary: '#FAFAFA',
+  primaryLight: '#262626',
   
-  success: '#10B981',
+  success: '#22C55E',
   warning: '#F59E0B',
   error: '#EF4444',
   
   shadow: '#000000',
   overlay: 'rgba(0, 0, 0, 0.8)',
+  
+  glass: 'rgba(26, 26, 26, 0.8)',
+  accent: '#6366F1',
+  surfaceElevated: '#262626',
+  surfaceHighest: '#404040',
 };
 
 const pinkColors: ThemeColors = {
-  background: '#FEFCFE',
-  surface: '#FFFFFF',
-  card: '#FDF2F8',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#262626',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#FAFAFA',
+  textSecondary: '#D4D4D4',
+  textTertiary: '#737373',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#404040',
+  borderLight: '#2A2A2A',
   
   primary: '#EC4899',
-  primaryLight: '#FCE7F3',
+  primaryLight: '#2D1B2E',
   
-  success: '#059669',
-  warning: '#D97706',
-  error: '#DC2626',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.8)',
+  
+  glass: 'rgba(26, 26, 26, 0.8)',
+  accent: '#EC4899',
+  surfaceElevated: '#262626',
+  surfaceHighest: '#404040',
 };
 
 const blueColors: ThemeColors = {
-  background: '#FEFEFE',
-  surface: '#FFFFFF',
-  card: '#F0F9FF',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#262626',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#FAFAFA',
+  textSecondary: '#D4D4D4',
+  textTertiary: '#737373',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#404040',
+  borderLight: '#2A2A2A',
   
   primary: '#0EA5E9',
-  primaryLight: '#F0F9FF',
+  primaryLight: '#1E2A3A',
   
-  success: '#059669',
-  warning: '#D97706',
-  error: '#DC2626',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.8)',
+  
+  glass: 'rgba(26, 26, 26, 0.8)',
+  accent: '#0EA5E9',
+  surfaceElevated: '#262626',
+  surfaceHighest: '#404040',
 };
 
 const greenColors: ThemeColors = {
-  background: '#FEFEFE',
-  surface: '#FFFFFF',
-  card: '#F0FDF4',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#262626',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#FAFAFA',
+  textSecondary: '#D4D4D4',
+  textTertiary: '#737373',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#404040',
+  borderLight: '#2A2A2A',
   
-  primary: '#16A34A',
-  primaryLight: '#F0FDF4',
+  primary: '#22C55E',
+  primaryLight: '#1E2A1E',
   
-  success: '#059669',
-  warning: '#D97706',
-  error: '#DC2626',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.8)',
+  
+  glass: 'rgba(26, 26, 26, 0.8)',
+  accent: '#22C55E',
+  surfaceElevated: '#262626',
+  surfaceHighest: '#404040',
 };
 
 const orangeColors: ThemeColors = {
-  background: '#FEFEFE',
-  surface: '#FFFFFF',
-  card: '#FFFBEB',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#262626',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#FAFAFA',
+  textSecondary: '#D4D4D4',
+  textTertiary: '#737373',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#404040',
+  borderLight: '#2A2A2A',
   
   primary: '#F59E0B',
-  primaryLight: '#FFFBEB',
+  primaryLight: '#2A1E0B',
   
-  success: '#059669',
-  warning: '#D97706',
-  error: '#DC2626',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.8)',
+  
+  glass: 'rgba(26, 26, 26, 0.8)',
+  accent: '#F59E0B',
+  surfaceElevated: '#262626',
+  surfaceHighest: '#404040',
 };
 
 const purpleColors: ThemeColors = {
-  background: '#FEFEFE',
-  surface: '#FFFFFF',
-  card: '#FAF5FF',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#262626',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#FAFAFA',
+  textSecondary: '#D4D4D4',
+  textTertiary: '#737373',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#404040',
+  borderLight: '#2A2A2A',
   
   primary: '#A855F7',
-  primaryLight: '#FAF5FF',
+  primaryLight: '#2A1A3A',
   
-  success: '#059669',
-  warning: '#D97706',
-  error: '#DC2626',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.8)',
+  
+  glass: 'rgba(26, 26, 26, 0.8)',
+  accent: '#A855F7',
+  surfaceElevated: '#262626',
+  surfaceHighest: '#404040',
 };
 
 const redColors: ThemeColors = {
-  background: '#FEFEFE',
-  surface: '#FFFFFF',
-  card: '#FEF2F2',
+  background: '#0A0A0A',
+  surface: '#1A1A1A',
+  card: '#262626',
   
-  text: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  text: '#FAFAFA',
+  textSecondary: '#D4D4D4',
+  textTertiary: '#737373',
   
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  border: '#404040',
+  borderLight: '#2A2A2A',
   
   primary: '#EF4444',
-  primaryLight: '#FEF2F2',
+  primaryLight: '#2A1A1A',
   
-  success: '#059669',
-  warning: '#D97706',
-  error: '#DC2626',
+  success: '#22C55E',
+  warning: '#F59E0B',
+  error: '#EF4444',
   
   shadow: '#000000',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.8)',
+  
+  glass: 'rgba(26, 26, 26, 0.8)',
+  accent: '#EF4444',
+  surfaceElevated: '#262626',
+  surfaceHighest: '#404040',
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -229,7 +275,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const THEME_STORAGE_KEY = 'app_theme';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>('system');
+  const [theme, setThemeState] = useState<ThemeMode>('dark');
   const [systemColorScheme, setSystemColorScheme] = useState<ColorSchemeName>(
     Appearance.getColorScheme()
   );
@@ -269,7 +315,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   // Determine if we should use dark mode
-  const isDark = theme === 'dark' || (theme === 'system' && systemColorScheme === 'dark');
+  const isDark = theme === 'dark' || (theme === 'system' && systemColorScheme === 'dark') || 
+                 ['pink', 'blue', 'green', 'orange', 'purple', 'red'].includes(theme);
   
   // Get current colors based on theme
   const getColors = () => {
@@ -286,12 +333,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         return purpleColors;
       case 'red':
         return redColors;
-      case 'dark':
-        return darkColors;
+      case 'light':
+        return lightColors;
       case 'system':
         return isDark ? darkColors : lightColors;
       default:
-        return lightColors;
+        return darkColors;
     }
   };
   

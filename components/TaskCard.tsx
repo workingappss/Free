@@ -45,7 +45,7 @@ export default function TaskCard({
   drag,
   isActive,
 }: TaskCardProps) {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -82,8 +82,9 @@ export default function TaskCard({
         {
           backgroundColor: colors.card,
           borderColor: colors.borderLight,
-          opacity: isActive ? 0.8 : 1,
+          opacity: isActive ? 0.9 : 1,
           transform: [{ scale: isActive ? 0.98 : 1 }],
+          shadowColor: colors.shadow,
         },
       ]}
     >
@@ -92,7 +93,7 @@ export default function TaskCard({
         onLongPress={drag}
         style={[styles.dragHandle, { backgroundColor: colors.surface }]}
       >
-        <GripVertical size={16} color={colors.textTertiary} strokeWidth={2} />
+        <GripVertical size={18} color={colors.textTertiary} strokeWidth={2} />
       </Pressable>
 
       {/* Main Content */}
@@ -111,7 +112,7 @@ export default function TaskCard({
             activeOpacity={0.7}
           >
             {task.completed && (
-              <Check size={14} color="#FFFFFF" strokeWidth={2.5} />
+              <Check size={16} color="#FFFFFF" strokeWidth={3} />
             )}
           </TouchableOpacity>
 
@@ -146,7 +147,7 @@ export default function TaskCard({
               <View style={styles.timeInfo}>
                 {task.startTime && (
                   <View style={styles.timeItem}>
-                    <Clock size={12} color={colors.textTertiary} strokeWidth={2} />
+                    <Clock size={14} color={colors.textTertiary} strokeWidth={2} />
                     <Text style={[styles.timeText, { color: colors.textTertiary }]}>
                       {formatTime(task.startTime)}
                     </Text>
@@ -154,7 +155,7 @@ export default function TaskCard({
                 )}
                 {task.duration && (
                   <View style={styles.timeItem}>
-                    <Target size={12} color={colors.textTertiary} strokeWidth={2} />
+                    <Target size={14} color={colors.textTertiary} strokeWidth={2} />
                     <Text style={[styles.timeText, { color: colors.textTertiary }]}>
                       {formatDuration(task.duration)}
                     </Text>
@@ -169,7 +170,7 @@ export default function TaskCard({
             onPress={onDelete}
             activeOpacity={0.7}
           >
-            <Trash2 size={16} color={colors.error} strokeWidth={2} />
+            <Trash2 size={18} color={colors.error} strokeWidth={2} />
           </TouchableOpacity>
         </View>
 
@@ -211,7 +212,7 @@ export default function TaskCard({
                     ]}
                   >
                     {subtask.completed && (
-                      <Check size={10} color="#FFFFFF" strokeWidth={2.5} />
+                      <Check size={12} color="#FFFFFF" strokeWidth={3} />
                     )}
                   </View>
                   <Text
@@ -238,139 +239,129 @@ export default function TaskCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    marginBottom: 12,
+    borderRadius: 20,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
     flexDirection: 'row',
+    overflow: 'hidden',
   },
   dragHandle: {
-    width: 32,
+    width: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F9FAFB',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 16,
     marginTop: 2,
   },
   taskInfo: {
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: 'Inter-SemiBold',
-    color: '#1F2937',
-    lineHeight: 22,
-    marginBottom: 4,
+    lineHeight: 24,
+    marginBottom: 6,
+    letterSpacing: -0.2,
   },
   description: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
-    lineHeight: 20,
-    marginBottom: 8,
+    lineHeight: 22,
+    marginBottom: 10,
+    letterSpacing: 0.1,
   },
   timeInfo: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 4,
+    gap: 16,
+    marginTop: 6,
   },
   timeItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   timeText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
+    letterSpacing: 0.2,
   },
   deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F9FAFB',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: 12,
   },
   subtasksContainer: {
-    marginTop: 16,
-    paddingTop: 16,
+    marginTop: 20,
+    paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-    gap: 8,
+    marginBottom: 16,
+    gap: 12,
   },
   progressBar: {
     flex: 1,
-    height: 4,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 2,
+    height: 6,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#10B981',
-    borderRadius: 2,
+    borderRadius: 3,
   },
   progressText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'Inter-SemiBold',
-    color: '#6B7280',
-    minWidth: 32,
+    minWidth: 36,
+    letterSpacing: 0.3,
   },
   subtasksList: {
-    gap: 8,
+    gap: 12,
   },
   subtaskItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   subtaskCheckbox: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1.5,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F9FAFB',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: 12,
   },
   subtaskTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: 'Inter-Medium',
-    color: '#374151',
     flex: 1,
+    letterSpacing: 0.1,
   },
 });
