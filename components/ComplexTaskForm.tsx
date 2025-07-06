@@ -830,14 +830,14 @@ const styles = StyleSheet.create({
   },
   timePickerConfirmButton: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: '#4F46E5',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: colors.card,
+  },
   timePickerConfirmText: {
     fontSize: 14,
-    borderColor: colors.borderLight,
-    color: colors.text,
-  },
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+  }
 });
