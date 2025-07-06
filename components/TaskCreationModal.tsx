@@ -30,17 +30,19 @@ interface TaskCreationModalProps {
     isComplex?: boolean;
   }) => void;
   onCancel: () => void;
+  initialType?: 'simple' | 'complex';
 }
 
 type TaskType = 'simple' | 'complex';
 
-export default function TaskCreationModal({ onSave, onCancel }: TaskCreationModalProps) {
+export default function TaskCreationModal({ onSave, onCancel, initialType }: TaskCreationModalProps) {
   const [selectedType, setSelectedType] = useState<TaskType | null>(null);
   const { colors } = useTheme();
 
   const handleSimpleTaskSave = (title: string) => {
     onSave({
       title,
+      taskType: 'simple',
       isComplex: false,
     });
   };
@@ -54,6 +56,7 @@ export default function TaskCreationModal({ onSave, onCancel }: TaskCreationModa
   }) => {
     onSave({
       title: taskData.title,
+      taskType: 'complex',
       description: taskData.description || undefined,
       subtasks: taskData.subtasks,
       startTime: taskData.startTime || undefined,
@@ -65,6 +68,11 @@ export default function TaskCreationModal({ onSave, onCancel }: TaskCreationModa
   const handleBack = () => {
     setSelectedType(null);
   };
+
+  // Auto-select type if provided
+  React.useEffect(() => {
+    if (initialType) setSelectedType(initialType);
+  }, [initialType]);
 
   // Task Type Selection Screen
   if (!selectedType) {
@@ -84,7 +92,7 @@ export default function TaskCreationModal({ onSave, onCancel }: TaskCreationModa
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.typeSelection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              What type of task would you like to create?
+              Choose Task Type
             </Text>
             <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
               Choose the option that best fits your needs
@@ -104,7 +112,7 @@ export default function TaskCreationModal({ onSave, onCancel }: TaskCreationModa
                   <Plus size={24} color={colors.primary} strokeWidth={2} />
                 </View>
                 <View style={styles.typeContent}>
-                  <Text style={[styles.typeTitle, { color: colors.text }]}>Simple Task</Text>
+                  <Text style={[styles.typeTitle, { color: colors.text }]}>Quick Task</Text>
                   <Text style={[styles.typeDescription, { color: colors.textSecondary }]}>
                     Quick and straightforward task with just a title
                   </Text>
@@ -129,7 +137,7 @@ export default function TaskCreationModal({ onSave, onCancel }: TaskCreationModa
                   <Target size={24} color="#8B5CF6" strokeWidth={2} />
                 </View>
                 <View style={styles.typeContent}>
-                  <Text style={[styles.typeTitle, { color: colors.text }]}>Complex Task</Text>
+                  <Text style={[styles.typeTitle, { color: colors.text }]}>Detailed Task</Text>
                   <Text style={[styles.typeDescription, { color: colors.textSecondary }]}>
                     Detailed task with subtasks, timing, and descriptions
                   </Text>
@@ -163,7 +171,7 @@ export default function TaskCreationModal({ onSave, onCancel }: TaskCreationModa
             <X size={20} color={colors.textSecondary} strokeWidth={2} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {selectedType === 'simple' ? 'Simple Task' : 'Complex Task'}
+            {selectedType === 'simple' ? 'Quick Task' : 'Detailed Task'}
           </Text>
           <TouchableOpacity 
             style={[styles.closeButton, { backgroundColor: colors.card }]} 
@@ -238,8 +246,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 24,
-    fontFamily: 'Inter-Bold',
-    color: '#1F2937',
+    fontFamily: 'Inter-ExtraBold',
+    color: '#111827',
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -247,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Medium',
     color: '#6B7280',
-    textAlign: 'center',
+    textAlign: 'center', 
     marginBottom: 32,
     lineHeight: 24,
   },
@@ -257,7 +265,7 @@ const styles = StyleSheet.create({
   typeOption: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     shadowColor: '#000',
@@ -287,7 +295,7 @@ const styles = StyleSheet.create({
   typeDescription: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#6B7280',
+    color: '#6B7280', 
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -297,7 +305,7 @@ const styles = StyleSheet.create({
   typeFeature: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9CA3AF',
+    color: '#9CA3AF', 
     lineHeight: 16,
   },
   formContainer: {

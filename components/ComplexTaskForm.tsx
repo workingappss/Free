@@ -37,6 +37,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [duration, setDuration] = useState(30);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [customDuration, setCustomDuration] = useState('');
   const { colors } = useTheme();
 
   const addSubtask = () => {
@@ -78,7 +79,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
     });
   };
 
-  const durationOptions = [15, 30, 45, 60, 90, 120];
+  const durationOptions = [15, 30, 45, 60, 90, 120, 180, 240];
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.surface }]} showsVerticalScrollIndicator={false}>
@@ -169,7 +170,7 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
           <View style={styles.durationContainer}>
             <View style={styles.durationHeader}>
               <Target size={16} color={colors.textSecondary} strokeWidth={2} />
-              <Text style={[styles.durationLabel, { color: colors.textSecondary }]}>
+              <Text style={[styles.durationLabel, { color: colors.text }]}>
                 Duration: {duration} minutes
               </Text>
             </View>
@@ -197,6 +198,40 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
                   </Text>
                 </TouchableOpacity>
               ))}
+            </View>
+            
+            {/* Custom Duration Input */}
+            <View style={styles.customDurationContainer}>
+              <Text style={[styles.customDurationLabel, { color: colors.textSecondary }]}>
+                Or enter custom duration:
+              </Text>
+              <View style={styles.customDurationRow}>
+                <TextInput
+                  style={[
+                    styles.customDurationInput,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.borderLight,
+                      color: colors.text,
+                    },
+                  ]}
+                  value={customDuration}
+                  onChangeText={(text) => {
+                    setCustomDuration(text);
+                    const minutes = parseInt(text);
+                    if (!isNaN(minutes) && minutes > 0) {
+                      setDuration(minutes);
+                    }
+                  }}
+                  placeholder="Enter minutes"
+                  placeholderTextColor={colors.textTertiary}
+                  keyboardType="numeric"
+                  maxLength={4}
+                />
+                <Text style={[styles.customDurationUnit, { color: colors.textSecondary }]}>
+                  minutes
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -429,6 +464,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#374151',
+  },
+  customDurationContainer: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  customDurationLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  customDurationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  customDurationInput: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#1F2937',
+    width: 100,
+    textAlign: 'center',
+  },
+  customDurationUnit: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#6B7280',
   },
   addSubtaskContainer: {
     flexDirection: 'row',
