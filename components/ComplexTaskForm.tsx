@@ -128,6 +128,81 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
           />
         </View>
 
+        {/* Subtasks */}
+        <View style={styles.section}>
+          <Text style={[styles.label, { color: colors.text }]}>Subtasks</Text>
+          
+          {/* Add Subtask Input */}
+          <View style={styles.addSubtaskContainer}>
+            <TextInput
+              style={[
+                styles.subtaskInput,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.borderLight,
+                  color: colors.text,
+                },
+              ]}
+              value={newSubtaskTitle}
+              onChangeText={setNewSubtaskTitle}
+              placeholder="Add a subtask..."
+              placeholderTextColor={colors.textTertiary}
+              onSubmitEditing={addSubtask}
+              returnKeyType="done"
+              maxLength={100}
+            />
+            <TouchableOpacity
+              style={[
+                styles.addSubtaskButton,
+                {
+                  backgroundColor: newSubtaskTitle.trim() ? colors.primary : colors.surface,
+                },
+              ]}
+              onPress={addSubtask}
+              disabled={!newSubtaskTitle.trim()}
+              activeOpacity={0.7}
+            >
+              <Plus
+                size={16}
+                color={newSubtaskTitle.trim() ? '#FFFFFF' : colors.textTertiary}
+                strokeWidth={2}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Subtasks List */}
+          {subtasks.length > 0 && (
+            <View style={styles.subtasksList}>
+              {subtasks.map((subtask, index) => (
+                <View
+                  key={subtask.id}
+                  style={[
+                    styles.subtaskItem,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.borderLight,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.subtaskNumber, { color: colors.textTertiary }]}>
+                    {index + 1}.
+                  </Text>
+                  <Text style={[styles.subtaskTitle, { color: colors.text }]} numberOfLines={2}>
+                    {subtask.title}
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.removeSubtaskButton, { backgroundColor: colors.surface }]}
+                    onPress={() => removeSubtask(subtask.id)}
+                    activeOpacity={0.7}
+                  >
+                    <X size={14} color={colors.error} strokeWidth={2} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
         {/* Time Settings */}
         <View style={styles.section}>
           <Text style={[styles.label, { color: colors.text }]}>Time & Duration</Text>
@@ -235,81 +310,6 @@ export default function ComplexTaskForm({ onSave, onCancel }: ComplexTaskFormPro
               </View>
             </View>
           </View>
-        </View>
-
-        {/* Subtasks */}
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.text }]}>Subtasks</Text>
-          
-          {/* Add Subtask Input */}
-          <View style={styles.addSubtaskContainer}>
-            <TextInput
-              style={[
-                styles.subtaskInput,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.borderLight,
-                  color: colors.text,
-                },
-              ]}
-              value={newSubtaskTitle}
-              onChangeText={setNewSubtaskTitle}
-              placeholder="Add a subtask..."
-              placeholderTextColor={colors.textTertiary}
-              onSubmitEditing={addSubtask}
-              returnKeyType="done"
-              maxLength={100}
-            />
-            <TouchableOpacity
-              style={[
-                styles.addSubtaskButton,
-                {
-                  backgroundColor: newSubtaskTitle.trim() ? colors.primary : colors.surface,
-                },
-              ]}
-              onPress={addSubtask}
-              disabled={!newSubtaskTitle.trim()}
-              activeOpacity={0.7}
-            >
-              <Plus
-                size={16}
-                color={newSubtaskTitle.trim() ? '#FFFFFF' : colors.textTertiary}
-                strokeWidth={2}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* Subtasks List */}
-          {subtasks.length > 0 && (
-            <View style={styles.subtasksList}>
-              {subtasks.map((subtask, index) => (
-                <View
-                  key={subtask.id}
-                  style={[
-                    styles.subtaskItem,
-                    {
-                      backgroundColor: colors.card,
-                      borderColor: colors.borderLight,
-                    },
-                  ]}
-                >
-                  <Text style={[styles.subtaskNumber, { color: colors.textTertiary }]}>
-                    {index + 1}.
-                  </Text>
-                  <Text style={[styles.subtaskTitle, { color: colors.text }]} numberOfLines={2}>
-                    {subtask.title}
-                  </Text>
-                  <TouchableOpacity
-                    style={[styles.removeSubtaskButton, { backgroundColor: colors.surface }]}
-                    onPress={() => removeSubtask(subtask.id)}
-                    activeOpacity={0.7}
-                  >
-                    <X size={14} color={colors.error} strokeWidth={2} />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-          )}
         </View>
 
         {/* Action Buttons */}
